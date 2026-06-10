@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import type { PostTag } from "@/lib/types";
 
 export async function GET(
   request: Request,
@@ -28,7 +29,7 @@ export async function GET(
       title: post.title,
       content: post.content,
       author: post.author,
-      tags: post.tags.map((pt: { tag: { id: string; name: string } }) => pt.tag),
+      tags: post.tags.map((pt: PostTag) => pt.tag),
       commentCount: post._count.comments,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PostSchema } from "@/lib/validators";
+import type { PostTag } from "@/lib/types";
 
 export async function GET(request: Request) {
   try {
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
       title: post.title,
       content: post.content.slice(0, 300),
       author: post.author,
-      tags: post.tags.map((pt: { tag: { id: string; name: string } }) => pt.tag),
+      tags: post.tags.map((pt: PostTag) => pt.tag),
       commentCount: post._count.comments,
       createdAt: post.createdAt,
     }));
