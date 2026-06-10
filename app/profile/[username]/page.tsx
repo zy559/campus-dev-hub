@@ -45,7 +45,7 @@ async function getUserProfile(username: string) {
       id: post.id,
       title: post.title,
       content: post.content.slice(0, 200),
-      tags: post.tags.map((pt) => pt.tag),
+      tags: post.tags.map((pt: { tag: { id: string; name: string } }) => pt.tag),
       commentCount: post._count.comments,
       createdAt: post.createdAt.toISOString(),
     })),

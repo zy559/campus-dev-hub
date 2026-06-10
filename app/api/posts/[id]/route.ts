@@ -28,7 +28,7 @@ export async function GET(
       title: post.title,
       content: post.content,
       author: post.author,
-      tags: post.tags.map((pt) => pt.tag),
+      tags: post.tags.map((pt: { tag: { id: string; name: string } }) => pt.tag),
       commentCount: post._count.comments,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
