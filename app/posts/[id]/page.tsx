@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PostContent from "@/components/posts/PostContent";
+import CommentList from "@/components/comments/CommentList";
+import CommentForm from "@/components/comments/CommentForm";
 
 interface Tag {
   id: string;
@@ -86,14 +88,15 @@ export default async function PostDetailPage({
         <PostContent content={post.content} />
       </div>
 
-      {/* 评论区将在后续接入 */}
+      {/* 评论区 */}
       <section className="border-t border-gray-200 pt-8">
         <h2 className="text-2xl font-bold mb-6">
           评论 ({post.commentCount})
         </h2>
-        <p className="text-gray-500 text-center py-8">
-          评论功能即将上线
-        </p>
+        <CommentForm postId={post.id} />
+        <div className="mt-8">
+          <CommentList postId={post.id} />
+        </div>
       </section>
     </div>
   );
