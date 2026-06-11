@@ -34,7 +34,7 @@ export default async function PostDetailPage({
     <div className="max-w-4xl mx-auto py-8 px-4">
       {/* 面包屑 */}
       <nav className="mb-6 text-sm text-gray-500">
-        <Link href="/" className="hover:text-indigo-600">
+        <Link href="/" className="hover:text-orange-600">
           首页
         </Link>
         <span className="mx-2">/</span>
@@ -47,14 +47,14 @@ export default async function PostDetailPage({
       {/* 作者信息 */}
       <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200">
         <Link href={`/profile/${post.author.username}`}>
-          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
             {post.author.username.charAt(0).toUpperCase()}
           </div>
         </Link>
         <div>
           <Link
             href={`/profile/${post.author.username}`}
-            className="font-medium text-gray-900 hover:text-indigo-600"
+            className="font-medium text-gray-900 hover:text-orange-600"
           >
             {post.author.username}
           </Link>
@@ -75,7 +75,7 @@ export default async function PostDetailPage({
             <Link
               key={tag.id}
               href={`/?tag=${tag.name}`}
-              className="px-3 py-1 bg-indigo-50 text-indigo-600 text-sm rounded-full hover:bg-indigo-100 transition-colors"
+              className="px-3 py-1 bg-orange-50 text-orange-600 text-sm rounded-full hover:bg-orange-100 transition-colors"
             >
               {tag.name}
             </Link>

@@ -90,7 +90,7 @@ export default function PostForm() {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-lg"
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-lg"
           placeholder="输入帖子标题..."
         />
         {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
@@ -104,13 +104,13 @@ export default function PostForm() {
           <button
             type="button"
             onClick={() => setShowPreview(!showPreview)}
-            className="text-sm text-indigo-600 hover:text-indigo-800"
+            className="text-sm text-orange-600 hover:text-orange-800"
           >
             {showPreview ? "编辑" : "预览"}
           </button>
         </div>
         {showPreview ? (
-          <div className="prose prose-indigo max-w-none min-h-[300px] border rounded-md p-4 bg-white">
+          <div className="prose prose-orange max-w-none min-h-[300px] border rounded-md p-4 bg-white">
             <pre className="whitespace-pre-wrap font-sans text-gray-800">{content}</pre>
           </div>
         ) : (
@@ -119,7 +119,7 @@ export default function PostForm() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={16}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-sm"
+            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono text-sm"
             placeholder={"用 Markdown 写帖子内容...\n\n## 二级标题\n\n- 列表项\n- 列表项\n\n`代码块`"}
           />
         )}
@@ -138,7 +138,7 @@ export default function PostForm() {
               onClick={() => toggleTag(tag.id)}
               className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                 selectedTagIds.includes(tag.id)
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
@@ -155,7 +155,7 @@ export default function PostForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
+        className="w-full bg-orange-600 text-white py-3 px-4 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
       >
         {loading ? "发布中..." : "发布帖子"}
       </button>

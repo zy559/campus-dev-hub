@@ -64,7 +64,7 @@ export default function CommentList({ postId }: CommentListProps) {
         <p className="text-red-600">{error}</p>
         <button
           onClick={fetchComments}
-          className="mt-2 text-indigo-600 hover:text-indigo-800 text-sm"
+          className="mt-2 text-orange-600 hover:text-orange-800 text-sm"
         >
           重试
         </button>
@@ -95,7 +95,7 @@ export default function CommentList({ postId }: CommentListProps) {
             </Link>
             <Link
               href={`/profile/${comment.author.username}`}
-              className="text-sm font-medium text-gray-900 hover:text-indigo-600"
+              className="text-sm font-medium text-gray-900 hover:text-orange-600"
             >
               {comment.author.username}
             </Link>

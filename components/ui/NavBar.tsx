@@ -45,7 +45,7 @@ export default function NavBar() {
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-indigo-600">💻</span>
+          <span className="text-xl font-bold text-orange-600">💻</span>
           <span className="text-lg font-bold text-gray-900 hidden sm:inline">
             Campus Dev Hub
           </span>
@@ -54,13 +54,13 @@ export default function NavBar() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
+            className="text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors"
           >
             发现
           </Link>
           <Link
             href="/posts/new"
-            className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
+            className="text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors"
           >
             发帖
           </Link>
@@ -71,7 +71,7 @@ export default function NavBar() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-sm">
                   {session.user?.name?.charAt(0).toUpperCase() || "U"}
                 </div>
               </button>
@@ -88,7 +88,7 @@ export default function NavBar() {
                         {session.user?.name}
                       </p>
                       {isAdmin && (
-                        <p className="text-xs text-indigo-600">管理员</p>
+                        <p className="text-xs text-orange-600">管理员</p>
                       )}
                     </div>
                     <Link
@@ -104,7 +104,7 @@ export default function NavBar() {
                           setMenuOpen(false);
                           setImpersonateOpen(true);
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-gray-50"
+                        className="block w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-50"
                       >
                         切换用户
                       </button>
@@ -125,7 +125,7 @@ export default function NavBar() {
           ) : (
             <Link
               href="/login"
-              className="text-sm font-medium bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+              className="text-sm font-medium bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors"
             >
               登录
             </Link>
@@ -147,7 +147,7 @@ export default function NavBar() {
                   type="text"
                   value={targetUsername}
                   onChange={(e) => setTargetUsername(e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                   placeholder="用户名"
                   required
                 />
@@ -168,7 +168,7 @@ export default function NavBar() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 text-sm text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 transition-colors"
                 >
                   {loading ? "切换中..." : "确认切换"}
                 </button>

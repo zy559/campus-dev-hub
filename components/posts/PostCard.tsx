@@ -29,16 +29,16 @@ export default function PostCard({
   createdAt,
 }: PostCardProps) {
   return (
-    <article className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
       <div className="flex items-center gap-3 mb-3">
         <Link href={`/profile/${author.username}`}>
-          <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+          <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-sm">
             {author.username.charAt(0).toUpperCase()}
           </div>
         </Link>
         <Link
           href={`/profile/${author.username}`}
-          className="text-sm font-medium text-gray-900 hover:text-indigo-600"
+          className="text-sm font-medium text-gray-900 hover:text-orange-600"
         >
           {author.username}
         </Link>
@@ -48,7 +48,7 @@ export default function PostCard({
       </div>
 
       <Link href={`/posts/${id}`}>
-        <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-indigo-600 transition-colors">
+        <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-orange-600 transition-colors">
           {title}
         </h2>
       </Link>
@@ -61,7 +61,7 @@ export default function PostCard({
             <Link
               key={tag.id}
               href={`/?tag=${tag.name}`}
-              className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
+              className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-orange-100 hover:text-orange-600 transition-colors"
             >
               {tag.name}
             </Link>

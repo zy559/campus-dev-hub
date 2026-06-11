@@ -72,7 +72,7 @@ export default async function ProfilePage({
       {/* 用户信息卡片 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
         <div className="flex items-start gap-6">
-          <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-3xl flex-shrink-0">
+          <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-3xl flex-shrink-0">
             {profile.username.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
@@ -108,7 +108,7 @@ export default async function ProfilePage({
                 className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow"
               >
                 <Link href={`/posts/${post.id}`}>
-                  <h3 className="text-lg font-bold text-gray-900 hover:text-indigo-600 mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 hover:text-orange-600 mb-2">
                     {post.title}
                   </h3>
                 </Link>
@@ -119,7 +119,7 @@ export default async function ProfilePage({
                       <Link
                         key={tag.id}
                         href={`/?tag=${tag.name}`}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-indigo-100"
+                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-orange-100"
                       >
                         {tag.name}
                       </Link>

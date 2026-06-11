@@ -22,7 +22,7 @@ export default function LoginPage() {
               还没有账号？{" "}
               <button
                 onClick={() => setMode("register")}
-                className="text-indigo-600 hover:text-indigo-800 font-medium"
+                className="text-orange-600 hover:text-orange-800 font-medium"
               >
                 去注册
               </button>
@@ -32,7 +32,7 @@ export default function LoginPage() {
               已有账号？{" "}
               <button
                 onClick={() => setMode("login")}
-                className="text-indigo-600 hover:text-indigo-800 font-medium"
+                className="text-orange-600 hover:text-orange-800 font-medium"
               >
                 去登录
               </button>
