@@ -3,10 +3,43 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NavBar() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [impersonateOpen, setImpersonateOpen] = useState(false);
+  const [targetUsername, setTargetUsername] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
+
+  async function handleImpersonate(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const res = await fetch("/api/admin/impersonate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: targetUsername }),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (!res.ok) {
+      setError(data.error || "操作失败");
+      return;
+    }
+
+    setImpersonateOpen(false);
+    setTargetUsername("");
+    router.refresh();
+    window.location.href = "/";
+  }
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -54,6 +87,9 @@ export default function NavBar() {
                       <p className="text-sm font-medium text-gray-900">
                         {session.user?.name}
                       </p>
+                      {isAdmin && (
+                        <p className="text-xs text-indigo-600">管理员</p>
+                      )}
                     </div>
                     <Link
                       href={`/profile/${session.user?.name}`}
@@ -62,6 +98,17 @@ export default function NavBar() {
                     >
                       个人主页
                     </Link>
+                    {isAdmin && (
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setImpersonateOpen(true);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-gray-50"
+                      >
+                        切换用户
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setMenuOpen(false);
@@ -85,6 +132,51 @@ export default function NavBar() {
           )}
         </div>
       </div>
+
+      {/* 模拟登录弹窗 */}
+      {impersonateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
+            <h2 className="text-lg font-bold mb-4">切换用户</h2>
+            <form onSubmit={handleImpersonate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  输入目标用户名
+                </label>
+                <input
+                  type="text"
+                  value={targetUsername}
+                  onChange={(e) => setTargetUsername(e.target.value)}
+                  className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  placeholder="用户名"
+                  required
+                />
+                {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImpersonateOpen(false);
+                    setTargetUsername("");
+                    setError("");
+                  }}
+                  className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? "切换中..." : "确认切换"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

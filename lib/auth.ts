@@ -43,6 +43,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.username,
+          role: user.role,
         };
       },
     }),
@@ -51,10 +52,15 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.username = user.name ?? undefined;
+        token.role = (user as { role?: string }).role ?? "user";
+      }
+      // 支持外部直接注入 token（模拟登录用）
+      if (trigger === "update") {
+        // token 已在调用时被覆盖，保持不变
       }
       return token;
     },
@@ -62,6 +68,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.name = token.username as string;
+        (session.user as { role?: string }).role = token.role as string;
       }
       return session;
     },
