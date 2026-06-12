@@ -67,13 +67,16 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
       {serverError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {serverError}
+        <div
+          className="bg-error-bg border border-error-border text-error px-4 py-3 rounded"
+          role="alert"
+        >
+          <span aria-hidden="true">⚠️ </span>{serverError}
         </div>
       )}
 
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="username" className="block text-sm font-medium text-muted">
           用户名
         </label>
         <input
@@ -81,16 +84,20 @@ export default function RegisterForm() {
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           placeholder="你的用户名"
+          aria-invalid={!!errors.username}
+          aria-describedby={errors.username ? "username-error" : undefined}
         />
         {errors.username && (
-          <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+          <p id="username-error" className="mt-1 text-sm text-error" role="alert">
+            {errors.username}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="reg-email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="reg-email" className="block text-sm font-medium text-muted">
           邮箱
         </label>
         <input
@@ -98,16 +105,20 @@ export default function RegisterForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           placeholder="your@email.com"
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "reg-email-error" : undefined}
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+          <p id="reg-email-error" className="mt-1 text-sm text-error" role="alert">
+            {errors.email}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="reg-password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="reg-password" className="block text-sm font-medium text-muted">
           密码
         </label>
         <input
@@ -115,18 +126,22 @@ export default function RegisterForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           placeholder="至少 6 位密码"
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "reg-password-error" : undefined}
         />
         {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+          <p id="reg-password-error" className="mt-1 text-sm text-error" role="alert">
+            {errors.password}
+          </p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-accent text-white py-2 px-4 rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? "注册中..." : "注册"}
       </button>

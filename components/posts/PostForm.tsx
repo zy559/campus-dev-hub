@@ -76,13 +76,13 @@ export default function PostForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
       {serverError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {serverError}
+        <div className="bg-error-bg border border-error-border text-error px-4 py-3 rounded" role="alert">
+          <span aria-hidden="true">⚠️ </span>{serverError}
         </div>
       )}
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="title" className="block text-sm font-medium text-muted mb-1">
           标题
         </label>
         <input
@@ -90,28 +90,32 @@ export default function PostForm() {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-lg"
+          className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent text-lg"
           placeholder="输入帖子标题..."
+          aria-invalid={!!errors.title}
+          aria-describedby={errors.title ? "title-error" : undefined}
         />
-        {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+        {errors.title && (
+          <p id="title-error" className="mt-1 text-sm text-error" role="alert">{errors.title}</p>
+        )}
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="content" className="block text-sm font-medium text-muted">
             内容（支持 Markdown）
           </label>
           <button
             type="button"
             onClick={() => setShowPreview(!showPreview)}
-            className="text-sm text-orange-600 hover:text-orange-800"
+            className="text-sm text-accent hover:text-accent-hover"
           >
             {showPreview ? "编辑" : "预览"}
           </button>
         </div>
         {showPreview ? (
-          <div className="prose prose-orange max-w-none min-h-[300px] border rounded-md p-4 bg-white">
-            <pre className="whitespace-pre-wrap font-sans text-gray-800">{content}</pre>
+          <div className="prose prose-orange max-w-none min-h-[300px] border border-border rounded-md p-4 bg-surface">
+            <pre className="whitespace-pre-wrap font-sans text-ink">{content}</pre>
           </div>
         ) : (
           <textarea
@@ -119,15 +123,19 @@ export default function PostForm() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={16}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono text-sm"
+            className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent font-mono text-sm"
             placeholder={"用 Markdown 写帖子内容...\n\n## 二级标题\n\n- 列表项\n- 列表项\n\n`代码块`"}
+            aria-invalid={!!errors.content}
+            aria-describedby={errors.content ? "content-error" : undefined}
           />
         )}
-        {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
+        {errors.content && (
+          <p id="content-error" className="mt-1 text-sm text-error" role="alert">{errors.content}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-muted mb-2">
           标签（最多 5 个）
         </label>
         <div className="flex flex-wrap gap-2">
@@ -136,26 +144,29 @@ export default function PostForm() {
               key={tag.id}
               type="button"
               onClick={() => toggleTag(tag.id)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px] ${
                 selectedTagIds.includes(tag.id)
-                  ? "bg-orange-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-accent text-white"
+                  : "bg-surface-alt text-muted hover:bg-accent-soft"
               }`}
+              aria-pressed={selectedTagIds.includes(tag.id)}
             >
               {tag.name}
             </button>
           ))}
           {allTags.length === 0 && (
-            <p className="text-sm text-gray-400">暂无可用标签</p>
+            <p className="text-sm text-subtle">暂无可用标签</p>
           )}
         </div>
-        {errors.tagIds && <p className="mt-1 text-sm text-red-600">{errors.tagIds}</p>}
+        {errors.tagIds && (
+          <p className="mt-1 text-sm text-error" role="alert">{errors.tagIds}</p>
+        )}
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-orange-600 text-white py-3 px-4 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
+        className="w-full bg-accent text-white py-3 px-4 rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
       >
         {loading ? "发布中..." : "发布帖子"}
       </button>

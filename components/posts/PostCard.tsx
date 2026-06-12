@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { avatarColor, relativeTime } from "@/lib/utils";
 
 interface Tag {
   id: string;
@@ -28,48 +29,57 @@ export default function PostCard({
   commentCount,
   createdAt,
 }: PostCardProps) {
+  const color = avatarColor(author.username);
+
   return (
-    <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+    <article className="bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-border-strong transition-all duration-200">
       <div className="flex items-center gap-3 mb-3">
-        <Link href={`/profile/${author.username}`}>
-          <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-sm">
+        <Link href={`/profile/${author.username}`} className="flex-shrink-0">
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm ring-2 ring-white/50 shadow-sm transition-transform duration-200 hover:scale-105"
+            style={{ backgroundColor: color }}
+          >
             {author.username.charAt(0).toUpperCase()}
           </div>
         </Link>
-        <Link
-          href={`/profile/${author.username}`}
-          className="text-sm font-medium text-gray-900 hover:text-orange-600"
-        >
-          {author.username}
-        </Link>
-        <span className="text-sm text-gray-500">
-          {new Date(createdAt).toLocaleDateString("zh-CN")}
-        </span>
+        <div className="min-w-0 flex-1">
+          <Link
+            href={`/profile/${author.username}`}
+            className="text-sm font-semibold text-ink hover:text-accent transition-colors"
+          >
+            {author.username}
+          </Link>
+          <span className="text-xs text-subtle ml-2">
+            {relativeTime(createdAt)}
+          </span>
+        </div>
       </div>
 
-      <Link href={`/posts/${id}`}>
-        <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-orange-600 transition-colors">
+      <Link href={`/posts/${id}`} className="group">
+        <h2 className="text-lg sm:text-xl font-bold text-ink mb-2 group-hover:text-accent transition-colors leading-snug">
           {title}
         </h2>
       </Link>
 
-      <p className="text-gray-600 mb-4 line-clamp-3">{content}</p>
+      <p className="text-muted mb-4 line-clamp-3 leading-relaxed text-sm sm:text-base">
+        {content}
+      </p>
 
       <div className="flex items-center justify-between">
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 flex-wrap">
           {tags.map((tag) => (
             <Link
               key={tag.id}
               href={`/?tag=${tag.name}`}
-              className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-orange-100 hover:text-orange-600 transition-colors"
+              className="px-2.5 py-1 bg-surface-alt text-muted text-xs rounded-full hover:bg-accent-subtle hover:text-accent transition-all duration-200 min-h-[26px] inline-flex items-center active:scale-95"
             >
               {tag.name}
             </Link>
           ))}
         </div>
 
-        <span className="text-sm text-gray-500">
-          {commentCount} 条评论
+        <span className="text-xs text-subtle flex-shrink-0 ml-3">
+          {commentCount > 0 ? `${commentCount} 条评论` : "暂无评论"}
         </span>
       </div>
     </article>

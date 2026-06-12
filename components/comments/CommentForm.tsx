@@ -20,10 +20,10 @@ export default function CommentForm({ postId, onCommentAdded }: CommentFormProps
 
   if (!session) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-        <p className="text-gray-600">
+      <div className="bg-surface-alt border border-border rounded-lg p-4 text-center">
+        <p className="text-muted">
           请{" "}
-          <Link href="/login" className="text-orange-600 hover:text-orange-800 font-medium">
+          <Link href="/login" className="text-accent hover:text-accent-hover font-medium">
             登录
           </Link>{" "}
           后发表评论
@@ -76,17 +76,25 @@ export default function CommentForm({ postId, onCommentAdded }: CommentFormProps
         onChange={(e) => setContent(e.target.value)}
         rows={4}
         placeholder="写下你的评论..."
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 resize-y"
+        className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-y"
+        aria-invalid={!!error}
+        aria-describedby={error ? "comment-error" : undefined}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p id="comment-error" className="text-sm text-error" role="alert">
+          <span aria-hidden="true">⚠️ </span>{error}
+        </p>
+      )}
       {success && (
-        <p className="text-sm text-green-600">评论发布成功！</p>
+        <p className="text-sm text-success" role="status">
+          <span aria-hidden="true">✅ </span>评论发布成功！
+        </p>
       )}
       <div className="flex justify-end">
         <button
           type="submit"
           disabled={loading}
-          className="bg-orange-600 text-white px-6 py-2 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="bg-accent text-white px-6 py-2 rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "提交中..." : "发表评论"}
         </button>
