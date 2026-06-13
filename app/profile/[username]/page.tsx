@@ -58,7 +58,7 @@ export default async function ProfilePage({
   const isOwnProfile = session?.user?.name === params.username;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="py-6">
       {/* 用户信息卡片 */}
       <div className="glass rounded-2xl p-8 mb-8 animate-scale-in">
         <div className="flex items-start gap-6">

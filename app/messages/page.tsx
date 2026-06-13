@@ -38,7 +38,7 @@ export default async function MessagesPage() {
   }));
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div className="py-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-ink">消息</h1>
         <Link href="/" className="text-sm text-muted hover:text-accent transition-colors">

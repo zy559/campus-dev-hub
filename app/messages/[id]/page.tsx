@@ -27,7 +27,7 @@ export default async function MessageDetailPage({
   const isP2 = conv.participant2Id === session.user.id;
   if (!isP1 && !isP2) {
     return (
-      <div className="max-w-2xl mx-auto py-20 px-4 text-center">
+      <div className="py-20 text-center">
         <p className="text-muted text-lg">你没有权限查看此对话</p>
         <Link href="/messages" className="text-accent hover:text-accent-hover mt-4 inline-block">
           返回消息列表
@@ -45,7 +45,7 @@ export default async function MessageDetailPage({
   });
 
   return (
-    <div className="max-w-2xl mx-auto py-4 px-4 h-[calc(100vh-4rem)] flex flex-col">
+    <div className="py-4 h-[calc(100vh-4rem)] flex flex-col">
       {/* 顶部 */}
       <div className="flex items-center gap-3 pb-3 border-b border-border">
         <Link href="/messages" className="text-muted hover:text-accent transition-colors">

@@ -102,7 +102,7 @@ export default function NavBar() {
 
   return (
     <nav className="glass-nav sticky top-0 z-50">
-      <div className="max-w-[1440px] mx-auto px-4 lg:px-6 h-16 flex items-center gap-4">
+      <div className="px-4 lg:px-6 h-16 flex items-center gap-4">
         <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <span className="text-xl font-bold text-accent transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
             💻
@@ -113,7 +113,7 @@ export default function NavBar() {
         </Link>
 
         {/* 搜索栏 */}
-        <div className="flex-1 max-w-xl mx-auto hidden sm:block">
+        <div className="flex-1 hidden sm:block">
           <SearchBar />
         </div>
 

@@ -63,7 +63,7 @@ export default async function BoardPage({
     : posts;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="py-6">
       <div className="mb-8">
         <Link href="/" className="text-sm text-muted hover:text-accent transition-colors">
           ← 返回首页

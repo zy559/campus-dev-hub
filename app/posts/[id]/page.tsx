@@ -32,7 +32,7 @@ export default async function PostDetailPage({
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="py-6">
       {/* 面包屑 */}
       <nav className="mb-6 text-sm text-muted animate-fade-in" aria-label="面包屑导航">
         <Link href="/" className="hover:text-accent transition-colors">

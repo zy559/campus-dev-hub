@@ -11,7 +11,7 @@ export default async function NewPostPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="py-6">
       <h1 className="text-3xl font-bold text-ink mb-8">发布新帖子</h1>
       <PostForm />
     </div>

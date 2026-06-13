@@ -22,7 +22,7 @@ export default async function ProfileEditPage({
   const currentTags = user.userTags.map((ut) => ut.tag.id);
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div className="py-6">
       <h1 className="text-2xl font-bold text-ink mb-6">编辑个人资料</h1>
       <ProfileEditForm
         username={user.username}
