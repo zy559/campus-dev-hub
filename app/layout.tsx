@@ -5,6 +5,7 @@ import NavBar from "@/components/ui/NavBar";
 import Footer from "@/components/ui/Footer";
 import RevealObserver from "@/components/ui/RevealObserver";
 import ContentShell from "@/components/layout/ContentShell";
+import BottomNav from "@/components/layout/BottomNav";
 import { Providers } from "./providers";
 import { Suspense } from "react";
 
@@ -60,7 +61,8 @@ export default function RootLayout({
               <ContentShell>{children}</ContentShell>
             </Suspense>
           </main>
-          <Footer />
+          <div className="hidden lg:block"><Footer /></div>
+          <BottomNav />
         </Providers>
       </body>
     </html>

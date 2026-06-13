@@ -19,10 +19,10 @@ export default function ContentShell({ children }: { children: React.ReactNode }
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
+    <div className="flex min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-4rem)]">
       <LeftSidebar />
-      <main className="flex-1 min-w-0 border-x border-border">
-        <div className="py-6 px-6">
+      <main className="flex-1 min-w-0 lg:border-x border-border pb-16 lg:pb-0">
+        <div className="py-4 px-4 lg:py-6 lg:px-6">
           {children}
         </div>
       </main>
