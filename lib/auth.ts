@@ -39,6 +39,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        // 检查是否被封禁
+        if (user.bannedUntil) {
+          const bannedUntil = new Date(user.bannedUntil);
+          if (bannedUntil > new Date()) {
+            const daysLeft = Math.ceil((bannedUntil.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            throw new Error(`账号已被封禁，剩余 ${daysLeft} 天`);
+          }
+        }
+
         return {
           id: user.id,
           email: user.email,

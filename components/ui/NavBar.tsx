@@ -147,16 +147,26 @@ export default function NavBar() {
                       个人主页
                     </Link>
                     {isAdmin && (
-                      <button
-                        onClick={() => {
-                          setMenuOpen(false);
-                          setImpersonateOpen(true);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-accent hover:bg-surface-alt transition-colors"
-                        role="menuitem"
-                      >
-                        切换用户
-                      </button>
+                      <>
+                        <Link
+                          href="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-ink hover:bg-surface-alt transition-colors"
+                          role="menuitem"
+                        >
+                          🛡️ 管理面板
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setImpersonateOpen(true);
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-accent hover:bg-surface-alt transition-colors"
+                          role="menuitem"
+                        >
+                          切换用户
+                        </button>
+                      </>
                     )}
                     <Link
                       href="/premium"

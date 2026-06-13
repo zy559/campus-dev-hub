@@ -47,6 +47,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // 检查是否被禁言
+    const user = await db.user.findUnique({ where: { id: session.user.id }, select: { muted: true } });
+    if (user?.muted) {
+      return NextResponse.json(
+        { error: "你已被禁言，暂时无法评论" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const parsed = CommentSchema.safeParse(body);
 
