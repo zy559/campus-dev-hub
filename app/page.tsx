@@ -149,19 +149,31 @@ async function getAllTags(): Promise<Tag[]> {
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { tag?: string };
+  searchParams: { tag?: string; browse?: string };
 }) {
   const session = await getServerSession(authOptions);
   const tag = searchParams.tag;
+  const isBrowsing = searchParams.browse === "1";
   const [data, tags] = await Promise.all([getPosts(tag), getAllTags()]);
   const posts = data.posts || [];
   const total = data.total || 0;
   const fetchError = data.error;
 
-  // ===== LOGGED IN =====
-  if (session) {
+  // ===== LOGGED IN or EXPLICITLY BROWSING =====
+  if (session || isBrowsing) {
     return (
       <div className="py-6">
+        {/* 未登录但浏览中的提示条 */}
+        {!session && isBrowsing && (
+          <div className="flex items-center justify-between bg-accent-subtle border border-accent/20 rounded-xl px-5 py-3 mb-6 animate-scale-in">
+            <p className="text-sm text-accent font-medium">
+              你正在以游客身份浏览，登录后可发帖、评论、私信
+            </p>
+            <Link href="/login" className="text-sm bg-accent text-white px-4 py-1.5 rounded-full hover:bg-accent-hover transition-colors flex-shrink-0">
+              立即登录
+            </Link>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-6 animate-fade-in-up">
           <div>
             <h1 className="text-3xl font-bold text-ink">
@@ -236,7 +248,7 @@ export default async function HomePage({
 
               <div className="animate-fade-in-up stagger-3 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link
-                  href="/"
+                  href="/?browse=1"
                   className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-4 rounded-full hover:bg-accent-hover transition-all duration-200 font-semibold text-base hover:shadow-2xl hover:shadow-accent/35 active:scale-95"
                 >
                   免费开始使用
@@ -320,7 +332,7 @@ export default async function HomePage({
                 <div className="text-center">
                   <div className="text-5xl mb-3">📝</div>
                   <p className="text-muted">还没有帖子，成为第一个分享的人吧</p>
-                  <Link href="/" className="inline-block mt-4 text-accent hover:text-accent-hover font-medium transition-colors">
+                  <Link href="/?browse=1" className="inline-block mt-4 text-accent hover:text-accent-hover font-medium transition-colors">
                     立即开始 →
                   </Link>
                 </div>
@@ -390,7 +402,7 @@ export default async function HomePage({
               <p className="text-subtle mt-2">
                 成为第一个发帖的人，和全校同学分享你的技术见解
               </p>
-              <Link href="/" className="inline-flex items-center gap-1.5 mt-6 text-accent hover:text-accent-hover font-medium transition-colors">
+              <Link href="/?browse=1" className="inline-flex items-center gap-1.5 mt-6 text-accent hover:text-accent-hover font-medium transition-colors">
                 立即开始
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
               </Link>
@@ -423,7 +435,7 @@ export default async function HomePage({
               和全校同学一起，打造属于我们的技术社区。
             </p>
             <Link
-              href="/"
+              href="/?browse=1"
               className="relative inline-flex items-center gap-2 bg-white text-accent px-10 py-4 rounded-full hover:bg-white/95 transition-all duration-200 font-bold text-base hover:shadow-2xl active:scale-95"
             >
               立即加入
