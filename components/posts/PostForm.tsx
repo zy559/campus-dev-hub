@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { PostSchema } from "@/lib/validators";
 import { ZodError } from "zod";
 
@@ -21,12 +22,30 @@ export default function PostForm() {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [posted, setPosted] = useState<{ id: string; title: string } | null>(null);
+  const [countdown, setCountdown] = useState(5);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/tags").then(r => r.json()).then(d => setAllTags(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/boards").then(r => r.json()).then(d => setBoards(Array.isArray(d) ? d : [])).catch(() => {});
   }, []);
+
+  // 发布成功后倒计时
+  useEffect(() => {
+    if (!posted) return;
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push("/");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [posted, router]);
 
   function toggleTag(tagId: string) {
     setSelectedTagIds(prev => prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]);
@@ -60,7 +79,42 @@ export default function PostForm() {
     const res = await fetch("/api/posts", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ title, content, tagIds: selectedTagIds, boardId: selectedBoardId }) });
     const data = await res.json(); setLoading(false);
     if (!res.ok) { setServerError(data.error || "发布失败"); return; }
-    router.push(`/posts/${data.id}`);
+    setPosted({ id: data.id, title: data.title || title });
+    setCountdown(5);
+  }
+
+  // 发布成功后的确认界面
+  if (posted) {
+    return (
+      <div className="max-w-lg mx-auto py-20 text-center animate-scale-in">
+        <div className="text-6xl mb-6">🎉</div>
+        <h2 className="text-2xl font-bold text-ink mb-3">发布成功！</h2>
+        <p className="text-muted mb-2">「{posted.title}」已发布</p>
+        <p className="text-subtle text-sm mb-8">
+          {countdown} 秒后自动返回主页...
+        </p>
+        <div className="flex gap-3 justify-center">
+          <Link
+            href={`/posts/${posted.id}`}
+            className="bg-accent text-white px-6 py-2.5 rounded-full hover:bg-accent-hover transition-colors text-sm font-medium"
+          >
+            查看帖子
+          </Link>
+          <button
+            onClick={() => { setPosted(null); setTitle(""); setContent(""); setSelectedTagIds([]); setSelectedBoardId(""); }}
+            className="px-6 py-2.5 rounded-full border border-border text-muted hover:bg-surface-alt transition-colors text-sm"
+          >
+            继续发布
+          </button>
+          <Link
+            href="/"
+            className="px-6 py-2.5 rounded-full border border-border text-muted hover:bg-surface-alt transition-colors text-sm"
+          >
+            返回主页
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

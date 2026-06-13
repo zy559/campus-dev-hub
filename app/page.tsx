@@ -43,19 +43,19 @@ const heroSlides = [
     id: "1", img: IMG.carousel[0],
     title: "📝 用 Markdown 分享技术",
     description: "代码高亮 · 表格支持 · 图片嵌入。写技术文章就像写代码一样自然。",
-    link: "/login",
+    link: "/",
   },
   {
     id: "2", img: IMG.carousel[1],
     title: "👥 找到你的项目队友",
     description: "刷题、做课设、打比赛——好的队友让学习事半功倍。",
-    link: "/login",
+    link: "/",
   },
   {
     id: "3", img: IMG.carousel[2],
     title: "📚 沉淀校园技术记忆",
     description: "课程心得、面试总结、项目展示——每个帖子都是真实经验。",
-    link: "/login",
+    link: "/",
   },
 ];
 
@@ -236,7 +236,7 @@ export default async function HomePage({
 
               <div className="animate-fade-in-up stagger-3 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link
-                  href="/login"
+                  href="/"
                   className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-4 rounded-full hover:bg-accent-hover transition-all duration-200 font-semibold text-base hover:shadow-2xl hover:shadow-accent/35 active:scale-95"
                 >
                   免费开始使用
@@ -320,7 +320,7 @@ export default async function HomePage({
                 <div className="text-center">
                   <div className="text-5xl mb-3">📝</div>
                   <p className="text-muted">还没有帖子，成为第一个分享的人吧</p>
-                  <Link href="/login" className="inline-block mt-4 text-accent hover:text-accent-hover font-medium transition-colors">
+                  <Link href="/" className="inline-block mt-4 text-accent hover:text-accent-hover font-medium transition-colors">
                     立即开始 →
                   </Link>
                 </div>
@@ -390,7 +390,7 @@ export default async function HomePage({
               <p className="text-subtle mt-2">
                 成为第一个发帖的人，和全校同学分享你的技术见解
               </p>
-              <Link href="/login" className="inline-flex items-center gap-1.5 mt-6 text-accent hover:text-accent-hover font-medium transition-colors">
+              <Link href="/" className="inline-flex items-center gap-1.5 mt-6 text-accent hover:text-accent-hover font-medium transition-colors">
                 立即开始
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
               </Link>
@@ -423,7 +423,7 @@ export default async function HomePage({
               和全校同学一起，打造属于我们的技术社区。
             </p>
             <Link
-              href="/login"
+              href="/"
               className="relative inline-flex items-center gap-2 bg-white text-accent px-10 py-4 rounded-full hover:bg-white/95 transition-all duration-200 font-bold text-base hover:shadow-2xl active:scale-95"
             >
               立即加入
