@@ -5,6 +5,7 @@ import PostFeed from "@/components/posts/PostFeed";
 import FetchError from "@/components/ui/FetchError";
 import AutoCarousel from "@/components/ui/AutoCarousel";
 import ScrollRow from "@/components/ui/ScrollRow";
+import RevealObserver from "@/components/ui/RevealObserver";
 
 /* ============================================================
    IMAGE ASSETS — Unsplash free-use photos
@@ -190,6 +191,8 @@ export default async function HomePage({
   // ===== LANDING PAGE =====
   return (
     <div>
+      <RevealObserver />
+
       {/* ============================================================
           HERO
           ============================================================ */}
