@@ -1,15 +1,17 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 
 export default function ContentShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
 
-  const isLanding = pathname === "/" && !session;
+  const isBrowsing = searchParams.get("browse") === "1";
+  const isLanding = pathname === "/" && !session && !isBrowsing;
   const isFullWidth = isLanding || pathname === "/login" || pathname.startsWith("/posts/new");
 
   if (isFullWidth) {
