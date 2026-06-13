@@ -26,7 +26,7 @@ export const PostSchema = z.object({
     .max(200, "标题最多 200 个字符"),
   content: z.string().min(1, "内容不能为空"),
   tagIds: z.array(z.string()).max(5, "最多选择 5 个标签"),
-  boardId: z.string().min(1, "请选择板块"),
+  boardId: z.string().optional(),
 });
 
 export const CommentSchema = z.object({

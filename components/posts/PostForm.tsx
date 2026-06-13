@@ -69,16 +69,19 @@ export default function PostForm() {
 
       {/* 板块选择 */}
       <div>
-        <label className="block text-sm font-medium text-muted mb-2">选择板块</label>
-        <div className="flex flex-wrap gap-2">
-          {boards.map(b => (
-            <button key={b.id} type="button" onClick={() => setSelectedBoardId(b.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedBoardId === b.id ? "bg-accent text-white" : "bg-surface-alt text-muted hover:bg-accent-soft"}`}>
-              {b.name}
-            </button>
-          ))}
-        </div>
-        {errors.boardId && <p className="mt-1 text-sm text-error" role="alert">{errors.boardId}</p>}
+        <label className="block text-sm font-medium text-muted mb-2">选择板块（可选）</label>
+        {boards.length === 0 ? (
+          <p className="text-xs text-subtle">暂无可用板块，可直接发帖</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {boards.map(b => (
+              <button key={b.id} type="button" onClick={() => setSelectedBoardId(b.id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedBoardId === b.id ? "bg-accent text-white" : "bg-surface-alt text-muted hover:bg-accent-soft"}`}>
+                {b.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 标题 */}
