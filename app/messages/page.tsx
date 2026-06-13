@@ -5,6 +5,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import ConversationCard from "@/components/chat/ConversationCard";
 import type { ConversationData } from "@/lib/types";
+export const dynamic = 'force-dynamic';
 
 export default async function MessagesPage() {
   const session = await getServerSession(authOptions);

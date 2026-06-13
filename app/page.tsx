@@ -6,6 +6,7 @@ import FetchError from "@/components/ui/FetchError";
 import AutoCarousel from "@/components/ui/AutoCarousel";
 import ScrollRow from "@/components/ui/ScrollRow";
 import RevealObserver from "@/components/ui/RevealObserver";
+export const dynamic = 'force-dynamic';
 
 /* ============================================================
    IMAGE ASSETS — Unsplash free-use photos

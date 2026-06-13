@@ -3,6 +3,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import PostFeed from "@/components/posts/PostFeed";
 import BoardSelector from "@/components/boards/BoardSelector";
+export const dynamic = 'force-dynamic';
 
 async function getBoard(boardId: string) {
   return db.board.findUnique({ where: { id: boardId } });

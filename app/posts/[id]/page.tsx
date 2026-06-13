@@ -4,6 +4,7 @@ import PostContent from "@/components/posts/PostContent";
 import CommentList from "@/components/comments/CommentList";
 import CommentForm from "@/components/comments/CommentForm";
 import { avatarColor, fullDate } from "@/lib/utils";
+export const dynamic = 'force-dynamic';
 
 interface Tag {
   id: string;

@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { avatarColor, relativeTime, fullDate } from "@/lib/utils";
 import StartChatButton from "./StartChatButton";
+export const dynamic = 'force-dynamic';
 
 interface PostTag { id: string; name: string; }
 interface PostTagRelation { tag: PostTag; }

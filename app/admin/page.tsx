@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import AdminPanel from "./AdminPanel";
+export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
