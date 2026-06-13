@@ -1,24 +1,32 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { db } from "@/lib/db";
 import PostContent from "@/components/posts/PostContent";
 import CommentList from "@/components/comments/CommentList";
 import CommentForm from "@/components/comments/CommentForm";
 import { avatarColor, fullDate } from "@/lib/utils";
+
 export const dynamic = 'force-dynamic';
 
-interface Tag {
-  id: string;
-  name: string;
-}
+interface Tag { id: string; name: string; }
 
 async function getPost(id: string) {
-  const res = await fetch(
-    `${process.env.NEXTAUTH_URL}/api/posts/${id}`,
-    { next: { revalidate: 30 } }
-  );
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to fetch post");
-  return res.json();
+  const post = await db.post.findUnique({
+    where: { id },
+    include: {
+      author: { select: { id: true, username: true, avatar: true } },
+      tags: { include: { tag: true } },
+      _count: { select: { comments: true } },
+    },
+  });
+  if (!post) return null;
+  return {
+    id: post.id, title: post.title, content: post.content,
+    author: post.author,
+    tags: post.tags.map((pt) => pt.tag),
+    commentCount: post._count.comments,
+    createdAt: post.createdAt.toISOString(),
+  };
 }
 
 export default async function PostDetailPage({
