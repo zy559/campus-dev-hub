@@ -6,6 +6,7 @@ import Footer from "@/components/ui/Footer";
 import RevealObserver from "@/components/ui/RevealObserver";
 import ContentShell from "@/components/layout/ContentShell";
 import { Providers } from "./providers";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -55,7 +56,9 @@ export default function RootLayout({
           <NavBar />
           <RevealObserver />
           <main id="main-content" className="flex-1">
-            <ContentShell>{children}</ContentShell>
+            <Suspense fallback={null}>
+              <ContentShell>{children}</ContentShell>
+            </Suspense>
           </main>
           <Footer />
         </Providers>
