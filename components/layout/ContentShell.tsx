@@ -9,8 +9,6 @@ export default function ContentShell({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  // 登录后的首页、板块页、消息页、个人主页 → 三栏
-  // 未登录首页 → 全宽落地页
   const isLanding = pathname === "/" && !session;
   const isFullWidth = isLanding || pathname === "/login" || pathname.startsWith("/posts/new");
 
@@ -19,10 +17,12 @@ export default function ContentShell({ children }: { children: React.ReactNode }
   }
 
   return (
-    <div className="flex justify-center">
+    <div className="flex min-h-[calc(100vh-4rem)]">
       <LeftSidebar />
-      <main className="flex-1 min-w-0 max-w-[760px] border-x border-border">
-        {children}
+      <main className="flex-1 min-w-0 border-x border-border">
+        <div className="py-6 px-6">
+          {children}
+        </div>
       </main>
       <RightSidebar />
     </div>

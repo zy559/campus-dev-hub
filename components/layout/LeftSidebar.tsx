@@ -21,16 +21,16 @@ export default function LeftSidebar() {
 
   function linkClass(href: string) {
     const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
-    return `flex items-center gap-3 px-5 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+    return `flex items-center gap-3 py-3 text-base font-medium transition-all duration-200 ${
       active
-        ? "bg-accent text-white shadow-sm"
-        : "text-muted hover:bg-surface-alt hover:text-ink"
+        ? "bg-accent text-white shadow-sm rounded-r-xl pl-6 pr-4"
+        : "text-muted hover:bg-surface-alt hover:text-ink rounded-r-xl pl-6 pr-4"
     }`;
   }
 
   return (
-    <aside className="w-[260px] flex-shrink-0 hidden lg:block pt-6">
-      <nav className="sticky top-20 space-y-1 px-4">
+    <aside className="w-[260px] flex-shrink-0 hidden lg:block pt-6 bg-surface-alt/50">
+      <nav className="sticky top-20 space-y-1">
         {NAV_ITEMS.map((item) => (
           <Link key={item.href} href={item.href} className={linkClass(item.href)}>
             <span className="text-lg w-6 text-center">{item.icon}</span>
@@ -40,7 +40,7 @@ export default function LeftSidebar() {
 
         {session && (
           <>
-            <div className="my-3 border-t border-border" />
+            <div className="my-3 ml-6 mr-4 border-t border-border" />
             {AUTH_ITEMS.map((item) => (
               <Link key={item.href} href={item.href} className={linkClass(item.href)}>
                 <span className="text-lg w-6 text-center">{item.icon}</span>
@@ -51,7 +51,7 @@ export default function LeftSidebar() {
         )}
 
         {!session && (
-          <div className="mt-4 p-5 rounded-xl bg-surface-alt">
+          <div className="mt-4 mx-2 p-5 rounded-xl bg-surface-alt border border-border">
             <p className="text-sm text-muted mb-3">登录后解锁更多功能</p>
             <Link
               href="/login"
