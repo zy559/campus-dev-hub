@@ -7,6 +7,36 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
+function SearchBar() {
+  const router = useRouter();
+  const [q, setQ] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (q.trim()) {
+      router.push(`/?search=${encodeURIComponent(q.trim())}`);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="relative w-full">
+      <svg
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-subtle pointer-events-none"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="搜索帖子、标签、用户..."
+        className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-surface-alt text-sm text-ink placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+      />
+    </form>
+  );
+}
+
 export default function NavBar() {
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -72,24 +102,29 @@ export default function NavBar() {
 
   return (
     <nav className="glass-nav sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
+      <div className="max-w-[1440px] mx-auto px-4 lg:px-6 h-16 flex items-center gap-4">
+        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <span className="text-xl font-bold text-accent transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
             💻
           </span>
-          <span className="text-lg font-bold text-ink hidden sm:inline">
+          <span className="text-lg font-bold text-ink hidden lg:inline">
             Campus Dev Hub
           </span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-4">
+        {/* 搜索栏 */}
+        <div className="flex-1 max-w-xl mx-auto hidden sm:block">
+          <SearchBar />
+        </div>
+
+        <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
           <Link href="/" className={navClass("/")}>
             发现
           </Link>
           <Link href="/boards" className={navClass("/boards")}>
             板块
           </Link>
-          <Link href="/posts/new" className={navClass("/posts/new")}>
+          <Link href="/posts/new" className={navClass("/posts/new") + " hidden sm:inline"}>
             发帖
           </Link>
 

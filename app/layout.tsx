@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/components/ui/NavBar";
 import Footer from "@/components/ui/Footer";
 import RevealObserver from "@/components/ui/RevealObserver";
+import ContentShell from "@/components/layout/ContentShell";
 import { Providers } from "./providers";
 
 const geistSans = localFont({
@@ -53,7 +54,9 @@ export default function RootLayout({
           </a>
           <NavBar />
           <RevealObserver />
-          <main id="main-content" className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">
+            <ContentShell>{children}</ContentShell>
+          </main>
           <Footer />
         </Providers>
       </body>
