@@ -111,7 +111,7 @@ async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: n
     const url = tag
       ? `${process.env.NEXTAUTH_URL}/api/posts?tag=${tag}&limit=50`
       : `${process.env.NEXTAUTH_URL}/api/posts?limit=50`;
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { next: { revalidate: 30 } });
     if (!res.ok) {
       // API unavailable — serve demo data so the page isn't empty
       return { posts: DEMO_POSTS, total: DEMO_POSTS.length };
@@ -128,7 +128,7 @@ async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: n
 
 async function getAllTags(): Promise<Tag[]> {
   try {
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/tags`, { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/tags`, { next: { revalidate: 60 } });
     if (!res.ok) return DEMO_TAGS;
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) return DEMO_TAGS;

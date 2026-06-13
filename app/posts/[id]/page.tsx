@@ -13,7 +13,7 @@ interface Tag {
 async function getPost(id: string) {
   const res = await fetch(
     `${process.env.NEXTAUTH_URL}/api/posts/${id}`,
-    { cache: "no-store" }
+    { next: { revalidate: 30 } }
   );
   if (res.status === 404) return null;
   if (!res.ok) throw new Error("Failed to fetch post");
