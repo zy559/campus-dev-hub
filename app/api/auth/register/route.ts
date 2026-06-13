@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { username, email, password } = parsed.data;
+    const { username, email, password, tagIds } = parsed.data;
 
     const existingUsername = await db.user.findUnique({
       where: { username },
@@ -46,6 +46,9 @@ export async function POST(request: Request) {
         password: hashedPassword,
         avatar: null,
         bio: null,
+        userTags: tagIds?.length
+          ? { create: tagIds.map((tagId: string) => ({ tagId })) }
+          : undefined,
       },
     });
 

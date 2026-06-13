@@ -5,12 +5,14 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { RegisterSchema } from "@/lib/validators";
 import { ZodError } from "zod";
+import UserTagSelector from "@/components/user/UserTagSelector";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function RegisterForm() {
     setServerError("");
 
     try {
-      RegisterSchema.parse({ username, email, password });
+      RegisterSchema.parse({ username, email, password, tagIds: selectedTagIds });
     } catch (err) {
       if (err instanceof ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -38,7 +40,7 @@ export default function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, password, tagIds: selectedTagIds }),
     });
 
     const data = await res.json();
@@ -137,6 +139,13 @@ export default function RegisterForm() {
           </p>
         )}
       </div>
+
+      <UserTagSelector
+        selectedTagIds={selectedTagIds}
+        onChange={setSelectedTagIds}
+        maxTags={5}
+        label="选择你的兴趣标签（帮助找到志同道合的人）"
+      />
 
       <button
         type="submit"

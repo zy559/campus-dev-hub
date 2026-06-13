@@ -12,13 +12,14 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const tag = searchParams.get("tag");
+    const boardId = searchParams.get("boardId");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(20, Math.max(1, parseInt(searchParams.get("limit") || "10")));
     const skip = (page - 1) * limit;
 
-    const where = tag
-      ? { tags: { some: { tag: { name: tag } } } }
-      : {};
+    const where: Record<string, unknown> = {};
+    if (tag) where.tags = { some: { tag: { name: tag } } };
+    if (boardId) where.boardId = boardId;
 
     const [posts, total] = await Promise.all([
       db.post.findMany({
@@ -30,6 +31,7 @@ export async function GET(request: Request) {
           tags: {
             include: { tag: true },
           },
+          board: { select: { id: true, name: true } },
           _count: { select: { comments: true } },
         },
         orderBy: { createdAt: "desc" },
@@ -45,6 +47,7 @@ export async function GET(request: Request) {
       content: post.content.slice(0, 300),
       author: post.author,
       tags: post.tags.map((pt: PostTagItem) => pt.tag),
+      board: post.board ?? undefined,
       commentCount: post._count.comments,
       createdAt: post.createdAt,
     }));
@@ -85,12 +88,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const { title, content, tagIds } = parsed.data;
+    const { title, content, tagIds, boardId } = parsed.data;
 
     const post = await db.post.create({
       data: {
         title,
         content,
+        boardId: boardId || null,
         authorId: session.user.id,
         tags: {
           create: tagIds.map((tagId: string) => ({

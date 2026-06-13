@@ -11,6 +11,7 @@ export const RegisterSchema = z.object({
     .string()
     .min(6, "密码至少 6 个字符")
     .max(100, "密码最多 100 个字符"),
+  tagIds: z.array(z.string()).max(5, "最多选择 5 个兴趣标签").optional(),
 });
 
 export const LoginSchema = z.object({
@@ -25,6 +26,7 @@ export const PostSchema = z.object({
     .max(200, "标题最多 200 个字符"),
   content: z.string().min(1, "内容不能为空"),
   tagIds: z.array(z.string()).max(5, "最多选择 5 个标签"),
+  boardId: z.string().min(1, "请选择板块"),
 });
 
 export const CommentSchema = z.object({
@@ -32,6 +34,13 @@ export const CommentSchema = z.object({
     .string()
     .min(1, "评论不能为空")
     .max(2000, "评论最多 2000 个字符"),
+});
+
+export const MessageSchema = z.object({
+  content: z
+    .string()
+    .min(1, "消息不能为空")
+    .max(5000, "消息最多 5000 个字符"),
 });
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;

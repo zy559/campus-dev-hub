@@ -18,8 +18,12 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  posts    Post[]
-  comments Comment[]
+  posts          Post[]
+  comments       Comment[]
+  userTags       UserTag[]
+  conversation1  Conversation[] @relation("Participant1")
+  conversation2  Conversation[] @relation("Participant2")
+  messages       Message[]
 }
 
 model Post {
@@ -27,10 +31,12 @@ model Post {
   title     String
   content   String
   authorId  String
+  boardId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  board    Board?    @relation(fields: [boardId], references: [id])
   comments Comment[]
   tags     PostTag[]
 }
@@ -51,6 +57,7 @@ model Tag {
   name  String    @unique
 
   posts PostTag[]
+  users UserTag[]
 }
 
 model PostTag {
@@ -61,4 +68,49 @@ model PostTag {
   tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
+}
+
+model UserTag {
+  userId String
+  tagId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tagId])
+}
+
+model Board {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  posts Post[]
+}
+
+model Conversation {
+  id             String   @id @default(uuid())
+  participant1Id String
+  participant2Id String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  participant1 User      @relation("Participant1", fields: [participant1Id], references: [id], onDelete: Cascade)
+  participant2 User      @relation("Participant2", fields: [participant2Id], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@unique([participant1Id, participant2Id])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }

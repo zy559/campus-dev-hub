@@ -16,6 +16,7 @@ interface PostCardProps {
     avatar: string | null;
   };
   tags: Tag[];
+  board?: { id: string; name: string };
   commentCount: number;
   createdAt: string;
 }
@@ -26,6 +27,7 @@ export default function PostCard({
   content,
   author,
   tags,
+  board,
   commentCount,
   createdAt,
 }: PostCardProps) {
@@ -52,6 +54,14 @@ export default function PostCard({
           <span className="text-xs text-subtle ml-2">
             {relativeTime(createdAt)}
           </span>
+          {board && (
+            <Link
+              href={`/boards/${board.id}`}
+              className="ml-auto px-2 py-0.5 bg-accent-subtle text-accent text-xs rounded-full hover:bg-accent-soft transition-colors"
+            >
+              {board.name}
+            </Link>
+          )}
         </div>
       </div>
 

@@ -15,6 +15,43 @@ export interface PostCardData {
   content: string;
   author: { id: string; username: string; avatar: string | null };
   tags: Tag[];
+  board?: { id: string; name: string };
   commentCount: number;
+  createdAt: string;
+}
+
+// 板块
+export interface Board {
+  id: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+}
+
+// 对话
+export interface ConversationData {
+  id: string;
+  otherUser: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
+  lastMessage?: {
+    content: string;
+    createdAt: string;
+  };
+  updatedAt: string;
+}
+
+// 消息
+export interface MessageData {
+  id: string;
+  conversationId: string;
+  content: string;
+  sender: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
   createdAt: string;
 }
