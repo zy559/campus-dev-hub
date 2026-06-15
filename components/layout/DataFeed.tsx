@@ -11,6 +11,26 @@ interface PostCardData {
   board?: { id: string; name: string };
 }
 
+// 日常子板块渐变映射 — 静态，不依赖 DB seed 顺序
+const DAILY_GRADIENTS: Record<string, string> = {
+  "🍜 美食推荐": "from-orange-400 to-red-500",
+  "🏀 运动健身": "from-green-400 to-emerald-600",
+  "🎮 游戏娱乐": "from-purple-400 to-indigo-600",
+  "📸 摄影随拍": "from-cyan-400 to-blue-500",
+  "🎬 影视音乐": "from-pink-400 to-rose-500",
+  "💬 心情杂谈": "from-yellow-400 to-amber-500",
+  "🎉 活动聚会": "from-red-400 to-orange-500",
+  "🛒 二手好物": "from-teal-400 to-cyan-600",
+};
+
+async function getDailyBoards() {
+  const daily = await db.board.findUnique({
+    where: { name: "分享日常" },
+    include: { children: { orderBy: { sortOrder: "asc" } } },
+  });
+  return daily?.children ?? [];
+}
+
 async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: number }> {
   const where = tag ? { tags: { some: { tag: { name: tag } } } } : {};
   const [posts, total] = await Promise.all([
@@ -56,7 +76,11 @@ export default async function DataFeed({
   search: string;
   isBrowsing: boolean;
 }) {
-  const [data, tags] = await Promise.all([getPosts(tag), getAllTags()]);
+  const [data, tags, dailyBoards] = await Promise.all([
+    getPosts(tag),
+    getAllTags(),
+    getDailyBoards(),
+  ]);
 
   return (
     <div className="py-6">
@@ -70,6 +94,38 @@ export default async function DataFeed({
           </Link>
         </div>
       )}
+
+      {/* 日常分区入口 — 登录/浏览用户也能看到 */}
+      {dailyBoards.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-ink/80 tracking-wide">📋 分享日常</h3>
+            <Link href="/boards" className="text-xs text-accent hover:text-accent-hover transition-colors">
+              查看全部 →
+            </Link>
+          </div>
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+            {dailyBoards.map((board) => {
+              const gradient = DAILY_GRADIENTS[board.name] || "from-gray-400 to-gray-500";
+              return (
+                <Link
+                  key={board.id}
+                  href={`/boards/${board.id}`}
+                  className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${gradient} p-2 sm:p-3 transition-all duration-200 hover:scale-[1.05] hover:shadow-lg active:scale-95`}
+                >
+                  <div className="relative z-10 text-center">
+                    <span className="text-lg sm:text-2xl block mb-0.5">{board.name.slice(0, 2)}</span>
+                    <span className="text-[10px] sm:text-xs font-medium text-white/90 line-clamp-1">
+                      {board.name.replace(/^[^\s]+\s/, "")}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-ink">
