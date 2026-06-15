@@ -107,7 +107,7 @@ const DEMO_TAGS: Tag[] = [
    ============================================================ */
 
 // 直接数据库查询 — 减少 HTTP 往返，速度提升 200-400ms
-async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: number }> {
+async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: number; dbError?: boolean }> {
   try {
     const where = tag ? { tags: { some: { tag: { name: tag } } } } : {};
     const [posts, total] = await Promise.all([
@@ -134,7 +134,7 @@ async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: n
       total,
     };
   } catch {
-    return { posts: DEMO_POSTS, total: DEMO_POSTS.length };
+    return { posts: DEMO_POSTS, total: DEMO_POSTS.length, dbError: true };
   }
 }
 
@@ -173,11 +173,18 @@ export default async function HomePage({
   const [data, tags] = await Promise.all([getPosts(tag), getAllTags()]);
   const posts = data.posts;
   const total = data.total;
+  const dbError = data.dbError;
 
   // ===== LOGGED IN or EXPLICITLY BROWSING =====
   if (session || isBrowsing) {
     return (
       <div className="py-6">
+        {/* 数据库异常提示 */}
+        {dbError && (
+          <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl px-5 py-3 mb-4 text-sm">
+            <span>⚠️</span> 数据加载异常，当前显示的是示例内容
+          </div>
+        )}
         {/* 未登录但浏览中的提示条 */}
         {!session && isBrowsing && (
           <div className="flex items-center justify-between bg-accent-subtle border border-accent/20 rounded-xl px-5 py-3 mb-6 animate-scale-in">
