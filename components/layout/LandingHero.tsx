@@ -1,23 +1,29 @@
 import Link from "next/link";
-import AutoCarousel from "@/components/ui/AutoCarousel";
+import dynamic from "next/dynamic";
 import ScrollRow from "@/components/ui/ScrollRow";
 
+// 动态导入轮播 — 移动端首屏不需要 JS
+const AutoCarousel = dynamic(() => import("@/components/ui/AutoCarousel"), {
+  loading: () => <div className="min-h-[320px] sm:min-h-[360px] rounded-3xl bg-surface-alt/50 animate-pulse" />,
+});
+
+// 缩小图片尺寸 → 移动端下载量减半
 const IMG = {
-  heroBg: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1400&q=80",
+  heroBg: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=75&auto=format&fit=crop",
   carousel: [
-    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&q=80",
-    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80",
-    "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=900&q=80",
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=75",
+    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=75",
+    "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&q=75",
   ],
   topics: {
-    algo: "https://images.unsplash.com/photo-1504639725591-34d0984388bd?w=600&q=80",
-    web: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&q=80",
-    backend: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80",
-    ai: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80",
-    os: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=600&q=80",
-    project: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80",
-    interview: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&q=80",
-    notes: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=600&q=80",
+    algo: "https://images.unsplash.com/photo-1504639725591-34d0984388bd?w=400&q=75",
+    web: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&q=75",
+    backend: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=75",
+    ai: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=75",
+    os: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=400&q=75",
+    project: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&q=75",
+    interview: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=75",
+    notes: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400&q=75",
   },
 };
 
