@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import LandingHero from "./LandingHero";
-import DailySection from "./DailySection";
 import DataFeed, { LandingPostSection } from "./DataFeed";
 
 export default function BrowseOrFeed({
@@ -24,13 +23,10 @@ export default function BrowseOrFeed({
     );
   }
 
-  // Landing page: hero + daily section + post feed
+  // Landing page: hero (with tech + daily scroll) + post feed
   return (
     <>
       <LandingHero />
-      <Suspense fallback={null}>
-        <DailySection />
-      </Suspense>
       <div className="max-w-4xl mx-auto px-4 pb-16">
         <Suspense fallback={<FeedSkeleton />}>
           <LandingPostSection />

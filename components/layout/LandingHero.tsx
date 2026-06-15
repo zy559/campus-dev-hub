@@ -25,6 +25,16 @@ const IMG = {
     interview: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=75",
     notes: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400&q=75",
   },
+  daily: {
+    food: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75",
+    sports: "https://images.unsplash.com/photo-1461896836934-bd45ba882cf1?w=400&q=75",
+    gaming: "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=400&q=75",
+    photo: "https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?w=400&q=75",
+    movie: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=75",
+    chat: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=75",
+    event: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&q=75",
+    market: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=75",
+  },
 };
 
 const heroSlides = [
@@ -42,6 +52,17 @@ const topicCards = [
   { id: "proj", img: IMG.topics.project, icon: "🚀", title: "项目实战", description: "课设展示、开源贡献、Hackathon 作品" },
   { id: "intv", img: IMG.topics.interview, icon: "💼", title: "面试经验", description: "大厂面经、实习攻略、简历优化" },
   { id: "notes", img: IMG.topics.notes, icon: "📖", title: "学习笔记", description: "课程总结、考试复习、知识体系梳理" },
+];
+
+const dailyTopicCards = [
+  { id: "food", img: IMG.daily.food, icon: "🍜", title: "美食推荐", description: "食堂探店、外卖测评、周边美食推荐" },
+  { id: "sports", img: IMG.daily.sports, icon: "🏀", title: "运动健身", description: "约球组队、跑步打卡、健身房交流" },
+  { id: "gaming", img: IMG.daily.gaming, icon: "🎮", title: "游戏娱乐", description: "开黑组队、游戏攻略、赛事讨论" },
+  { id: "photo", img: IMG.daily.photo, icon: "📸", title: "摄影随拍", description: "校园风景、日常记录、手机摄影" },
+  { id: "movie", img: IMG.daily.movie, icon: "🎬", title: "影视音乐", description: "电影推荐、追番讨论、歌单分享" },
+  { id: "chat", img: IMG.daily.chat, icon: "💬", title: "心情杂谈", description: "吐槽专区、树洞、心情随笔" },
+  { id: "event", img: IMG.daily.event, icon: "🎉", title: "活动聚会", description: "社团活动、线下聚会、志愿者招募" },
+  { id: "market", img: IMG.daily.market, icon: "🛒", title: "二手好物", description: "闲置转卖、求购、好物推荐" },
 ];
 
 // 纯静态组件 — 零数据库查询，瞬间渲染
@@ -109,15 +130,31 @@ export default function LandingHero() {
         </div>
       </section>
 
-      {/* Section 2: 话题滚动 */}
+      {/* Section 2: 话题滚动 — 学习 + 日常 */}
       <section className="py-20 overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6 mb-10">
+        {/* 技术学习 */}
+        <div className="max-w-6xl mx-auto px-6 mb-6">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-ink mb-3">探索你感兴趣的话题</h2>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium bg-accent-subtle text-accent mb-3">
+              📚 学习知识
+            </span>
+            <h2 className="text-3xl font-bold text-ink mb-2">探索你感兴趣的话题</h2>
             <p className="text-muted">左右滑动查看更多，每周都有新内容</p>
           </div>
         </div>
         <ScrollRow cards={topicCards} speed={25} />
+
+        {/* 分享日常 */}
+        <div className="max-w-6xl mx-auto px-6 mb-6 mt-16">
+          <div className="text-center">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 mb-3">
+              📋 分享日常
+            </span>
+            <h2 className="text-3xl font-bold text-ink mb-2">不只是技术，还有生活</h2>
+            <p className="text-muted">美食、运动、游戏、摄影——和全校同学分享校园日常</p>
+          </div>
+        </div>
+        <ScrollRow cards={dailyTopicCards} speed={22} />
       </section>
 
       {/* Section 3: Feature showcase */}
