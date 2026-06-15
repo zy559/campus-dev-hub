@@ -26,6 +26,8 @@ export interface Board {
   name: string;
   description: string;
   sortOrder: number;
+  parentId: string | null;
+  children?: Board[];
 }
 
 // 对话

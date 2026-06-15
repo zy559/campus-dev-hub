@@ -95,9 +95,12 @@ model Board {
   name        String   @unique
   description String
   sortOrder   Int      @default(0)
+  parentId    String?
   createdAt   DateTime @default(now())
 
-  posts Post[]
+  parent   Board?  @relation("BoardChildren", fields: [parentId], references: [id])
+  children Board[] @relation("BoardChildren")
+  posts    Post[]
 }
 
 model Conversation {
