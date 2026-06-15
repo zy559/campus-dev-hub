@@ -42,6 +42,10 @@ model Post {
   board    Board?    @relation(fields: [boardId], references: [id])
   comments Comment[]
   tags     PostTag[]
+
+  @@index([authorId])
+  @@index([boardId])
+  @@index([createdAt])
 }
 
 model Comment {
@@ -53,6 +57,9 @@ model Comment {
 
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
 }
 
 model Tag {
@@ -105,6 +112,8 @@ model Conversation {
   messages     Message[]
 
   @@unique([participant1Id, participant2Id])
+  @@index([participant1Id])
+  @@index([participant2Id])
 }
 
 model Message {
@@ -116,4 +125,6 @@ model Message {
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }

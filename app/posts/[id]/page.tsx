@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import PostContent from "@/components/posts/PostContent";
-import CommentList from "@/components/comments/CommentList";
-import CommentForm from "@/components/comments/CommentForm";
+import CommentSection from "@/components/comments/CommentSection";
 import { avatarColor, fullDate } from "@/lib/utils";
 
 export const dynamic = 'force-dynamic';
@@ -82,7 +81,7 @@ export default async function PostDetailPage({
             <Link
               key={tag.id}
               href={`/?tag=${tag.name}`}
-              className="px-3 py-1.5 bg-accent-subtle text-accent text-sm rounded-full hover:bg-accent-soft transition-all duration-200"
+              className="px-3 py-2 bg-accent-subtle text-accent text-sm rounded-full hover:bg-accent-soft transition-all duration-200 min-h-[36px] inline-flex items-center"
             >
               {tag.name}
             </Link>
@@ -100,10 +99,7 @@ export default async function PostDetailPage({
         <h2 className="text-2xl font-bold text-ink mb-6">
           评论 ({post.commentCount})
         </h2>
-        <CommentForm postId={post.id} />
-        <div className="mt-8">
-          <CommentList postId={post.id} />
-        </div>
+        <CommentSection postId={post.id} />
       </section>
     </div>
   );

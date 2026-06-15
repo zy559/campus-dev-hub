@@ -166,8 +166,9 @@ export default function PostForm() {
             <pre className="whitespace-pre-wrap font-sans text-ink">{content}</pre>
           </div>
         ) : (
-          <textarea id="content" value={content} onChange={e => setContent(e.target.value)} rows={16}
-            className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent font-mono text-sm"
+          <textarea id="content" value={content} onChange={e => setContent(e.target.value)}
+            rows={8}
+            className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent font-mono text-sm sm:min-h-[400px]"
             placeholder={"用 Markdown 写帖子内容...\n\n## 二级标题\n\n- 列表项\n\n`代码块`\n\n点击 📎 插入图片或视频"} />
         )}
         {errors.content && <p className="mt-1 text-sm text-error" role="alert">{errors.content}</p>}
@@ -179,7 +180,7 @@ export default function PostForm() {
         <div className="flex flex-wrap gap-2">
           {allTags.map(tag => (
             <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)}
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px] ${selectedTagIds.includes(tag.id) ? "bg-accent text-white" : "bg-surface-alt text-muted hover:bg-accent-soft"}`}>
+              className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors min-h-[44px] ${selectedTagIds.includes(tag.id) ? "bg-accent text-white" : "bg-surface-alt text-muted hover:bg-accent-soft"}`}>
               {tag.name}
             </button>
           ))}

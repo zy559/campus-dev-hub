@@ -6,7 +6,6 @@ import PostFeed from "@/components/posts/PostFeed";
 import AutoCarousel from "@/components/ui/AutoCarousel";
 import ScrollRow from "@/components/ui/ScrollRow";
 import RevealObserver from "@/components/ui/RevealObserver";
-export const dynamic = 'force-dynamic';
 
 /* ============================================================
    IMAGE ASSETS — Unsplash free-use photos
@@ -165,11 +164,12 @@ export const revalidate = 30;
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { tag?: string; browse?: string };
+  searchParams: { tag?: string; browse?: string; search?: string };
 }) {
   const session = await getServerSession(authOptions);
   const tag = searchParams.tag;
   const isBrowsing = searchParams.browse === "1";
+  const search = searchParams.search || "";
   const [data, tags] = await Promise.all([getPosts(tag), getAllTags()]);
   const posts = data.posts;
   const total = data.total;
@@ -206,7 +206,7 @@ export default async function HomePage({
           </Link>
         </div>
 
-        <PostFeed posts={posts} tags={tags} activeTag={tag} />
+        <PostFeed posts={posts} tags={tags} activeTag={tag} initialSearch={search} />
       </div>
     );
   }
@@ -273,7 +273,7 @@ export default async function HomePage({
                 </a>
               </div>
 
-              <div className="animate-fade-in-up stagger-4 flex gap-8 mt-10 justify-center lg:justify-start text-sm text-muted">
+              <div className="animate-fade-in-up stagger-4 flex flex-wrap gap-6 sm:gap-8 mt-10 justify-center lg:justify-start text-sm text-muted">
                 <span>📝 {total || "..."} 篇帖子</span>
                 <span>🏷️ {tags.length} 个话题</span>
                 <span>🎓 面向全校同学</span>

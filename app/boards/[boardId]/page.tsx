@@ -9,9 +9,11 @@ async function getBoard(boardId: string) {
   return db.board.findUnique({ where: { id: boardId } });
 }
 
-async function getPosts(boardId: string) {
+async function getPosts(boardId: string, tag?: string) {
+  const where: Record<string, unknown> = { boardId };
+  if (tag) where.tags = { some: { tag: { name: tag } } };
   const posts = await db.post.findMany({
-    where: { boardId },
+    where,
     include: {
       author: { select: { id: true, username: true, avatar: true } },
       tags: { include: { tag: true } },
@@ -55,13 +57,9 @@ export default async function BoardPage({
 
   const activeTag = searchParams.tag;
   const [posts, tags] = await Promise.all([
-    getPosts(params.boardId),
+    getPosts(params.boardId, activeTag),
     getAllTags(),
   ]);
-
-  const filteredPosts = activeTag
-    ? posts.filter((p) => p.tags.some((t) => t.name === activeTag))
-    : posts;
 
   return (
     <div className="py-6">
@@ -76,7 +74,7 @@ export default async function BoardPage({
       <BoardSelector activeBoardId={params.boardId} />
 
       <div className="mt-8">
-        <PostFeed posts={filteredPosts} tags={tags} activeTag={activeTag} />
+        <PostFeed posts={posts} tags={tags} activeTag={activeTag} />
       </div>
     </div>
   );

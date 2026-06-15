@@ -19,16 +19,17 @@ interface PostCardData {
   createdAt: string;
 }
 
-type SortKey = "latest" | "popular" | "comments";
+type SortKey = "latest" | "popular";
 
 interface PostFeedProps {
   posts: PostCardData[];
   tags: Tag[];
   activeTag?: string;
+  initialSearch?: string;
 }
 
-export default function PostFeed({ posts, tags, activeTag }: PostFeedProps) {
-  const [search, setSearch] = useState("");
+export default function PostFeed({ posts, tags, activeTag, initialSearch = "" }: PostFeedProps) {
+  const [search, setSearch] = useState(initialSearch);
   const [sort, setSort] = useState<SortKey>("latest");
 
   const filtered = useMemo(() => {
@@ -48,8 +49,6 @@ export default function PostFeed({ posts, tags, activeTag }: PostFeedProps) {
 
     // Sort
     if (sort === "popular") {
-      result.sort((a, b) => b.commentCount - a.commentCount);
-    } else if (sort === "comments") {
       result.sort((a, b) => b.commentCount - a.commentCount);
     } else {
       // latest — already in server order
@@ -96,7 +95,6 @@ export default function PostFeed({ posts, tags, activeTag }: PostFeedProps) {
             [
               { key: "latest", label: "最新" },
               { key: "popular", label: "最热" },
-              { key: "comments", label: "最多评论" },
             ] as { key: SortKey; label: string }[]
           ).map((opt) => (
             <button

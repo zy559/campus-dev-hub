@@ -81,7 +81,7 @@ export default function PostCard({
             <Link
               key={tag.id}
               href={`/?tag=${tag.name}`}
-              className="px-2.5 py-1 bg-surface-alt text-muted text-xs rounded-full hover:bg-accent-subtle hover:text-accent transition-all duration-200 min-h-[26px] inline-flex items-center active:scale-95"
+              className="px-3 py-2 bg-surface-alt text-muted text-xs rounded-full hover:bg-accent-subtle hover:text-accent transition-all duration-200 min-h-[36px] inline-flex items-center active:scale-95"
             >
               {tag.name}
             </Link>

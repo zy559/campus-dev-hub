@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
           {mode === "login" ? "登录 Campus Dev Hub" : "注册账号"}
         </h1>
 
-        {mode === "login" ? <LoginForm /> : <RegisterForm />}
+        {mode === "login" ? <Suspense fallback={<div className="text-center text-sm text-muted">加载中...</div>}><LoginForm /></Suspense> : <RegisterForm />}
 
         <div className="mt-6 text-center text-sm text-muted">
           {mode === "login" ? (

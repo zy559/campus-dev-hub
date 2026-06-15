@@ -94,7 +94,7 @@ export default function CommentForm({ postId, onCommentAdded }: CommentFormProps
         <button
           type="submit"
           disabled={loading}
-          className="bg-accent text-white px-6 py-2 rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="bg-accent text-white px-6 py-3 rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "提交中..." : "发表评论"}
         </button>

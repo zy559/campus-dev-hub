@@ -15,6 +15,7 @@ async function getUserProfile(username: string) {
     where: { username },
     include: {
       posts: {
+        take: 20,
         include: {
           tags: { include: { tag: true } },
           _count: { select: { comments: true } },
