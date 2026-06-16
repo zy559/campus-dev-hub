@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import LandingHero from "./LandingHero";
+import LandingShowcase from "./LandingShowcase";
 import DataFeed, { LandingPostSection } from "./DataFeed";
 
 export default function BrowseOrFeed({
@@ -23,26 +24,55 @@ export default function BrowseOrFeed({
     );
   }
 
-  // Landing page: hero (with tech + daily scroll) + post feed
+  // Landing page: dark hero → bento showcase → post feed
   return (
     <>
       <LandingHero />
-      <div className="max-w-4xl mx-auto px-4 pb-16">
-        <Suspense fallback={<FeedSkeleton />}>
-          <LandingPostSection />
-        </Suspense>
+      <Suspense fallback={<ShowcaseSkeleton />}>
+        <LandingShowcase />
+      </Suspense>
+      <div className="bg-slate-950 border-t border-white/5">
+        <div className="max-w-4xl mx-auto px-4 pb-16">
+          <Suspense fallback={<FeedSkeleton />}>
+            <LandingPostSection />
+          </Suspense>
+        </div>
       </div>
     </>
+  );
+}
+
+function ShowcaseSkeleton() {
+  return (
+    <div className="bg-slate-950 py-24 border-t border-white/5">
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 animate-pulse">
+        <div className="flex justify-center mb-6">
+          <div className="h-5 w-24 bg-slate-800 rounded-full" />
+        </div>
+        <div className="mx-auto max-w-lg">
+          <div className="h-10 bg-slate-800 rounded-lg mx-auto max-w-sm" />
+        </div>
+        <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
+          <div className="lg:row-span-2 rounded-lg bg-slate-800 min-h-[360px]" />
+          <div className="rounded-lg bg-slate-800 min-h-[180px]" />
+          <div className="rounded-lg bg-slate-800 min-h-[180px]" />
+          <div className="lg:row-span-2 rounded-lg bg-slate-800 min-h-[360px]" />
+        </div>
+      </div>
+    </div>
   );
 }
 
 function FeedSkeleton() {
   return (
     <div className="py-6">
-      <div className="h-10 w-32 bg-gray-200 rounded animate-pulse mb-6" />
+      <div className="h-10 w-32 bg-slate-800 rounded animate-pulse mb-6" />
       <div className="flex gap-2 mb-8">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-9 w-16 bg-gray-100 rounded-full animate-pulse" />
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="h-9 w-16 bg-slate-800 rounded-full animate-pulse"
+          />
         ))}
       </div>
       <div className="space-y-4">
