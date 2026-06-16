@@ -71,7 +71,7 @@ export default function ScrollRow({ cards, speed = 30 }: ScrollRowProps) {
                 loading="lazy"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-subtle to-accent-soft" />
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
             <div className="relative z-10 p-6 flex flex-col justify-end h-[220px]">

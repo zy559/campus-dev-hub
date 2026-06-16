@@ -1,27 +1,47 @@
 import Link from "next/link";
 import ScrollRow from "@/components/ui/ScrollRow";
 
+// Unsplash 图片 — 小尺寸优化
+const IMG = {
+  algo: "https://images.unsplash.com/photo-1504639725591-34d0984388bd?w=400&q=75",
+  web: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&q=75",
+  backend: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=75",
+  ai: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=75",
+  os: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=400&q=75",
+  project: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&q=75",
+  interview: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=75",
+  notes: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400&q=75",
+  food: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75",
+  sports: "https://images.unsplash.com/photo-1461896836934-bd45ba882cf1?w=400&q=75",
+  gaming: "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=400&q=75",
+  photo: "https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?w=400&q=75",
+  movie: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=75",
+  chat: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=75",
+  event: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&q=75",
+  market: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=75",
+};
+
 // 话题卡片数据（纯静态）
 const topicCards = [
-  { id: "algo", icon: "🧠", title: "算法与数据结构", description: "LeetCode 题解、竞赛总结、面试高频题型" },
-  { id: "web", icon: "🌐", title: "前端开发", description: "React、Vue、CSS 技巧与项目实战" },
-  { id: "be", icon: "⚙️", title: "后端架构", description: "Go、Java、数据库设计与系统设计" },
-  { id: "ai", icon: "🤖", title: "AI & 机器学习", description: "深度学习、NLP、CV 论文解读与实践" },
-  { id: "os", icon: "💾", title: "操作系统", description: "Linux 内核、进程调度、内存管理" },
-  { id: "proj", icon: "🚀", title: "项目实战", description: "课设展示、开源贡献、Hackathon 作品" },
-  { id: "intv", icon: "💼", title: "面试经验", description: "大厂面经、实习攻略、简历优化" },
-  { id: "notes", icon: "📖", title: "学习笔记", description: "课程总结、考试复习、知识体系梳理" },
+  { id: "algo", img: IMG.algo, icon: "🧠", title: "算法与数据结构", description: "LeetCode 题解、竞赛总结、面试高频题型" },
+  { id: "web", img: IMG.web, icon: "🌐", title: "前端开发", description: "React、Vue、CSS 技巧与项目实战" },
+  { id: "be", img: IMG.backend, icon: "⚙️", title: "后端架构", description: "Go、Java、数据库设计与系统设计" },
+  { id: "ai", img: IMG.ai, icon: "🤖", title: "AI & 机器学习", description: "深度学习、NLP、CV 论文解读与实践" },
+  { id: "os", img: IMG.os, icon: "💾", title: "操作系统", description: "Linux 内核、进程调度、内存管理" },
+  { id: "proj", img: IMG.project, icon: "🚀", title: "项目实战", description: "课设展示、开源贡献、Hackathon 作品" },
+  { id: "intv", img: IMG.interview, icon: "💼", title: "面试经验", description: "大厂面经、实习攻略、简历优化" },
+  { id: "notes", img: IMG.notes, icon: "📖", title: "学习笔记", description: "课程总结、考试复习、知识体系梳理" },
 ];
 
 const dailyTopicCards = [
-  { id: "food", icon: "🍜", title: "美食推荐", description: "食堂探店、外卖测评、周边美食推荐" },
-  { id: "sports", icon: "🏀", title: "运动健身", description: "约球组队、跑步打卡、健身房交流" },
-  { id: "gaming", icon: "🎮", title: "游戏娱乐", description: "开黑组队、游戏攻略、赛事讨论" },
-  { id: "photo", icon: "📸", title: "摄影随拍", description: "校园风景、日常记录、手机摄影" },
-  { id: "movie", icon: "🎬", title: "影视音乐", description: "电影推荐、追番讨论、歌单分享" },
-  { id: "chat", icon: "💬", title: "心情杂谈", description: "吐槽专区、树洞、心情随笔" },
-  { id: "event", icon: "🎉", title: "活动聚会", description: "社团活动、线下聚会、志愿者招募" },
-  { id: "market", icon: "🛒", title: "二手好物", description: "闲置转卖、求购、好物推荐" },
+  { id: "food", img: IMG.food, icon: "🍜", title: "美食推荐", description: "食堂探店、外卖测评、周边美食推荐" },
+  { id: "sports", img: IMG.sports, icon: "🏀", title: "运动健身", description: "约球组队、跑步打卡、健身房交流" },
+  { id: "gaming", img: IMG.gaming, icon: "🎮", title: "游戏娱乐", description: "开黑组队、游戏攻略、赛事讨论" },
+  { id: "photo", img: IMG.photo, icon: "📸", title: "摄影随拍", description: "校园风景、日常记录、手机摄影" },
+  { id: "movie", img: IMG.movie, icon: "🎬", title: "影视音乐", description: "电影推荐、追番讨论、歌单分享" },
+  { id: "chat", img: IMG.chat, icon: "💬", title: "心情杂谈", description: "吐槽专区、树洞、心情随笔" },
+  { id: "event", img: IMG.event, icon: "🎉", title: "活动聚会", description: "社团活动、线下聚会、志愿者招募" },
+  { id: "market", img: IMG.market, icon: "🛒", title: "二手好物", description: "闲置转卖、求购、好物推荐" },
 ];
 
 /** Clip-path 光晕组件 */
