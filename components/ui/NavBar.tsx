@@ -110,6 +110,9 @@ export default function NavBar() {
           <span className="text-lg font-bold text-ink hidden lg:inline">
             围炉
           </span>
+          <span className="hidden xl:inline text-xs text-muted font-normal pl-2 border-l border-border ml-0.5">
+            技术有温度
+          </span>
         </Link>
 
         {/* 搜索栏 — desktop always show, mobile toggle */}

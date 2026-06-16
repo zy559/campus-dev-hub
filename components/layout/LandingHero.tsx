@@ -92,15 +92,18 @@ export default function LandingHero() {
                 </span>
               </div>
 
-              <h1 className="animate-fade-in-up stagger-1 text-4xl sm:text-5xl lg:text-6xl font-extrabold text-ink mb-5 tracking-tight leading-[1.08] text-balance">
-                分享知识<br /><span className="text-accent">找到队友</span>
+              <h1 className="animate-fade-in-up stagger-1 text-4xl sm:text-5xl lg:text-6xl font-extrabold text-ink mb-3 tracking-tight leading-[1.08] text-balance">
+                技术有温度
               </h1>
+              <p className="animate-fade-in-up stagger-2 text-xl sm:text-2xl text-accent font-semibold mb-5">
+                写代码，也写日常
+              </p>
 
-              <p className="animate-fade-in-up stagger-2 text-lg text-muted mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              <p className="animate-fade-in-up stagger-3 text-lg text-muted mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
                 用 Markdown 写技术文章，和全校同学讨论课程与项目。一个人的笔记，全年级的力量。
               </p>
 
-              <div className="animate-fade-in-up stagger-3 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+              <div className="animate-fade-in-up stagger-4 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link href="/?browse=1" className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-4 rounded-full hover:bg-accent-hover transition-all duration-200 font-semibold text-base hover:shadow-2xl hover:shadow-accent/35 active:scale-95">
                   免费开始使用
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
@@ -110,7 +113,7 @@ export default function LandingHero() {
                 </a>
               </div>
 
-              <div className="animate-fade-in-up stagger-4 flex flex-wrap gap-6 sm:gap-8 mt-10 justify-center lg:justify-start text-sm text-muted">
+              <div className="animate-fade-in-up stagger-5 flex flex-wrap gap-6 sm:gap-8 mt-10 justify-center lg:justify-start text-sm text-muted">
                 <span>📝 分享知识</span>
                 <span>👥 找到队友</span>
                 <span>🎓 面向全校同学</span>
