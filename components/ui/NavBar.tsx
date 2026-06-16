@@ -105,10 +105,10 @@ export default function NavBar() {
       <div className="px-4 lg:px-6 h-16 flex items-center gap-4">
         <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <span className="text-xl font-bold text-accent transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
-            💻
+            🔥
           </span>
           <span className="text-lg font-bold text-ink hidden lg:inline">
-            Campus Dev Hub
+            围炉
           </span>
         </Link>
 

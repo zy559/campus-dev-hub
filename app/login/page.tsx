@@ -11,7 +11,7 @@ export default function LoginPage() {
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md glass rounded-2xl p-8 animate-scale-in">
         <h1 className="text-2xl font-bold text-center text-ink mb-6">
-          {mode === "login" ? "登录 Campus Dev Hub" : "注册账号"}
+          {mode === "login" ? "登录 围炉" : "注册账号"}
         </h1>
 
         {mode === "login" ? <Suspense fallback={<div className="text-center text-sm text-muted">加载中...</div>}><LoginForm /></Suspense> : <RegisterForm />}

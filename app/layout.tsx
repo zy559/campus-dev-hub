@@ -21,8 +21,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Campus Dev Hub",
-  description: "校园技术交流社区 — 分享、学习、组队",
+  title: "围炉 · Campfire",
+  description: "围炉 · Campfire — 校园技术交流社区，分享、学习、组队",
 };
 
 export default function RootLayout({
