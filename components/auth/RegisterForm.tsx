@@ -76,6 +76,7 @@ export default function RegisterForm() {
     if (code.length !== 6) fe.code = "请输入 6 位验证码";
     if (Object.keys(fe).length > 0) { setErrors(fe); return; }
 
+    console.log("[Register] submitting to /api/auth/register with username:", username);
     setLoading(true);
     try {
       const res = await fetch("/api/auth/register", {
@@ -88,29 +89,33 @@ export default function RegisterForm() {
       try {
         data = JSON.parse(text);
       } catch {
-        // 非 JSON 响应（如 HTML 错误页）
-        data = { error: "服务器异常，请稍后重试" };
+        data = { error: `服务器异常 ${res.status}` };
       }
-      setLoading(false);
 
-      if (!res.ok) { setServerError(data.error || "注册失败"); return; }
+      if (!res.ok) {
+        setLoading(false);
+        setServerError(data.error || "注册失败");
+        return;
+      }
+
+      // 注册成功 — 自动登录
+      const result = await signIn("credentials", { username, password, redirect: false });
+      if (result?.error) {
+        setLoading(false);
+        setServerError("账号已创建但自动登录失败，请手动登录。2 秒后跳转...");
+        setTimeout(() => router.push("/login"), 2000);
+        return;
+      }
+      router.push("/");
+      router.refresh();
     } catch (err: unknown) {
       setLoading(false);
+      console.error("[Register] error:", err);
       const message = err instanceof TypeError && err.message === "Failed to fetch"
         ? "网络连接失败，请检查网络"
-        : "请求失败，请稍后重试";
+        : `请求失败：${err instanceof Error ? err.message : "请稍后重试"}`;
       setServerError(message);
-      return;
     }
-
-    const result = await signIn("credentials", { username, password, redirect: false });
-    if (result?.error) {
-      setServerError("账号已创建，但自动登录失败，请手动登录。");
-      setTimeout(() => router.push("/login"), 2000);
-      return;
-    }
-    router.push("/");
-    router.refresh();
   }
 
   function pwStrength() {
