@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { LoginSchema } from "@/lib/validators";
 import { ZodError } from "zod";
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState("");
@@ -23,7 +24,7 @@ export default function LoginForm() {
     setServerError("");
 
     try {
-      LoginSchema.parse({ email, password });
+      LoginSchema.parse({ username, password });
     } catch (err) {
       if (err instanceof ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -38,7 +39,7 @@ export default function LoginForm() {
     setLoading(true);
 
     const result = await signIn("credentials", {
-      email,
+      username,
       password,
       redirect: false,
     });
@@ -46,7 +47,7 @@ export default function LoginForm() {
     setLoading(false);
 
     if (result?.error) {
-      setServerError("邮箱或密码错误");
+      setServerError("用户名或密码错误");
       return;
     }
 
@@ -57,33 +58,68 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
       {serverError && (
-        <div className="bg-error-bg border border-error-border text-error px-4 py-3 rounded" role="alert">
+        <div className="bg-error-bg border border-error-border text-error px-4 py-3 rounded-lg" role="alert">
           <span aria-hidden="true">⚠️ </span>{serverError}
         </div>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-muted">邮箱</label>
+        <label htmlFor="username" className="block text-sm font-medium text-muted">
+          用户名
+        </label>
         <input
-          id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-          placeholder="your@email.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined}
+          id="username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+          placeholder="输入你的用户名"
+          autoComplete="username"
+          aria-invalid={!!errors.username}
+          aria-describedby={errors.username ? "username-error" : undefined}
         />
-        {errors.email && <p id="email-error" className="mt-1 text-sm text-error" role="alert">{errors.email}</p>}
+        {errors.username && (
+          <p id="username-error" className="mt-1 text-sm text-error" role="alert">
+            {errors.username}
+          </p>
+        )}
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-muted">密码</label>
+        <div className="flex items-center justify-between">
+          <label htmlFor="password" className="block text-sm font-medium text-muted">
+            密码
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-xs text-accent hover:text-accent-hover transition-colors"
+          >
+            忘记密码？
+          </Link>
+        </div>
         <input
-          id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-          placeholder="输入密码" aria-invalid={!!errors.password} aria-describedby={errors.password ? "pw-error" : undefined}
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+          placeholder="输入密码"
+          autoComplete="current-password"
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "pw-error" : undefined}
         />
-        {errors.password && <p id="pw-error" className="mt-1 text-sm text-error" role="alert">{errors.password}</p>}
+        {errors.password && (
+          <p id="pw-error" className="mt-1 text-sm text-error" role="alert">
+            {errors.password}
+          </p>
+        )}
       </div>
 
-      <button type="submit" disabled={loading}
-        className="w-full bg-accent text-white py-2.5 px-4 rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-accent text-white py-2.5 px-4 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+      >
         {loading ? "登录中..." : "登录"}
       </button>
     </form>

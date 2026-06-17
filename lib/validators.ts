@@ -10,12 +10,18 @@ export const RegisterSchema = z.object({
   password: z
     .string()
     .min(6, "密码至少 6 个字符")
-    .max(100, "密码最多 100 个字符"),
+    .max(100, "密码最多 100 个字符")
+    .regex(/[a-zA-Z]/, "密码需包含至少一个字母")
+    .regex(/[0-9]/, "密码需包含至少一个数字"),
   tagIds: z.array(z.string()).max(5, "最多选择 5 个兴趣标签").optional(),
+  code: z.string().length(6, "验证码为 6 位数字").optional(),
 });
 
 export const LoginSchema = z.object({
-  email: z.string().email("请输入有效的邮箱地址"),
+  username: z
+    .string()
+    .min(2, "用户名至少 2 个字符")
+    .max(20, "用户名最多 20 个字符"),
   password: z.string().min(1, "请输入密码"),
 });
 
