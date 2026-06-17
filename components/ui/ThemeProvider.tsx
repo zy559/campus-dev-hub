@@ -10,7 +10,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "light",
+  theme: "dark",
   toggle: () => {},
 });
 
@@ -18,43 +18,43 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
+function getInitialTheme(): Theme {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("campus-dev-hub-theme") === "light" ? "light" : "dark";
+  }
+  return "dark";
+}
+
 export default function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [mounted, setMounted] = useState(false);
 
-  // Hydrate from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("campus-dev-hub-theme") as Theme | null;
-    if (stored === "dark") {
-      setTheme("dark");
+    const attr = document.documentElement.getAttribute("data-theme");
+    if (attr !== "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
-    } else {
-      document.documentElement.removeAttribute("data-theme");
     }
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    // sync localStorage and DOM attr
+    if (!mounted) return;
+    if (theme === "dark") {
+      localStorage.setItem("campus-dev-hub-theme", "dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      localStorage.setItem("campus-dev-hub-theme", "light");
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }, [theme, mounted]);
+
   const toggle = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === "light" ? "dark" : "light";
-      if (next === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem("campus-dev-hub-theme", "dark");
-      } else {
-        document.documentElement.removeAttribute("data-theme");
-        localStorage.setItem("campus-dev-hub-theme", "light");
-      }
-      return next;
-    });
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
-  // Avoid flash of wrong theme before hydration
   if (!mounted) {
-    return (
-      <ThemeContext.Provider value={{ theme: "light", toggle }}>
-        {children}
-      </ThemeContext.Provider>
-    );
+    return <ThemeContext.Provider value={{ theme: "dark", toggle }}>{children}</ThemeContext.Provider>;
   }
 
   return (

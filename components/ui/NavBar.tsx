@@ -230,11 +230,14 @@ export default function NavBar() {
                 <span className="text-xl">🔥</span>
                 <span className="text-lg font-bold text-slate-900 dark:text-white">围炉</span>
               </Link>
-              <button type="button" onClick={() => setMobileOpen(false)} className="-m-2.5 rounded-md p-2.5 text-slate-500 dark:text-slate-400" aria-label="关闭菜单">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="size-6">
-                  <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-1">
+                <ThemeToggle />
+                <button type="button" onClick={() => setMobileOpen(false)} className="-m-2.5 rounded-md p-2.5 text-slate-500 dark:text-slate-400" aria-label="关闭菜单">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="size-6">
+                    <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-slate-200 dark:divide-white/10">

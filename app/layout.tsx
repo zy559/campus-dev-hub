@@ -37,7 +37,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("campus-dev-hub-theme");if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}})()`,
+            __html: `(function(){var t=localStorage.getItem("campus-dev-hub-theme");if(t==="light"){document.documentElement.removeAttribute("data-theme")}else{document.documentElement.setAttribute("data-theme","dark")}})()`,
           }}
         />
       </head>
