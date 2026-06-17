@@ -2,12 +2,12 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-/**
- * 发送邮箱验证码
- */
+// Resend 免费版：需要验证发件域名。未验证域名的可以先用 resend.dev 开发模式
+const FROM = process.env.RESEND_FROM || "围炉 Campfire <onboarding@resend.dev>";
+
 export async function sendVerificationCode(to: string, code: string) {
   const { data, error } = await resend.emails.send({
-    from: "围炉 Campfire <noreply@11111w.ltd>",
+    from: FROM,
     to,
     subject: "围炉 · Campfire — 邮箱验证码",
     html: `
@@ -44,7 +44,7 @@ export async function sendResetLink(to: string, token: string) {
   const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
 
   const { data, error } = await resend.emails.send({
-    from: "围炉 Campfire <noreply@11111w.ltd>",
+    from: FROM,
     to,
     subject: "围炉 · Campfire — 重置密码",
     html: `

@@ -30,21 +30,34 @@ export async function POST(request: Request) {
     const code = generateCode();
     setCode(normalizedEmail, code);
 
+    // 检查 API Key 是否配置
+    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith("re_placeholder")) {
+      return NextResponse.json(
+        { error: "邮件服务未配置，请联系管理员" },
+        { status: 500 }
+      );
+    }
+
     // 尝试发送邮件
     try {
       await sendVerificationCode(normalizedEmail, code);
     } catch (emailError: unknown) {
-      console.error("Send email error:", emailError);
-      const err = emailError as { statusCode?: number; message?: string };
-      // Resend 限制 / API key 未配置
-      if (err.statusCode === 403 || err.statusCode === 401) {
+      console.error("Send email error:", JSON.stringify(emailError));
+      const err = emailError as { statusCode?: number; name?: string; message?: string };
+      if (err.statusCode === 403) {
         return NextResponse.json(
-          { error: "邮件服务未配置，请联系管理员" },
+          { error: "发件域名未验证，请在 Resend 控制台验证域名" },
+          { status: 500 }
+        );
+      }
+      if (err.statusCode === 401) {
+        return NextResponse.json(
+          { error: "API Key 无效，请检查环境变量 RESEND_API_KEY" },
           { status: 500 }
         );
       }
       return NextResponse.json(
-        { error: "邮件发送失败，请稍后重试" },
+        { error: `邮件发送失败：${err.message || "请稍后重试"}` },
         { status: 500 }
       );
     }
