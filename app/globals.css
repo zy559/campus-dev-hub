@@ -198,6 +198,11 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes theme-toggle-spin {
   0% { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(180deg) scale(0.8); }

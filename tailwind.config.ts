@@ -68,6 +68,7 @@ const config: Config = {
         float: "float 4s ease-in-out infinite",
         shimmer: "shimmer 2s ease-in-out infinite",
         "pulse-soft": "pulse-soft 3s ease-in-out infinite",
+        "slide-up": "slide-up 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) both",
       },
     },
   },
