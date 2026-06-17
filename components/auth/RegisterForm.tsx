@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import UserTagSelector from "@/components/user/UserTagSelector";
 
 type Step = "form" | "verify";
+type EmailStatus = "idle" | "checking" | "available" | "taken";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -22,6 +23,26 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
+  const emailCheckRef = useRef(0);
+
+  async function checkEmail(emailToCheck: string) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToCheck)) return;
+    const id = ++emailCheckRef.current;
+    setEmailStatus("checking");
+    try {
+      const res = await fetch("/api/auth/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailToCheck.trim().toLowerCase() }),
+      });
+      if (emailCheckRef.current !== id) return; // discard stale
+      const data = await res.json();
+      setEmailStatus(data.available ? "available" : "taken");
+    } catch {
+      setEmailStatus("idle");
+    }
+  }
 
   function startCountdown() {
     setCountdown(60);
@@ -39,6 +60,7 @@ export default function RegisterForm() {
 
     if (!email) { setErrors({ email: "请输入邮箱地址" }); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErrors({ email: "邮箱格式不正确" }); return; }
+    if (emailStatus === "taken") { setServerError("该邮箱已注册"); return; }
 
     setSendingCode(true);
     try {
@@ -136,10 +158,33 @@ export default function RegisterForm() {
 
           <div>
             <label htmlFor="reg-email" className="block text-sm font-medium text-muted">邮箱</label>
-            <input id="reg-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
-              placeholder="your@email.com" autoComplete="email" />
-            <p className="mt-1 text-xs text-subtle">用于身份验证和找回密码，不会公开</p>
+            <div className="relative">
+              <input id="reg-email" type="email" value={email}
+                onChange={(e) => { setEmail(e.target.value); setEmailStatus("idle"); setErrors((prev) => { const n = { ...prev }; delete n.email; return n; }); }}
+                onBlur={() => checkEmail(email)}
+                className={`mt-1 block w-full rounded-lg border px-3 py-2.5 shadow-sm focus:outline-none focus:ring-2 transition-all pr-10 ${
+                  emailStatus === "taken" ? "border-red-300 focus:border-red-400 focus:ring-red-400/20" :
+                  emailStatus === "available" ? "border-green-300 focus:border-green-400 focus:ring-green-400/20" :
+                  "border-border focus:border-accent focus:ring-accent/20"
+                }`}
+                placeholder="your@email.com" autoComplete="email" />
+              {emailStatus === "checking" && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 size-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+              )}
+              {emailStatus === "available" && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-sm">✓</span>
+              )}
+              {emailStatus === "taken" && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 text-sm">✗</span>
+              )}
+            </div>
+            {emailStatus === "taken" ? (
+              <p className="mt-1 text-sm text-error">该邮箱已注册</p>
+            ) : emailStatus === "available" ? (
+              <p className="mt-1 text-xs text-green-600">该邮箱可用</p>
+            ) : (
+              <p className="mt-1 text-xs text-subtle">用于身份验证和找回密码，不会公开</p>
+            )}
             {errors.email && <p className="mt-1 text-sm text-error">{errors.email}</p>}
           </div>
 
