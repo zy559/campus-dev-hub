@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import UserTagSelector from "@/components/user/UserTagSelector";
 
@@ -76,21 +75,16 @@ export default function RegisterForm() {
     if (code.length !== 6) fe.code = "请输入 6 位验证码";
     if (Object.keys(fe).length > 0) { setErrors(fe); return; }
 
-    console.log("[Register] submitting to /api/auth/register with username:", username);
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch("/api/auth/register-with-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email: email.trim().toLowerCase(), password, tagIds: selectedTagIds, code }),
       });
       const text = await res.text();
-      let data: { error?: string } = {};
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = { error: `服务器异常 ${res.status}` };
-      }
+      let data: { error?: string; success?: boolean } = {};
+      try { data = JSON.parse(text); } catch { data = { error: "服务器异常" }; }
 
       if (!res.ok) {
         setLoading(false);
@@ -98,23 +92,15 @@ export default function RegisterForm() {
         return;
       }
 
-      // 注册成功 — 自动登录
-      const result = await signIn("credentials", { username, password, redirect: false });
-      if (result?.error) {
-        setLoading(false);
-        setServerError("账号已创建但自动登录失败，请手动登录。2 秒后跳转...");
-        setTimeout(() => router.push("/login"), 2000);
-        return;
-      }
+      // 注册+登录一体化，cookie 已由服务器设置
       router.push("/");
       router.refresh();
     } catch (err: unknown) {
       setLoading(false);
       console.error("[Register] error:", err);
-      const message = err instanceof TypeError && err.message === "Failed to fetch"
+      setServerError(err instanceof TypeError && err.message === "Failed to fetch"
         ? "网络连接失败，请检查网络"
-        : `请求失败：${err instanceof Error ? err.message : "请稍后重试"}`;
-      setServerError(message);
+        : "请求失败，请稍后重试");
     }
   }
 
