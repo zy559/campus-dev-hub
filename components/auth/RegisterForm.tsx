@@ -77,20 +77,36 @@ export default function RegisterForm() {
     if (Object.keys(fe).length > 0) { setErrors(fe); return; }
 
     setLoading(true);
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email: email.trim().toLowerCase(), password, tagIds: selectedTagIds, code }),
-    });
-    const data = await res.json();
-    setLoading(false);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email: email.trim().toLowerCase(), password, tagIds: selectedTagIds, code }),
+      });
+      const text = await res.text();
+      let data: { error?: string } = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // 非 JSON 响应（如 HTML 错误页）
+        data = { error: "服务器异常，请稍后重试" };
+      }
+      setLoading(false);
 
-    if (!res.ok) { setServerError(data.error || "注册失败"); return; }
+      if (!res.ok) { setServerError(data.error || "注册失败"); return; }
+    } catch (err: unknown) {
+      setLoading(false);
+      const message = err instanceof TypeError && err.message === "Failed to fetch"
+        ? "网络连接失败，请检查网络"
+        : "请求失败，请稍后重试";
+      setServerError(message);
+      return;
+    }
 
     const result = await signIn("credentials", { username, password, redirect: false });
     if (result?.error) {
-      setServerError("注册成功！请手动登录。");
-      router.push("/login");
+      setServerError("账号已创建，但自动登录失败，请手动登录。");
+      setTimeout(() => router.push("/login"), 2000);
       return;
     }
     router.push("/");
