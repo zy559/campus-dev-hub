@@ -134,3 +134,9 @@ model Message {
 
   @@index([conversationId])
 }
+
+model VerificationCode {
+  email     String   @id
+  code      String
+  expiresAt DateTime
+}

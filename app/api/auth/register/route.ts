@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!verifyCode(normalizedEmail, code)) {
+    if (!(await verifyCode(normalizedEmail, code))) {
       return NextResponse.json(
         { error: "验证码错误或已过期" },
         { status: 400 }
