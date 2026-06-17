@@ -150,10 +150,10 @@ export async function LandingPostSection() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold text-white mb-8 text-center pt-4">近期帖子</h2>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center pt-4">近期帖子</h2>
       {data.posts.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-slate-500">暂无帖子</p>
+          <p className="text-slate-400 dark:text-slate-500">暂无帖子</p>
         </div>
       ) : (
         <div className="space-y-4">
