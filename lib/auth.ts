@@ -2,7 +2,6 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "./db";
-import { LoginSchema } from "./validators";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,26 +13,29 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) {
+          console.error("[authorize] missing credentials, got keys:", credentials ? Object.keys(credentials) : "null");
           return null;
         }
 
-        const parsed = LoginSchema.safeParse(credentials);
-        if (!parsed.success) {
+        // 手动提取字段 — NextAuth 在 credentials 里塞了 csrfToken 等额外字段，Zod v4 .safeParse() 可能因此失败
+        const username = String(credentials.username);
+        const password = String(credentials.password);
+
+        if (username.length < 2 || username.length > 20) {
+          console.error("[authorize] username length invalid:", username.length);
           return null;
         }
 
         const user = await db.user.findUnique({
-          where: { username: parsed.data.username },
+          where: { username },
         });
 
         if (!user) {
+          console.error("[authorize] user not found:", username);
           return null;
         }
 
-        const passwordMatch = await bcrypt.compare(
-          parsed.data.password,
-          user.password
-        );
+        const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
           return null;
