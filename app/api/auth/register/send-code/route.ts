@@ -21,12 +21,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "请 60 秒后再试" }, { status: 429 });
     }
 
-    const code = generateCode();
-    await setCode(normalizedEmail, code);
-
+    // 先检查邮件服务配置，再存储验证码 — 避免邮件未发送但验证码已入库
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith("re_placeholder")) {
       return NextResponse.json({ error: "邮件服务未配置，请联系管理员" }, { status: 500 });
     }
+
+    const code = generateCode();
+    await setCode(normalizedEmail, code);
 
     try {
       await sendVerificationCode(normalizedEmail, code);
