@@ -31,6 +31,15 @@ async function getDailyBoards() {
   return daily?.children ?? [];
 }
 
+// 主板块（非日常子板块的顶级板块）
+async function getMainBoards() {
+  return db.board.findMany({
+    where: { parentId: null },
+    orderBy: { sortOrder: "asc" },
+    include: { _count: { select: { posts: true } } },
+  });
+}
+
 async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: number }> {
   const where = tag ? { tags: { some: { tag: { name: tag } } } } : {};
   const [posts, total] = await Promise.all([
@@ -76,10 +85,11 @@ export default async function DataFeed({
   search: string;
   isBrowsing: boolean;
 }) {
-  const [data, tags, dailyBoards] = await Promise.all([
+  const [data, tags, dailyBoards, mainBoards] = await Promise.all([
     getPosts(tag),
     getAllTags(),
     getDailyBoards(),
+    getMainBoards(),
   ]);
 
   return (
@@ -92,6 +102,41 @@ export default async function DataFeed({
           <Link href="/login" className="text-sm bg-accent text-white px-4 py-1.5 rounded-full hover:bg-accent-hover transition-colors flex-shrink-0">
             立即登录
           </Link>
+        </div>
+      )}
+
+      {/* 学习分区入口 — 主板块 */}
+      {mainBoards.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-ink/80 tracking-wide">📚 学习知识</h3>
+            <Link href="/boards" className="text-xs text-accent hover:text-accent-hover transition-colors">
+              查看全部 →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {mainBoards.map((board) => {
+              const gradients: Record<string, string> = {
+                "寻找比赛": "from-blue-500 to-indigo-600",
+                "学习知识": "from-emerald-500 to-teal-600",
+                "分享日常": "from-orange-400 to-red-500",
+                "综合讨论": "from-violet-500 to-purple-600",
+              };
+              const gradient = gradients[board.name] || "from-slate-500 to-slate-600";
+              return (
+                <Link
+                  key={board.id}
+                  href={`/boards/${board.id}`}
+                  className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${gradient} p-4 transition-all duration-200 hover:scale-[1.03] hover:shadow-lg active:scale-95`}
+                >
+                  <div className="relative z-10">
+                    <p className="text-white font-bold text-sm mb-1">{board.name}</p>
+                    <p className="text-white/70 text-[11px]">{board._count.posts} 篇帖子</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
 
