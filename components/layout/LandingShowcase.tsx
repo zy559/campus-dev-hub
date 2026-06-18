@@ -138,7 +138,7 @@ export default async function LandingShowcase() {
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
               <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
                 <p className="mt-2 text-lg font-medium text-slate-900 dark:text-white max-lg:text-center">为什么选择围炉</p>
-                <p className="mt-2 max-w-lg text-sm text-slate-500 dark:text-slate-400 max-lg:text-center">专为计算机系同学设计的社区</p>
+                <p className="mt-2 max-w-lg text-sm text-slate-500 dark:text-slate-400 max-lg:text-center">属于每一个同学的校园社区</p>
               </div>
               <div className="flex-1 px-8 sm:px-10 py-6">
                 <div className="space-y-5">

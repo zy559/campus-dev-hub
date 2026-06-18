@@ -82,7 +82,7 @@ export default function LandingHero() {
             {/* Badge */}
             <div className="flex justify-center mb-8">
               <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 ring-1 ring-slate-200 dark:ring-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-sm">
-                🎓 计算机系同学的专属社区
+                🎓 属于每一个同学的校园社区
               </span>
             </div>
 
@@ -164,7 +164,7 @@ export default function LandingHero() {
               你需要的，我们都准备好了
             </p>
             <p className="mt-6 text-lg text-slate-500 dark:text-slate-400">
-              从技术写作到社区互动，从组队比赛到分享日常——围炉为计算机系同学量身打造。
+              从技术写作到社区互动，从组队比赛到分享日常——围炉为每一个同学量身打造。
             </p>
           </div>
 
