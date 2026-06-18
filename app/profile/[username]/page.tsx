@@ -40,7 +40,7 @@ async function getUserProfile(username: string) {
     posts: user.posts.map((post) => ({
       id: post.id,
       title: post.title,
-      content: post.content.slice(0, 200),
+      content: post.content,
       tags: post.tags.map((pt: PostTagRelation) => pt.tag),
       commentCount: post._count.comments,
       createdAt: post.createdAt.toISOString(),

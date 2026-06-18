@@ -58,7 +58,7 @@ async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: n
   ]);
   return {
     posts: posts.map((p) => ({
-      id: p.id, title: p.title, content: p.content.slice(0, 300),
+      id: p.id, title: p.title, content: p.content,
       author: p.author, tags: p.tags.map((pt) => pt.tag),
       board: p.board ?? undefined, commentCount: p._count.comments,
       createdAt: p.createdAt.toISOString(),

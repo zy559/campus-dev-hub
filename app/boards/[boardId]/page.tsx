@@ -30,7 +30,7 @@ async function getPosts(boardId: string, tag?: string) {
   return posts.map((post) => ({
     id: post.id,
     title: post.title,
-    content: post.content.slice(0, 300),
+    content: post.content,
     author: post.author,
     tags: post.tags.map((pt) => pt.tag),
     board: post.board ?? undefined,
