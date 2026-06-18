@@ -63,6 +63,7 @@ export async function POST(request: Request) {
       token: {
         id: user.id,
         name: user.username,
+        username: user.username,
         email: user.email,
         role: user.role,
         sub: user.id,

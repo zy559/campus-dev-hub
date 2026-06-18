@@ -32,8 +32,13 @@ export default function MessageInput({ onSend }: { onSend: (content: string) => 
     setUploading(true);
     try {
       const fd = new FormData(); fd.append("file", file);
-      const r = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!r.ok) { const d = await r.json(); alert(d.error || "上传失败"); return; }
+      const r = await fetch("/api/upload", { method: "POST", body: fd, credentials: "include" });
+      if (!r.ok) {
+        let msg = "上传失败";
+        try { const d = await r.json(); msg = d.error || msg; } catch {}
+        alert(msg);
+        return;
+      }
       const { url } = await r.json();
       const md = file.type.startsWith("video")
         ? `<video src="${url}" controls></video>`

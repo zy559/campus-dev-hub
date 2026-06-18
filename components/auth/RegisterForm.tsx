@@ -58,9 +58,19 @@ export default function RegisterForm() {
     setErrors({});
     setServerError("");
 
-    if (!email) { setErrors({ email: "请输入邮箱地址" }); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErrors({ email: "邮箱格式不正确" }); return; }
-    if (emailStatus === "taken") { setServerError("该邮箱已注册"); return; }
+    // 在发送验证码前校验所有字段，防止用户在步骤2提交时因不可见的错误而"没有反应"
+    const fe: Record<string, string> = {};
+    if (username.length < 2) fe.username = "用户名至少 2 个字符";
+    else if (username.length > 20) fe.username = "用户名最多 20 个字符";
+    else if (!/^[a-zA-Z0-9_一-龥]+$/.test(username)) fe.username = "用户名只能包含中英文、数字和下划线";
+    if (!email) fe.email = "请输入邮箱地址";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fe.email = "邮箱格式不正确";
+    else if (emailStatus === "taken") fe.email = "该邮箱已注册";
+    if (password.length < 6) fe.password = "密码至少 6 个字符";
+    else if (!/[a-zA-Z]/.test(password)) fe.password = "密码需包含字母";
+    else if (!/[0-9]/.test(password)) fe.password = "密码需包含数字";
+    if (password !== confirmPassword) fe.confirmPassword = "两次密码不一致";
+    if (Object.keys(fe).length > 0) { setErrors(fe); return; }
 
     setSendingCode(true);
     try {
@@ -226,6 +236,17 @@ export default function RegisterForm() {
           <div className="bg-accent-subtle border border-accent/20 rounded-lg p-4 text-sm text-accent">
             验证码已发送至 <strong>{email}</strong>
           </div>
+
+          {/* 显示来自步骤1字段的验证错误，防止用户看不到错误 */}
+          {(errors.username || errors.email || errors.password || errors.confirmPassword) && (
+            <div className="bg-error-bg border border-error-border text-error px-4 py-3 rounded-lg text-sm space-y-1" role="alert">
+              <p className="font-medium">请返回修正以下问题：</p>
+              {errors.username && <p>• {errors.username}</p>}
+              {errors.email && <p>• {errors.email}</p>}
+              {errors.password && <p>• {errors.password}</p>}
+              {errors.confirmPassword && <p>• {errors.confirmPassword}</p>}
+            </div>
+          )}
 
           <div>
             <label htmlFor="code" className="block text-sm font-medium text-muted">邮箱验证码</label>

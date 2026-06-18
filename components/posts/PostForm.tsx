@@ -54,8 +54,13 @@ export default function PostForm() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (!res.ok) { const d = await res.json(); alert(d.error || "上传失败"); return; }
+      const res = await fetch("/api/upload", { method: "POST", body: formData, credentials: "include" });
+      if (!res.ok) {
+        let msg = "上传失败";
+        try { const d = await res.json(); msg = d.error || msg; } catch {}
+        alert(msg);
+        return;
+      }
       const { url } = await res.json();
 
       const isVideo = file.type.startsWith("video");
