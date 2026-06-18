@@ -3,6 +3,7 @@ import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import LandingHero from "./LandingHero";
 import LandingShowcase from "./LandingShowcase";
 import AboutContact from "./AboutContact";
+import Spotlight from "@/components/ui/Spotlight";
 import DataFeed, { LandingPostSection } from "./DataFeed";
 
 export default function BrowseOrFeed({
@@ -25,7 +26,7 @@ export default function BrowseOrFeed({
   }
 
   return (
-    <>
+    <Spotlight>
       <LandingHero />
       <Suspense fallback={<ShowcaseSkeleton />}>
         <LandingShowcase />
@@ -38,7 +39,7 @@ export default function BrowseOrFeed({
         </div>
       </div>
       <AboutContact />
-    </>
+    </Spotlight>
   );
 }
 

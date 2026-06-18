@@ -1,27 +1,48 @@
 import Link from "next/link";
 import ScrollRow from "@/components/ui/ScrollRow";
 
-// 纯 CSS 渐变背景 — 不依赖任何外部图片，中国可访问
+const pexels = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=400&q=75`;
+
+const IMG = {
+  algo:    pexels(3861969),
+  web:     pexels(326503),
+  backend: pexels(1181271),
+  ai:      pexels(8386440),
+  os:      pexels(546819),
+  project: pexels(3183153),
+  intervw: pexels(4348404),
+  notes:   pexels(4144923),
+  food:    pexels(1640777),
+  sports:  pexels(1752757),
+  gaming:  pexels(7915357),
+  photo:   pexels(212324),
+  movie:   pexels(274937),
+  chat:    pexels(614810),
+  event:   pexels(1190297),
+  market:  pexels(4246074),
+};
+
 const topicCards = [
-  { id: "algo", icon: "🧠", title: "算法", description: "LeetCode 题解、竞赛、面试高频题型" },
-  { id: "web",  icon: "🌐", title: "前端", description: "React、Vue、CSS 与项目实战" },
-  { id: "be",   icon: "⚙️", title: "后端", description: "Go、Java、数据库与系统设计" },
-  { id: "ai",   icon: "🤖", title: "AI",  description: "深度学习、NLP、CV 论文与实践" },
-  { id: "os",   icon: "💾", title: "系统", description: "Linux 内核、进程调度、内存管理" },
-  { id: "proj", icon: "🚀", title: "实战", description: "课设展示、Hackathon 作品" },
-  { id: "intv", icon: "💼", title: "面试", description: "大厂面经、实习攻略、简历优化" },
-  { id: "notes", icon: "📖", title: "笔记", description: "课程总结、考试复习、知识梳理" },
+  { id: "algo", img: IMG.algo, icon: "🧠", title: "算法", description: "LeetCode 题解、竞赛、面试高频题型" },
+  { id: "web",  img: IMG.web,  icon: "🌐", title: "前端", description: "React、Vue、CSS 与项目实战" },
+  { id: "be",   img: IMG.backend, icon: "⚙️", title: "后端", description: "Go、Java、数据库与系统设计" },
+  { id: "ai",   img: IMG.ai,   icon: "🤖", title: "AI",  description: "深度学习、NLP、CV 论文与实践" },
+  { id: "os",   img: IMG.os,   icon: "💾", title: "系统", description: "Linux 内核、进程调度、内存管理" },
+  { id: "proj", img: IMG.project, icon: "🚀", title: "实战", description: "课设展示、Hackathon 作品" },
+  { id: "intv", img: IMG.intervw, icon: "💼", title: "面试", description: "大厂面经、实习攻略、简历优化" },
+  { id: "notes", img: IMG.notes, icon: "📖", title: "笔记", description: "课程总结、考试复习、知识梳理" },
 ];
 
 const dailyTopicCards = [
-  { id: "food",   icon: "🍜", title: "美食", description: "食堂探店、外卖测评" },
-  { id: "sports", icon: "🏀", title: "运动", description: "约球组队、跑步打卡" },
-  { id: "gaming", icon: "🎮", title: "游戏", description: "开黑组队、攻略讨论" },
-  { id: "photo",  icon: "📸", title: "摄影", description: "校园风景、日常记录" },
-  { id: "movie",  icon: "🎬", title: "影视", description: "电影推荐、歌单分享" },
-  { id: "chat",   icon: "💬", title: "心情", description: "吐槽专区、心情随笔" },
-  { id: "event",  icon: "🎉", title: "活动", description: "社团活动、聚会招募" },
-  { id: "market", icon: "🛒", title: "好物", description: "闲置转卖、好物推荐" },
+  { id: "food",   img: IMG.food,   icon: "🍜", title: "美食", description: "食堂探店、外卖测评" },
+  { id: "sports", img: IMG.sports, icon: "🏀", title: "运动", description: "约球组队、跑步打卡" },
+  { id: "gaming", img: IMG.gaming, icon: "🎮", title: "游戏", description: "开黑组队、攻略讨论" },
+  { id: "photo",  img: IMG.photo,  icon: "📸", title: "摄影", description: "校园风景、日常记录" },
+  { id: "movie",  img: IMG.movie,  icon: "🎬", title: "影视", description: "电影推荐、歌单分享" },
+  { id: "chat",   img: IMG.chat,   icon: "💬", title: "心情", description: "吐槽专区、心情随笔" },
+  { id: "event",  img: IMG.event,  icon: "🎉", title: "活动", description: "社团活动、聚会招募" },
+  { id: "market", img: IMG.market, icon: "🛒", title: "好物", description: "闲置转卖、好物推荐" },
 ];
 
 const features = [
