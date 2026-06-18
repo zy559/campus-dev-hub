@@ -3,13 +3,30 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!session) { setUnreadCount(0); return; }
+    async function poll() {
+      try {
+        const res = await fetch("/api/conversations");
+        if (!res.ok) return;
+        const data = await res.json();
+        const total = Array.isArray(data) ? data.reduce((sum: number, c: { unreadCount?: number }) => sum + (c.unreadCount || 0), 0) : 0;
+        setUnreadCount(total);
+      } catch { /* ignore */ }
+    }
+    poll();
+    const timer = setInterval(poll, 15000);
+    return () => clearInterval(timer);
+  }, [session]);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -56,11 +73,16 @@ export default function BottomNav() {
 
           {session ? (
             <>
-              <Link href="/messages" className={itemClass("/messages")}>
+              <Link href="/messages" className={`relative ${itemClass("/messages")}`}>
                 <svg className="w-6 h-6" fill={isActive("/messages") ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
                 <span className="text-[11px] font-medium">消息</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 right-1 min-w-[16px] h-[16px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </Link>
 
               {/* 我的 — 点击弹出菜单 */}

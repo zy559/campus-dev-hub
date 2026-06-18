@@ -107,11 +107,13 @@ model Board {
 }
 
 model Conversation {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   participant1Id String
   participant2Id String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  p1ReadAt       DateTime?
+  p2ReadAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   participant1 User      @relation("Participant1", fields: [participant1Id], references: [id], onDelete: Cascade)
   participant2 User      @relation("Participant2", fields: [participant2Id], references: [id], onDelete: Cascade)

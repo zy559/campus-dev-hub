@@ -21,21 +21,52 @@ export async function GET() {
         participant1: { select: { id: true, username: true, avatar: true } },
         participant2: { select: { id: true, username: true, avatar: true } },
         messages: { orderBy: { createdAt: "desc" }, take: 1 },
+        _count: { select: { messages: true } },
       },
       orderBy: { updatedAt: "desc" },
     });
 
-    const result = conversations.map((c) => ({
-      id: c.id,
-      otherUser:
-        c.participant1Id === session.user!.id
-          ? { id: c.participant2.id, username: c.participant2.username, avatar: c.participant2.avatar }
-          : { id: c.participant1.id, username: c.participant1.username, avatar: c.participant1.avatar },
-      lastMessage: c.messages[0]
-        ? { content: c.messages[0].content, createdAt: c.messages[0].createdAt.toISOString() }
-        : null,
-      updatedAt: c.updatedAt.toISOString(),
-    }));
+    const result = conversations.map((c) => {
+      const isP1 = c.participant1Id === session.user!.id;
+      const otherUser = isP1
+        ? { id: c.participant2.id, username: c.participant2.username, avatar: c.participant2.avatar }
+        : { id: c.participant1.id, username: c.participant1.username, avatar: c.participant1.avatar };
+      const myReadAt = isP1 ? c.p1ReadAt : c.p2ReadAt;
+
+      // 未读 = 从未读过 或 最后一条消息时间 > 读时间
+      let unreadCount = 0;
+      if (!myReadAt && c.messages.length > 0) {
+        // 从未读过且有消息 → 显示总消息数
+        unreadCount = c._count.messages;
+      } else if (myReadAt) {
+        // 只显示 readAt 之后的消息数（通过遍历 cursor 计算）
+        // DB 层计数：消息总数 - 已读消息数
+      }
+
+      return {
+        id: c.id,
+        otherUser,
+        lastMessage: c.messages[0]
+          ? { content: c.messages[0].content.slice(0, 100), createdAt: c.messages[0].createdAt.toISOString() }
+          : null,
+        updatedAt: c.updatedAt.toISOString(),
+        unreadCount,
+      };
+    });
+
+    // 批量计算未读数
+    for (let i = 0; i < result.length; i++) {
+      const c = conversations[i];
+      const isP1 = c.participant1Id === session.user!.id;
+      const myReadAt = isP1 ? c.p1ReadAt : c.p2ReadAt;
+      if (!myReadAt && c.messages.length > 0) {
+        result[i].unreadCount = c._count.messages;
+      } else if (myReadAt) {
+        result[i].unreadCount = await db.message.count({
+          where: { conversationId: c.id, createdAt: { gt: myReadAt } },
+        });
+      }
+    }
 
     return NextResponse.json(result);
   } catch (error) {
@@ -60,7 +91,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "不能和自己对话" }, { status: 400 });
     }
 
-    // 找到或创建对话（双向匹配）
     const existing = await db.conversation.findFirst({
       where: {
         OR: [
@@ -75,17 +105,16 @@ export async function POST(request: Request) {
     });
 
     if (existing) {
+      const isP1 = existing.participant1Id === session.user!.id;
       return NextResponse.json({
         id: existing.id,
-        otherUser:
-          existing.participant1Id === session.user!.id
-            ? { id: existing.participant2.id, username: existing.participant2.username, avatar: existing.participant2.avatar }
-            : { id: existing.participant1.id, username: existing.participant1.username, avatar: existing.participant1.avatar },
+        otherUser: isP1
+          ? { id: existing.participant2.id, username: existing.participant2.username, avatar: existing.participant2.avatar }
+          : { id: existing.participant1.id, username: existing.participant1.username, avatar: existing.participant1.avatar },
         updatedAt: existing.updatedAt.toISOString(),
       });
     }
 
-    // 验证目标用户存在
     const targetUser = await db.user.findUnique({ where: { id: participantId } });
     if (!targetUser) {
       return NextResponse.json({ error: "用户不存在" }, { status: 404 });
@@ -95,6 +124,7 @@ export async function POST(request: Request) {
       data: {
         participant1Id: session.user.id,
         participant2Id: participantId,
+        p1ReadAt: new Date(), // 创建者默认已读
       },
       include: {
         participant2: { select: { id: true, username: true, avatar: true } },

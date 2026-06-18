@@ -1,11 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { db } from "@/lib/db";
-import ConversationCard from "@/components/chat/ConversationCard";
+import MessagesClient from "./MessagesClient";
 import type { ConversationData } from "@/lib/types";
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function MessagesPage() {
   const session = await getServerSession(authOptions);
@@ -38,31 +37,5 @@ export default async function MessagesPage() {
     updatedAt: c.updatedAt.toISOString(),
   }));
 
-  return (
-    <div className="py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-ink">消息</h1>
-        <Link href="/" className="text-sm text-muted hover:text-accent transition-colors">
-          返回首页
-        </Link>
-      </div>
-
-      {data.length === 0 ? (
-        <div className="text-center py-20">
-          <div className="text-5xl mb-4">💬</div>
-          <p className="text-muted text-lg">暂无对话</p>
-          <p className="text-subtle mt-2">去浏览帖子，找到感兴趣的用户发起聊天</p>
-          <Link href="/" className="inline-block mt-4 text-accent hover:text-accent-hover font-medium transition-colors">
-            去发现内容 →
-          </Link>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {data.map((c) => (
-            <ConversationCard key={c.id} {...c} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return <MessagesClient conversations={data} />;
 }

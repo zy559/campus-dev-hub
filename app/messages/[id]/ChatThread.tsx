@@ -21,15 +21,20 @@ export default function ChatThread({
   initialMessages: Message[];
   currentUserId: string;
 }) {
-  // currentUserId is passed from server component
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Mark as read on mount
+  useEffect(() => {
+    fetch(`/api/conversations/${conversationId}/read`, { method: "POST" }).catch(() => {});
+  }, [conversationId]);
+
+  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 轮询新消息（每 5 秒）
+  // Poll
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -42,15 +47,19 @@ export default function ChatThread({
     return () => clearInterval(interval);
   }, [conversationId]);
 
-  async function handleSend(content: string) {
-    const res = await fetch(`/api/conversations/${conversationId}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content }),
-    });
-    if (res.ok) {
+  async function handleSend(content: string): Promise<boolean> {
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+      if (!res.ok) return false;
       const newMsg = await res.json();
       setMessages((prev) => [...prev, newMsg]);
+      return true;
+    } catch {
+      return false;
     }
   }
 
