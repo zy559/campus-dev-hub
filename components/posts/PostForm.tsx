@@ -139,6 +139,8 @@ export default function PostForm() {
     const res = await fetch("/api/posts", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ title, content, tagIds: selectedTagIds, boardId: selectedBoardId }) });
     const data = await res.json(); setLoading(false);
     if (!res.ok) { setServerError(data.error || "发布失败"); return; }
+    // 触发服务器端 ISR 刷新
+    try { await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/" }) }); } catch {}
     setPosted({ id: data.id, title: data.title || title });
     setCountdown(5);
   }
@@ -155,7 +157,7 @@ export default function PostForm() {
         <div className="flex gap-3 justify-center">
           <Link href={`/posts/${posted.id}`} className="bg-accent text-white px-6 py-2.5 rounded-full hover:bg-accent-hover transition-colors text-sm font-medium">查看帖子</Link>
           <button onClick={() => { setPosted(null); setTitle(""); setContent(""); setSelectedTagIds([]); setSelectedBoardId(""); setMediaList([]); }} className="px-6 py-2.5 rounded-full border border-border text-muted hover:bg-surface-alt transition-colors text-sm">继续发布</button>
-          <Link href="/" className="px-6 py-2.5 rounded-full border border-border text-muted hover:bg-surface-alt transition-colors text-sm">返回主页</Link>
+          <a href="/" className="px-6 py-2.5 rounded-full border border-border text-muted hover:bg-surface-alt transition-colors text-sm">返回主页</a>
         </div>
       </div>
     );

@@ -5,5 +5,7 @@ export async function uploadToBlob(file: File): Promise<string> {
     access: "private",
     addRandomSuffix: true,
   });
+  // Private blob URLs include an embedded token — directly accessible in <img> tags
+  console.log("[upload] blob URL:", blob.url.slice(0, 80) + "...");
   return blob.url;
 }
