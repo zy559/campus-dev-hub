@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import LandingHero from "./LandingHero";
 import LandingShowcase from "./LandingShowcase";
+import AboutContact from "./AboutContact";
 import DataFeed, { LandingPostSection } from "./DataFeed";
 
 export default function BrowseOrFeed({
@@ -36,6 +37,7 @@ export default function BrowseOrFeed({
           </Suspense>
         </div>
       </div>
+      <AboutContact />
     </>
   );
 }
