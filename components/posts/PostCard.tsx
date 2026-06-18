@@ -72,7 +72,7 @@ export default function PostCard({
       </Link>
 
       <p className="text-muted mb-4 line-clamp-3 leading-relaxed text-sm sm:text-base">
-        {content}
+        {content.replace(/!\[([^\]]*)\]\([^)]+\)/g, "📷 $1").replace(/<video[^>]*>[^<]*<\/video>/g, "🎬 视频").replace(/[#*`>]/g, "").slice(0, 300)}
       </p>
 
       <div className="flex items-center justify-between">

@@ -10,30 +10,38 @@ interface MessageBubbleProps {
 }
 
 function parseContent(content: string): { type: "text" | "image" | "video"; value: string }[] {
-  const parts: { type: "text" | "image" | "video"; value: string }[] = [];
+  // Image: ![alt](url)  or  [img]url[/img]
   const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-  const videoRegex = /<video src="([^"]+)" controls><\/video>/g;
-  const combined = new RegExp(`${imgRegex.source}|${videoRegex.source}`, "g");
+  // Video: <video src="url" controls></video>
+  const vidRegex = /<video src="([^"]+)"[^>]*><\/video>/g;
 
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
+  // Collect all matches
+  interface Match { index: number; end: number; type: "image" | "video"; value: string }
+  const matches: Match[] = [];
 
-  while ((match = combined.exec(content)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push({ type: "text", value: content.slice(lastIndex, match.index) });
-    }
-    if (match[1]) {
-      // Image group: match[1]=alt, match[2]=url
-      parts.push({ type: "image", value: match[2] });
-    } else if (match[3]) {
-      // Video group: match[3]=url
-      parts.push({ type: "video", value: match[3] });
-    }
-    lastIndex = match.index + match[0].length;
+  let m: RegExpExecArray | null;
+  while ((m = imgRegex.exec(content)) !== null) {
+    matches.push({ index: m.index, end: m.index + m[0].length, type: "image", value: m[2] });
   }
+  while ((m = vidRegex.exec(content)) !== null) {
+    matches.push({ index: m.index, end: m.index + m[0].length, type: "video", value: m[1] });
+  }
+  matches.sort((a, b) => a.index - b.index);
 
-  if (lastIndex < content.length) {
-    parts.push({ type: "text", value: content.slice(lastIndex) });
+  // Build parts
+  const parts: { type: "text" | "image" | "video"; value: string }[] = [];
+  let cursor = 0;
+  for (const match of matches) {
+    if (match.index > cursor) {
+      const text = content.slice(cursor, match.index).trim();
+      if (text) parts.push({ type: "text", value: text });
+    }
+    parts.push({ type: match.type, value: match.value });
+    cursor = match.end;
+  }
+  if (cursor < content.length) {
+    const text = content.slice(cursor).trim();
+    if (text) parts.push({ type: "text", value: text });
   }
 
   return parts.length > 0 ? parts : [{ type: "text", value: content }];

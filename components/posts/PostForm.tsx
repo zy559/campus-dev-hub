@@ -40,7 +40,7 @@ export default function PostForm() {
     if (!posted) return;
     const timer = setInterval(() => {
       setCountdown(prev => {
-        if (prev <= 1) { clearInterval(timer); router.push("/"); return 0; }
+        if (prev <= 1) { clearInterval(timer); window.location.href = "/"; return 0; }
         return prev - 1;
       });
     }, 1000);
