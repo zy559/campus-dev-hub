@@ -7,7 +7,7 @@ import { PostSchema } from "@/lib/validators";
 import { ZodError } from "zod";
 
 interface Tag { id: string; name: string; }
-interface Board { id: string; name: string; }
+interface Board { id: string; name: string; children?: Board[]; }
 
 interface UploadedMedia { url: string; name: string; type: "image" | "video"; }
 
@@ -33,7 +33,18 @@ export default function PostForm() {
 
   useEffect(() => {
     fetch("/api/tags").then(r => r.json()).then(d => setAllTags(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/boards").then(r => r.json()).then(d => setBoards(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/boards").then(r => r.json()).then((data: Board[]) => {
+      const all: Board[] = [];
+      for (const b of (Array.isArray(data) ? data : [])) {
+        all.push(b);
+        if (b.children) {
+          for (const child of b.children) {
+            all.push({ ...child, name: `${b.name} · ${child.name}` });
+          }
+        }
+      }
+      setBoards(all);
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -165,6 +176,9 @@ export default function PostForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
+      <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-2">
+        ← 返回首页
+      </Link>
       {serverError && (<div className="bg-error-bg border border-error-border text-error px-4 py-3 rounded-lg" role="alert"><span aria-hidden="true">⚠️ </span>{serverError}</div>)}
 
       {/* 板块选择 */}
