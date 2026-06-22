@@ -1,4 +1,6 @@
 import { NextAuthOptions } from "next-auth";
+import { decode } from "next-auth/jwt";
+import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "./db";
@@ -88,3 +90,47 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
 };
+
+/**
+ * 统一会话获取 — 兼容 Web Cookie 和 Mini Program Bearer Token
+ *
+ * Web:         Cookie 中有 next-auth.session-token → getServerSession()
+ * Mini Program: Authorization: Bearer <token> → getToken() 解码 JWT
+ *
+ * 在所有 API 路由中替代 getServerSession(authOptions) 使用，
+ * 即可同时支持两端认证。
+ */
+export async function getSessionFromRequest(request: Request) {
+  const authHeader = request.headers.get("Authorization");
+
+  // Mini Program: Bearer token
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) return null;
+
+    try {
+      const decoded = await decode({
+        token,
+        secret,
+      });
+
+      if (!decoded) return null;
+
+      return {
+        user: {
+          id: (decoded.id || decoded.sub) as string,
+          name: ((decoded as Record<string, unknown>).username ||
+            decoded.name) as string,
+          email: (decoded.email as string) || "",
+          role: ((decoded as Record<string, unknown>).role as string) || "user",
+        },
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  // Web: Cookie session (fallback)
+  return getServerSession(authOptions);
+}

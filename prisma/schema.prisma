@@ -19,6 +19,8 @@ model User {
   warned        Boolean   @default(false)
   muted         Boolean   @default(false)
   bannedUntil   DateTime?
+  wechatOpenId  String?   @unique
+  wechatUnionId String?
   resetToken       String?
   resetTokenExpires DateTime?
   createdAt     DateTime  @default(now())
