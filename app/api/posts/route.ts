@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const tag = searchParams.get("tag");
     const boardId = searchParams.get("boardId");
+    const author = searchParams.get("author");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(20, Math.max(1, parseInt(searchParams.get("limit") || "10")));
     const skip = (page - 1) * limit;
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
     const where: Record<string, unknown> = {};
     if (tag) where.tags = { some: { tag: { name: tag } } };
     if (boardId) where.boardId = boardId;
+    if (author) where.author = { username: author };
 
     const [posts, total] = await Promise.all([
       db.post.findMany({
