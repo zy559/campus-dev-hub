@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionFromRequest(request);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "请先登录" }, { status: 401 });
     }

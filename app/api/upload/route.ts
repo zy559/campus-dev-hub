@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth";
 import { uploadToBlob } from "@/lib/upload";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -11,7 +10,7 @@ const ALLOWED_TYPES = [
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionFromRequest(request);
     console.log("[upload] session user:", session?.user?.id || "NONE");
 
     if (!session?.user?.id) {
