@@ -42,12 +42,12 @@ export default function LeftSidebar() {
             <p className="mb-2 pl-6 text-xs font-bold text-subtle">我的</p>
             <SidebarLink
               item={{
-                href: `/profile/${session.user?.name}`,
+                href: "/me",
                 label: "我的主页",
-                desc: "资料和发布",
+                desc: "喜欢和资料",
                 icon: "◌",
               }}
-              active={pathname.startsWith(`/profile/${session.user?.name}`)}
+              active={pathname.startsWith("/me") || pathname.startsWith(`/profile/${session.user?.name}`)}
             />
             {isAdmin && (
               <SidebarLink

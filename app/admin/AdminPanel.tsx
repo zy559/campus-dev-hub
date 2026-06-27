@@ -73,6 +73,21 @@ export default function AdminPanel({ monitor, users }: AdminPanelProps) {
     setMsg(res.ok ? "帖子已删除" : "删除失败");
   }
 
+  async function impersonate(user: UserRow) {
+    if (!confirm(`确认以 ${user.username} 的身份进入系统？`)) return;
+    const res = await fetch("/api/admin/impersonate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setMsg(data.error || "模拟登录失败");
+      return;
+    }
+    window.location.href = "/";
+  }
+
   return (
     <div className="space-y-8">
       <MonitorOverview monitor={monitor} />
@@ -104,7 +119,7 @@ export default function AdminPanel({ monitor, users }: AdminPanelProps) {
 
         <div className="space-y-3">
           {filtered.map((user) => (
-            <UserGovernanceCard key={user.id} user={user} action={action} deletePost={deletePost} />
+            <UserGovernanceCard key={user.id} user={user} action={action} deletePost={deletePost} impersonate={impersonate} />
           ))}
         </div>
       </section>
@@ -215,10 +230,12 @@ function UserGovernanceCard({
   user,
   action,
   deletePost,
+  impersonate,
 }: {
   user: UserRow;
   action: (url: string, body: { userId: string } & Record<string, unknown>, okMsg: string) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
+  impersonate: (user: UserRow) => Promise<void>;
 }) {
   const isBanned = Boolean(user.bannedUntil && new Date(user.bannedUntil) > new Date());
 
@@ -241,6 +258,12 @@ function UserGovernanceCard({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => impersonate(user)}
+            className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 transition hover:bg-teal-100"
+          >
+            模拟登录
+          </button>
           <button
             onClick={() => action("/api/admin/warn", { userId: user.id, warned: !user.warned }, user.warned ? "已取消警告" : "已警告")}
             className="rounded-full bg-yellow-50 px-3 py-1 text-xs font-medium text-yellow-700 transition hover:bg-yellow-100"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface ProfileCardItem {
   id: string;
@@ -23,6 +23,8 @@ const fallbackGradients = [
   "from-emerald-100 via-slate-50 to-white",
 ];
 
+const LIKE_KEY = "campus-dev-hub-liked-profile-cards";
+
 export default function ProfileRecommendationFeed({
   cards,
   isBrowsing,
@@ -34,22 +36,45 @@ export default function ProfileRecommendationFeed({
   const [cardIndex, setCardIndex] = useState(0);
   const [imageIndex, setImageIndex] = useState(0);
   const [chatLoading, setChatLoading] = useState(false);
+  const [likedIds, setLikedIds] = useState<string[]>([]);
   const card = cards[cardIndex % cards.length];
   const image = card.images[imageIndex];
+  const isLiked = likedIds.includes(card.id);
   const opener = useMemo(
     () =>
       `你好，我看到你的资料卡，感觉我们都对${card.interests.slice(0, 2).join("、") || "校园生活"}感兴趣，可以认识一下吗？`,
     [card]
   );
 
+  useEffect(() => {
+    try {
+      setLikedIds(JSON.parse(localStorage.getItem(LIKE_KEY) || "[]"));
+    } catch {
+      setLikedIds([]);
+    }
+  }, []);
+
+  function saveLiked(next: string[]) {
+    setLikedIds(next);
+    localStorage.setItem(LIKE_KEY, JSON.stringify(next));
+  }
+
   function nextCard() {
     setCardIndex((value) => (value + 1) % cards.length);
     setImageIndex(0);
   }
 
+  function likeCard() {
+    if (!isLiked) {
+      saveLiked([...likedIds, card.id]);
+    }
+    nextCard();
+  }
+
   async function startChat(anonymous = false) {
+    const draft = anonymous ? "我想先匿名了解一下你的资料卡，可以聊聊吗？" : opener;
     if (!card.authorId) {
-      router.push(`/messages?opener=${encodeURIComponent(anonymous ? "我想先匿名了解一下你的资料卡，可以聊聊吗？" : opener)}`);
+      router.push(`/messages?opener=${encodeURIComponent(draft)}`);
       return;
     }
 
@@ -62,17 +87,16 @@ export default function ProfileRecommendationFeed({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "发起聊天失败");
-      const draft = anonymous ? "我想先匿名了解一下你的资料卡，可以聊聊吗？" : opener;
       router.push(`/messages/${data.id}?opener=${encodeURIComponent(draft)}`);
     } catch {
-      router.push(`/profile/${encodeURIComponent(card.username)}`);
+      alert("发起聊天失败，请先确认已登录。");
     } finally {
       setChatLoading(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-3 py-4 pb-24 sm:px-4 lg:pb-6">
+    <div className="mx-auto max-w-5xl px-3 py-4 pb-28 sm:px-4 lg:pb-6">
       {isBrowsing && (
         <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-teal-100 bg-teal-50 px-5 py-4 text-teal-900 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium">你正在以游客身份浏览。登录后可以发布资料卡、喜欢、聊天和匿名开口。</p>
@@ -99,14 +123,14 @@ export default function ProfileRecommendationFeed({
         </div>
 
         <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-xl ring-1 ring-slate-100">
-          <div className={`relative min-h-[560px] bg-gradient-to-br ${fallbackGradients[cardIndex % fallbackGradients.length]} p-4 sm:p-6`}>
+          <div className={`relative min-h-[calc(100vh-12rem)] bg-gradient-to-br ${fallbackGradients[cardIndex % fallbackGradients.length]} p-4 pb-24 sm:min-h-[560px] sm:p-6`}>
             <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-black text-teal-700 shadow-sm ring-1 ring-white/80 backdrop-blur">
               校园匹配
             </div>
 
             <div className="mt-10 grid gap-4 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
               <div>
-                <div className="relative aspect-[3/4] max-h-[520px] overflow-hidden rounded-[1.25rem] bg-white shadow-lg ring-1 ring-white/80">
+                <div className="relative mx-auto aspect-[3/4] max-h-[48vh] overflow-hidden rounded-[1.25rem] bg-white shadow-lg ring-1 ring-white/80 sm:max-h-[520px]">
                   {image ? (
                     <img src={image} alt={`${card.name} 的资料卡图片`} className="h-full w-full object-cover" />
                   ) : (
@@ -132,10 +156,10 @@ export default function ProfileRecommendationFeed({
                 )}
               </div>
 
-              <div className="rounded-[1.25rem] bg-white/88 p-5 shadow-sm backdrop-blur">
+              <div className="rounded-[1.25rem] bg-white/88 p-4 shadow-sm backdrop-blur sm:p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="truncate text-4xl font-black text-slate-950">{card.name}</h2>
+                    <h2 className="truncate text-3xl font-black text-slate-950 sm:text-4xl">{card.name}</h2>
                     <p className="mt-2 inline-flex max-w-full rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-600">
                       <span className="truncate">{card.meta}</span>
                     </p>
@@ -149,28 +173,52 @@ export default function ProfileRecommendationFeed({
                 <InfoChips title="TA 想找" items={card.needs} strong />
                 <InfoChips title="兴趣" items={card.interests} />
 
-                <p className="mt-6 text-base leading-8 text-slate-900">“{card.intro}”</p>
+                <p className="mt-5 line-clamp-3 text-sm leading-7 text-slate-900 sm:line-clamp-none sm:text-base">“{card.intro}”</p>
 
-                <div className="mt-6 grid grid-cols-3 gap-2">
-                  <button onClick={nextCard} className="rounded-full border border-slate-200 bg-white py-3 text-sm font-black text-slate-500">
-                    跳过
-                  </button>
-                  <button onClick={nextCard} className="rounded-full bg-sky-500 py-3 text-sm font-black text-white">
-                    喜欢
-                  </button>
-                  <button onClick={() => startChat(false)} disabled={chatLoading} className="rounded-full bg-slate-950 py-3 text-center text-sm font-black text-white disabled:opacity-60">
-                    {chatLoading ? "连接中" : "聊天"}
-                  </button>
+                <div className="mt-6 hidden grid-cols-3 gap-2 sm:grid">
+                  <ActionButtons nextCard={nextCard} likeCard={likeCard} startChat={() => startChat(false)} chatLoading={chatLoading} isLiked={isLiked} />
                 </div>
-                <button type="button" onClick={() => startChat(true)} className="mt-3 block w-full text-center text-sm font-bold text-teal-700">
+                <button type="button" onClick={() => startChat(true)} className="mt-3 hidden w-full text-center text-sm font-bold text-teal-700 sm:block">
                   匿名开口
                 </button>
               </div>
+            </div>
+
+            <div className="absolute inset-x-4 bottom-4 grid grid-cols-3 gap-2 rounded-2xl bg-white/92 p-2 shadow-xl ring-1 ring-slate-100 backdrop-blur sm:hidden">
+              <ActionButtons nextCard={nextCard} likeCard={likeCard} startChat={() => startChat(false)} chatLoading={chatLoading} isLiked={isLiked} />
             </div>
           </div>
         </div>
       </section>
     </div>
+  );
+}
+
+function ActionButtons({
+  nextCard,
+  likeCard,
+  startChat,
+  chatLoading,
+  isLiked,
+}: {
+  nextCard: () => void;
+  likeCard: () => void;
+  startChat: () => void;
+  chatLoading: boolean;
+  isLiked: boolean;
+}) {
+  return (
+    <>
+      <button onClick={nextCard} className="rounded-full border border-slate-200 bg-white py-3 text-sm font-black text-slate-500">
+        跳过
+      </button>
+      <button onClick={likeCard} className="rounded-full bg-sky-500 py-3 text-sm font-black text-white">
+        {isLiked ? "已喜欢" : "喜欢"}
+      </button>
+      <button onClick={startChat} disabled={chatLoading} className="rounded-full bg-slate-950 py-3 text-center text-sm font-black text-white disabled:opacity-60">
+        {chatLoading ? "连接中" : "聊天"}
+      </button>
+    </>
   );
 }
 

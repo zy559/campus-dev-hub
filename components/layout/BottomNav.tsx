@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -9,7 +9,6 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
-  const [profileOpen, setProfileOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
 
   function isActive(href: string) {
@@ -32,20 +31,7 @@ export default function BottomNav() {
           </button>
 
           <Tab href="/messages" label="聊天" icon="□" active={isActive("/messages")} />
-
-          {session ? (
-            <button
-              onClick={() => setProfileOpen(true)}
-              className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${
-                pathname.startsWith(`/profile/${session.user?.name}`) ? "text-teal-700" : "text-slate-700"
-              }`}
-            >
-              <span className="text-3xl leading-none">◌</span>
-              <span className="text-[11px] font-bold">我</span>
-            </button>
-          ) : (
-            <Tab href="/login" label="登录" icon="◌" active={isActive("/login")} />
-          )}
+          <Tab href={session ? "/me" : "/login"} label={session ? "我" : "登录"} icon="◌" active={isActive(session ? "/me" : "/login")} />
         </div>
       </nav>
 
@@ -75,47 +61,6 @@ export default function BottomNav() {
               <p className="mt-1 text-sm text-slate-500">发布组队、机会、经验、日常和问题。</p>
             </button>
           </div>
-        </Sheet>
-      )}
-
-      {profileOpen && (
-        <Sheet onClose={() => setProfileOpen(false)}>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-600 text-lg font-bold text-white">
-              {session?.user?.name?.charAt(0).toUpperCase() || "U"}
-            </div>
-            <div>
-              <p className="text-base font-semibold text-slate-900">{session?.user?.name}</p>
-              <p className="text-xs text-slate-500">{session?.user?.email}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              setProfileOpen(false);
-              router.push(`/profile/${session?.user?.name}`);
-            }}
-            className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-slate-900 hover:bg-slate-100"
-          >
-            我的主页
-          </button>
-          <button
-            onClick={() => {
-              setProfileOpen(false);
-              router.push("/messages");
-            }}
-            className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-slate-900 hover:bg-slate-100"
-          >
-            消息
-          </button>
-          <button
-            onClick={() => {
-              setProfileOpen(false);
-              signOut({ callbackUrl: "/" });
-            }}
-            className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-red-500 hover:bg-red-50"
-          >
-            退出登录
-          </button>
         </Sheet>
       )}
     </>

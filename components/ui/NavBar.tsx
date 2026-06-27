@@ -21,6 +21,7 @@ export default function NavBar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const isAdmin = session?.user?.role === "admin";
+  const isImpersonating = Boolean(session?.user?.impersonating);
 
   useEffect(() => {
     if (!session) return;
@@ -53,8 +54,30 @@ export default function NavBar() {
     if (keyword) router.push(`/activity?search=${encodeURIComponent(keyword)}`);
   }
 
+  async function stopImpersonation() {
+    const res = await fetch("/api/admin/impersonate", { method: "DELETE" });
+    if (res.ok) {
+      window.location.href = "/admin";
+      return;
+    }
+    alert("退出模拟失败，请重新登录管理员账号");
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/85 backdrop-blur-xl dark:border-white/5 dark:bg-slate-950/85">
+      {isImpersonating && (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <span className="truncate">
+              正在以 <strong>{session?.user?.name}</strong> 身份浏览，原管理员：{session?.user?.impersonatorName || "admin"}
+            </span>
+            <button onClick={stopImpersonation} className="shrink-0 rounded-full bg-amber-600 px-3 py-1 text-xs font-bold text-white hover:bg-amber-500">
+              退出模拟
+            </button>
+          </div>
+        </div>
+      )}
+
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8" aria-label="全局导航">
         <Link href="/" className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white dark:bg-teal-400 dark:text-slate-950">
@@ -85,7 +108,9 @@ export default function NavBar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-semibold transition ${active(link.href) ? "text-teal-700" : "text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white"}`}
+              className={`text-sm font-semibold transition ${
+                active(link.href) ? "text-teal-700" : "text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white"
+              }`}
             >
               {link.label}
             </Link>
@@ -116,14 +141,20 @@ export default function NavBar() {
                     <div className="border-b border-slate-100 px-4 py-2 dark:border-white/10">
                       <p className="text-sm font-medium text-slate-900 dark:text-white">{session.user?.name}</p>
                       {isAdmin && <p className="text-xs text-teal-700">管理员</p>}
+                      {isImpersonating && <p className="text-xs text-amber-600">模拟登录中</p>}
                     </div>
                     <MenuLink href={`/profile/${session.user?.name}`} onClick={() => setUserMenuOpen(false)}>
                       我的主页
                     </MenuLink>
-                    {isAdmin && (
+                    {isAdmin && !isImpersonating && (
                       <MenuLink href="/admin" onClick={() => setUserMenuOpen(false)}>
                         管理面板
                       </MenuLink>
+                    )}
+                    {isImpersonating && (
+                      <button onClick={stopImpersonation} className="block w-full px-4 py-2 text-left text-sm text-amber-700 hover:bg-slate-50 dark:hover:bg-white/5">
+                        退出模拟
+                      </button>
                     )}
                     <button onClick={() => signOut({ callbackUrl: "/" })} className="block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-slate-50 dark:hover:bg-white/5">
                       退出登录
@@ -161,10 +192,15 @@ export default function NavBar() {
                 消息
               </Link>
             )}
-            {isAdmin && (
+            {isAdmin && !isImpersonating && (
               <Link href="/admin" onClick={() => setMobileOpen(false)} className="block rounded-xl px-4 py-3 font-semibold">
                 管理面板
               </Link>
+            )}
+            {isImpersonating && (
+              <button onClick={stopImpersonation} className="block w-full rounded-xl px-4 py-3 text-left font-semibold text-amber-700 hover:bg-slate-50">
+                退出模拟
+              </button>
             )}
           </div>
         </div>
