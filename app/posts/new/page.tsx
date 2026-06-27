@@ -19,10 +19,8 @@ export default async function NewPostPage({
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-[#f7f8fb] px-4 py-6">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6 rounded-[1.75rem] bg-white p-6 shadow-sm ring-1 ring-slate-100">
-          <p className={`text-sm font-black ${isProfileCard ? "text-pink-500" : "text-teal-600"}`}>
-            {isProfileCard ? "资料卡" : "动态"}
-          </p>
+        <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+          <p className="text-sm font-black text-teal-700">{isProfileCard ? "资料卡" : "动态"}</p>
           <h1 className="mt-1 text-3xl font-black tracking-normal text-slate-950">
             {isProfileCard ? "发布资料卡" : "发布动态"}
           </h1>

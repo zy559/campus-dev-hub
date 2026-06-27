@@ -1,21 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-
-interface Board {
-  id: string;
-  name: string;
-  children?: Board[];
-}
-
-const FALLBACK_CATEGORIES = ["机会", "学习", "社交", "生活", "展示"];
+import { ACTIVITY_SECTIONS } from "@/lib/activitySections";
 
 export default function PostForm() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [boardId, setBoardId] = useState("");
+  const [section, setSection] = useState<string>(ACTIVITY_SECTIONS[0].title);
+  const [childTag, setChildTag] = useState<string>(ACTIVITY_SECTIONS[0].children[0]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
@@ -23,21 +16,7 @@ export default function PostForm() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch("/api/boards")
-      .then((res) => res.json())
-      .then((data: Board[]) => {
-        const list: Board[] = [];
-        for (const board of Array.isArray(data) ? data : []) {
-          list.push(board);
-          for (const child of board.children || []) {
-            list.push({ ...child, name: `${board.name} / ${child.name}` });
-          }
-        }
-        setBoards(list);
-      })
-      .catch(() => setBoards([]));
-  }, []);
+  const activeSection = ACTIVITY_SECTIONS.find((item) => item.title === section) || ACTIVITY_SECTIONS[0];
 
   async function upload(file: File) {
     setUploading(true);
@@ -74,7 +53,7 @@ export default function PostForm() {
         title,
         content: fullContent,
         tagIds: [],
-        boardId,
+        tagNames: [section, childTag],
       }),
     });
     const data = await res.json();
@@ -83,39 +62,50 @@ export default function PostForm() {
       setError(data.error || "发布失败");
       return;
     }
-    router.push("/activity");
+    router.push(`/activity?tag=${encodeURIComponent(childTag)}`);
     router.refresh();
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5">
+    <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5 pb-24 lg:pb-0">
       {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
 
-      <section className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
         <h2 className="text-lg font-black text-slate-950">选择栏目</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {boards.length > 0
-            ? boards.map((board) => (
-                <button
-                  key={board.id}
-                  type="button"
-                  onClick={() => setBoardId(board.id)}
-                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                    boardId === board.id ? "bg-teal-600 text-white" : "bg-slate-50 text-slate-600 hover:bg-teal-50 hover:text-teal-700"
-                  }`}
-                >
-                  {board.name}
-                </button>
-              ))
-            : FALLBACK_CATEGORIES.map((name) => (
-                <span key={name} className="rounded-full bg-slate-50 px-4 py-2 text-sm font-bold text-slate-600">
-                  {name}
-                </span>
-              ))}
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          {ACTIVITY_SECTIONS.map((item) => (
+            <button
+              key={item.title}
+              type="button"
+              onClick={() => {
+                setSection(item.title);
+                setChildTag(item.children[0]);
+              }}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold transition ${
+                section === item.title ? "bg-teal-600 text-white" : "bg-slate-50 text-slate-600 hover:bg-teal-50 hover:text-teal-700"
+              }`}
+            >
+              {item.title}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {activeSection.children.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setChildTag(item)}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                childTag === item ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-600 hover:bg-teal-50 hover:text-teal-700"
+              }`}
+            >
+              {item}
+            </button>
+          ))}
         </div>
       </section>
 
-      <section className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
         <label className="block">
           <span className="text-sm font-bold text-slate-700">标题</span>
           <input
@@ -130,14 +120,14 @@ export default function PostForm() {
           <textarea
             value={content}
             onChange={(event) => setContent(event.target.value)}
-            rows={7}
+            rows={6}
             placeholder="写清楚时间、地点、需求、联系方式或补充说明。"
             className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
           />
         </label>
       </section>
 
-      <section className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-black text-slate-950">图片</h2>
@@ -146,10 +136,16 @@ export default function PostForm() {
           <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="rounded-full bg-teal-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60">
             {uploading ? "上传中..." : "添加图片"}
           </button>
-          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) upload(file);
-          }} />
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) upload(file);
+            }}
+          />
         </div>
         {images.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">

@@ -21,25 +21,30 @@ export default function BottomNav() {
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-white lg:hidden">
         <div className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2">
-          <Tab href="/" label="推荐" icon="★" active={isActive("/")} />
-          <Tab href="/activity" label="动态" icon="◎" active={isActive("/activity")} />
+          <Tab href="/" label="推荐" icon="◇" active={isActive("/")} />
+          <Tab href="/activity" label="动态" icon="○" active={isActive("/activity")} />
 
           <button onClick={() => setPublishOpen(true)} className="flex flex-col items-center justify-center gap-0.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-pink-500 text-3xl font-light leading-none text-white shadow-lg shadow-pink-200">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-600 text-3xl font-light leading-none text-white shadow-lg shadow-teal-200">
               +
             </span>
-            <span className="text-[11px] font-bold text-pink-500">发布</span>
+            <span className="text-[11px] font-bold text-teal-700">发布</span>
           </button>
 
-          <Tab href="/messages" label="聊天" icon="○" active={isActive("/messages")} />
+          <Tab href="/messages" label="聊天" icon="□" active={isActive("/messages")} />
 
           {session ? (
-            <button onClick={() => setProfileOpen(true)} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${pathname.startsWith(`/profile/${session.user?.name}`) ? "text-pink-500" : "text-slate-700"}`}>
-              <span className="text-3xl leading-none">♙</span>
+            <button
+              onClick={() => setProfileOpen(true)}
+              className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${
+                pathname.startsWith(`/profile/${session.user?.name}`) ? "text-teal-700" : "text-slate-700"
+              }`}
+            >
+              <span className="text-3xl leading-none">◌</span>
               <span className="text-[11px] font-bold">我</span>
             </button>
           ) : (
-            <Tab href="/login" label="登录" icon="♙" active={isActive("/login")} />
+            <Tab href="/login" label="登录" icon="◌" active={isActive("/login")} />
           )}
         </div>
       </nav>
@@ -54,9 +59,9 @@ export default function BottomNav() {
                 setPublishOpen(false);
                 router.push("/posts/new?type=card");
               }}
-              className="rounded-2xl bg-pink-50 p-4 text-left ring-1 ring-pink-100"
+              className="rounded-2xl bg-teal-50 p-4 text-left ring-1 ring-teal-100"
             >
-              <p className="text-base font-black text-pink-600">发资料卡</p>
+              <p className="text-base font-black text-teal-700">发资料卡</p>
               <p className="mt-1 text-sm text-slate-500">上传照片、介绍自己，用于今日遇见和找同频。</p>
             </button>
             <button
@@ -76,7 +81,7 @@ export default function BottomNav() {
       {profileOpen && (
         <Sheet onClose={() => setProfileOpen(false)}>
           <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-500 text-lg font-bold text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-600 text-lg font-bold text-white">
               {session?.user?.name?.charAt(0).toUpperCase() || "U"}
             </div>
             <div>
@@ -119,7 +124,7 @@ export default function BottomNav() {
 
 function Tab({ href, label, icon, active }: { href: string; label: string; icon: string; active: boolean }) {
   return (
-    <Link href={href} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${active ? "text-pink-500" : "text-slate-700"}`}>
+    <Link href={href} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${active ? "text-teal-700" : "text-slate-700"}`}>
       <span className="text-3xl leading-none">{icon}</span>
       <span className="text-[11px] font-bold">{label}</span>
     </Link>

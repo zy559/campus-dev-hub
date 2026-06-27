@@ -15,16 +15,14 @@ export default function ContentShell({ children }: { children: React.ReactNode }
   const isFullWidth = isLanding || pathname === "/login" || pathname.startsWith("/posts/new");
 
   if (isFullWidth) {
-    return <>{children}</>;
+    return <div className="pb-24 lg:pb-0">{children}</div>;
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-4rem)]">
+    <div className="flex min-h-[calc(100vh-4rem)]">
       <LeftSidebar />
-      <main className="flex-1 min-w-0 lg:border-x border-border pb-16 lg:pb-0">
-        <div className="py-4 px-4 lg:py-6 lg:px-6">
-          {children}
-        </div>
+      <main className="min-w-0 flex-1 border-border pb-24 lg:border-x lg:pb-0">
+        <div className="px-4 py-4 lg:px-6 lg:py-6">{children}</div>
       </main>
       <RightSidebar />
     </div>
