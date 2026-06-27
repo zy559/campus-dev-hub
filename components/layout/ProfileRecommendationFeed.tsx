@@ -96,7 +96,7 @@ export default function ProfileRecommendationFeed({
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-3 py-4 pb-28 sm:px-4 lg:pb-6">
+    <div className="mx-auto max-w-5xl px-3 py-4 pb-40 sm:px-4 lg:pb-6">
       {isBrowsing && (
         <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-teal-100 bg-teal-50 px-5 py-4 text-teal-900 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium">你正在以游客身份浏览。登录后可以发布资料卡、喜欢、聊天和匿名开口。</p>
@@ -123,7 +123,7 @@ export default function ProfileRecommendationFeed({
         </div>
 
         <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-xl ring-1 ring-slate-100">
-          <div className={`relative min-h-[calc(100vh-12rem)] bg-gradient-to-br ${fallbackGradients[cardIndex % fallbackGradients.length]} p-4 pb-24 sm:min-h-[560px] sm:p-6`}>
+          <div className={`relative min-h-[calc(100vh-12rem)] bg-gradient-to-br ${fallbackGradients[cardIndex % fallbackGradients.length]} p-4 sm:min-h-[560px] sm:p-6`}>
             <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-black text-teal-700 shadow-sm ring-1 ring-white/80 backdrop-blur">
               校园匹配
             </div>
@@ -183,13 +183,13 @@ export default function ProfileRecommendationFeed({
                 </button>
               </div>
             </div>
-
-            <div className="absolute inset-x-4 bottom-4 grid grid-cols-3 gap-2 rounded-2xl bg-white/92 p-2 shadow-xl ring-1 ring-slate-100 backdrop-blur sm:hidden">
-              <ActionButtons nextCard={nextCard} likeCard={likeCard} startChat={() => startChat(false)} chatLoading={chatLoading} isLiked={isLiked} />
-            </div>
           </div>
         </div>
       </section>
+
+      <div className="fixed inset-x-3 bottom-20 z-[55] grid grid-cols-3 gap-2 rounded-2xl bg-white/95 p-2 shadow-2xl ring-1 ring-slate-100 backdrop-blur sm:hidden">
+        <ActionButtons nextCard={nextCard} likeCard={likeCard} startChat={() => startChat(false)} chatLoading={chatLoading} isLiked={isLiked} />
+      </div>
     </div>
   );
 }
