@@ -5,88 +5,138 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-const ITEMS = [
-  { href: "/", label: "推荐", icon: "★" },
-  { href: "/activity?search=遇见", label: "喜欢", icon: "♡" },
-  { href: "/activity", label: "动态", icon: "◎" },
-  { href: "/messages", label: "消息", icon: "○" },
-];
-
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
 
-  function active(href: string) {
+  function isActive(href: string) {
     if (href === "/") return pathname === "/";
-    const path = href.split("?")[0];
-    return pathname.startsWith(path);
+    return pathname.startsWith(href.split("?")[0]);
   }
 
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-white lg:hidden">
-        <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">
-          {ITEMS.map((item) => (
-            <Link key={item.href} href={item.href} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 px-2 py-2 ${active(item.href) ? "text-pink-500" : "text-slate-700"}`}>
-              <span className="text-3xl leading-none">{item.icon}</span>
-              <span className="text-[11px] font-bold">{item.label}</span>
-            </Link>
-          ))}
+        <div className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2">
+          <Tab href="/" label="推荐" icon="★" active={isActive("/")} />
+          <Tab href="/activity?search=遇见" label="喜欢" icon="♡" active={false} />
+
+          <button onClick={() => setPublishOpen(true)} className="flex flex-col items-center justify-center gap-0.5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-pink-500 text-3xl font-light leading-none text-white shadow-lg shadow-pink-200">
+              +
+            </span>
+            <span className="text-[11px] font-bold text-pink-500">发布</span>
+          </button>
+
+          <Tab href="/activity" label="动态" icon="◎" active={isActive("/activity")} />
 
           {session ? (
-            <button onClick={() => setProfileOpen(true)} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 px-2 py-2 ${pathname.startsWith(`/profile/${session.user?.name}`) ? "text-pink-500" : "text-slate-700"}`}>
+            <button onClick={() => setProfileOpen(true)} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${pathname.startsWith(`/profile/${session.user?.name}`) ? "text-pink-500" : "text-slate-700"}`}>
               <span className="text-3xl leading-none">♙</span>
               <span className="text-[11px] font-bold">我</span>
             </button>
           ) : (
-            <Link href="/login" className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 px-2 py-2 text-slate-700">
-              <span className="text-3xl leading-none">♙</span>
-              <span className="text-[11px] font-bold">登录</span>
-            </Link>
+            <Tab href="/login" label="登录" icon="♙" active={isActive("/login")} />
           )}
         </div>
       </nav>
 
-      {profileOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setProfileOpen(false)} />
-          <div className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white p-6 pb-8 shadow-2xl">
-            <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-slate-300" />
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-500 text-lg font-bold text-white">
-                {session?.user?.name?.charAt(0).toUpperCase() || "U"}
-              </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900">{session?.user?.name}</p>
-                <p className="text-xs text-slate-500">{session?.user?.email}</p>
-              </div>
-            </div>
+      {publishOpen && (
+        <Sheet onClose={() => setPublishOpen(false)}>
+          <h2 className="text-lg font-black text-slate-950">你想发布什么？</h2>
+          <p className="mt-1 text-sm text-slate-500">资料卡用于推荐页展示自己，动态帖用于信息流分享事情。</p>
+          <div className="mt-5 grid gap-3">
             <button
               onClick={() => {
-                setProfileOpen(false);
-                router.push(`/profile/${session?.user?.name}`);
+                setPublishOpen(false);
+                router.push("/posts/new?type=meet");
               }}
-              className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-slate-900 hover:bg-slate-100"
+              className="rounded-2xl bg-pink-50 p-4 text-left ring-1 ring-pink-100"
             >
-              我的主页
+              <p className="text-base font-black text-pink-600">发资料卡</p>
+              <p className="mt-1 text-sm text-slate-500">上传照片、介绍自己，用于今日遇见和找同频。</p>
             </button>
             <button
               onClick={() => {
-                setProfileOpen(false);
-                signOut({ callbackUrl: "/" });
+                setPublishOpen(false);
+                router.push("/posts/new?type=post");
               }}
-              className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-red-500 hover:bg-red-50"
+              className="rounded-2xl bg-slate-50 p-4 text-left ring-1 ring-slate-100"
             >
-              退出登录
-            </button>
-            <button onClick={() => setProfileOpen(false)} className="mt-3 w-full rounded-xl py-3 text-base font-medium text-slate-500 hover:bg-slate-100">
-              取消
+              <p className="text-base font-black text-slate-900">发动态帖</p>
+              <p className="mt-1 text-sm text-slate-500">发布组队、机会、经验、日常和问题。</p>
             </button>
           </div>
-        </div>
+        </Sheet>
+      )}
+
+      {profileOpen && (
+        <Sheet onClose={() => setProfileOpen(false)}>
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-500 text-lg font-bold text-white">
+              {session?.user?.name?.charAt(0).toUpperCase() || "U"}
+            </div>
+            <div>
+              <p className="text-base font-semibold text-slate-900">{session?.user?.name}</p>
+              <p className="text-xs text-slate-500">{session?.user?.email}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setProfileOpen(false);
+              router.push(`/profile/${session?.user?.name}`);
+            }}
+            className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-slate-900 hover:bg-slate-100"
+          >
+            我的主页
+          </button>
+          <button
+            onClick={() => {
+              setProfileOpen(false);
+              router.push("/messages");
+            }}
+            className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-slate-900 hover:bg-slate-100"
+          >
+            消息
+          </button>
+          <button
+            onClick={() => {
+              setProfileOpen(false);
+              signOut({ callbackUrl: "/" });
+            }}
+            className="w-full rounded-xl px-4 py-3.5 text-left text-base font-medium text-red-500 hover:bg-red-50"
+          >
+            退出登录
+          </button>
+        </Sheet>
       )}
     </>
+  );
+}
+
+function Tab({ href, label, icon, active }: { href: string; label: string; icon: string; active: boolean }) {
+  return (
+    <Link href={href} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${active ? "text-pink-500" : "text-slate-700"}`}>
+      <span className="text-3xl leading-none">{icon}</span>
+      <span className="text-[11px] font-bold">{label}</span>
+    </Link>
+  );
+}
+
+function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[60] lg:hidden">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white p-6 pb-8 shadow-2xl">
+        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-slate-300" />
+        {children}
+        <button onClick={onClose} className="mt-4 w-full rounded-xl py-3 text-base font-medium text-slate-500 hover:bg-slate-100">
+          取消
+        </button>
+      </div>
+    </div>
   );
 }
