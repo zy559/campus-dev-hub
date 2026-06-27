@@ -18,20 +18,12 @@ interface PostCardData {
   board?: { id: string; name: string };
 }
 
-const channels = ["推荐", "机会", "组队", "搭子", "遇见", "问答", "作品", "经验", "日常"];
-
-const actions = [
-  ["发机会", "比赛、活动、招募", "/posts/new"],
-  ["找队友", "比赛和项目协作", "/posts/new"],
-  ["遇见同频", "朋友、搭子、对象", "/?search=遇见"],
-  ["发起聊天", "搜索同学，轻松开口", "/messages"],
-];
-
-const hotNeeds = [
-  ["数学建模", "缺编程同学"],
-  ["考研自习", "晚间打卡"],
-  ["挑战杯", "招产品和答辩"],
-  ["摄影约拍", "周末校园"],
+const sections = [
+  { title: "机会", desc: "比赛、实习、活动、项目", color: "bg-teal-50 text-teal-700 ring-teal-100", children: ["比赛组队", "实习内推", "活动讲座", "项目招募"] },
+  { title: "学习", desc: "课程、考试、技术、问答", color: "bg-sky-50 text-sky-700 ring-sky-100", children: ["课程资料", "考研考公", "技术笔记", "问答求助"] },
+  { title: "社交", desc: "对象、朋友、搭子、同好", color: "bg-pink-50 text-pink-600 ring-pink-100", children: ["找对象", "找搭子", "运动约局", "兴趣同好"] },
+  { title: "生活", desc: "二手、美食、吐槽、失物", color: "bg-amber-50 text-amber-700 ring-amber-100", children: ["二手闲置", "美食推荐", "校园吐槽", "失物招领"] },
+  { title: "展示", desc: "作品、博客、项目、复盘", color: "bg-indigo-50 text-indigo-700 ring-indigo-100", children: ["作品展示", "博客文章", "简历项目", "经验复盘"] },
 ];
 
 async function getPosts(tag?: string): Promise<{ posts: PostCardData[]; total: number }> {
@@ -74,14 +66,6 @@ async function getAllTags(): Promise<Tag[]> {
   return tags.map((tag) => ({ id: tag.id, name: tag.name }));
 }
 
-async function getMainBoards() {
-  return db.board.findMany({
-    where: { parentId: null },
-    orderBy: { sortOrder: "asc" },
-    include: { _count: { select: { posts: true } } },
-  });
-}
-
 export default async function ActivityFeed({
   tag,
   search,
@@ -91,17 +75,8 @@ export default async function ActivityFeed({
   search: string;
   isBrowsing: boolean;
 }) {
-  const [data, tags, mainBoards] = await Promise.all([
-    getPosts(tag),
-    getAllTags(),
-    getMainBoards(),
-  ]).catch(
-    () =>
-      [
-        { posts: [], total: 0 },
-        [],
-        [],
-      ] as [{ posts: PostCardData[]; total: number }, Tag[], Awaited<ReturnType<typeof getMainBoards>>]
+  const [data, tags] = await Promise.all([getPosts(tag), getAllTags()]).catch(
+    () => [{ posts: [], total: 0 }, []] as [{ posts: PostCardData[]; total: number }, Tag[]]
   );
 
   return (
@@ -115,109 +90,49 @@ export default async function ActivityFeed({
         </div>
       )}
 
-      <section className="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-[1.75rem] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-bold text-teal-600">动态</p>
-            <h1 className="mt-1 text-3xl font-black tracking-normal text-slate-950">校园信息流</h1>
-            <p className="mt-2 text-sm text-slate-500">机会、组队、知识、日常都放在这里，不挤占推荐页。</p>
+            <p className="text-sm font-black text-teal-600">动态</p>
+            <h1 className="mt-1 text-3xl font-black tracking-normal text-slate-950">先选栏目，再找内容</h1>
+            <p className="mt-2 text-sm text-slate-500">把学校里的机会、学习、社交、生活和展示分开，减少信息差。</p>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {actions.map(([title, desc, href]) => (
-              <Link
-                key={title}
-                href={href}
-                className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50"
-              >
-                <p className="text-sm font-black text-slate-950">{title}</p>
-                <p className="mt-1 text-xs text-slate-500">{desc}</p>
-              </Link>
-            ))}
-          </div>
+          <Link href="/posts/new?type=post" className="rounded-full bg-teal-600 px-5 py-2.5 text-center text-sm font-black text-white transition hover:bg-teal-500">
+            发布动态
+          </Link>
         </div>
       </section>
 
-      <nav className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-white p-2 shadow-sm scrollbar-hide">
-        {channels.map((channel, index) => (
-          <Link
-            key={channel}
-            href={index === 0 ? "/activity" : `/activity?search=${encodeURIComponent(channel)}`}
-            className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold transition ${
-              index === 0 ? "bg-slate-950 text-white" : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
-            }`}
-          >
-            {channel}
-          </Link>
-        ))}
-      </nav>
-
-      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
-        <main className="min-w-0 rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-black tracking-normal text-slate-950">{tag ? `#${tag}` : "推荐动态"}</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                {tag ? `${data.posts.length} 篇相关帖子` : "机会、组队、遇见和校园讨论都在这里"}
-              </p>
-            </div>
-            <Link href="/posts/new" className="rounded-full bg-teal-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-teal-500">
-              发布
-            </Link>
-          </div>
-          <PostFeed posts={data.posts} tags={tags} activeTag={tag} initialSearch={search} />
-        </main>
-
-        <aside className="space-y-4">
-          <section className="rounded-[1.5rem] border border-slate-100 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-black text-slate-950">热门需求</h2>
-              <Link href="/posts/new" className="text-xs font-bold text-teal-600 hover:text-teal-500">
-                发布
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {hotNeeds.map(([title, desc]) => (
-                <div key={title} className="rounded-2xl bg-slate-50 px-4 py-3">
-                  <p className="text-sm font-bold text-slate-900">{title}</p>
-                  <p className="mt-1 text-xs text-slate-500">{desc}</p>
-                  <div className="mt-3 flex gap-2">
-                    <Link href="/messages" className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-teal-700 ring-1 ring-teal-100">
-                      私信
-                    </Link>
-                    <Link href="/posts/new" className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 ring-1 ring-slate-100">
-                      我也想找
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-[1.5rem] border border-slate-100 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-black text-slate-950">板块</h2>
-              <Link href="/boards" className="text-xs font-bold text-teal-600 hover:text-teal-500">
-                全部
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {mainBoards.slice(0, 5).map((board) => (
-                <Link
-                  key={board.id}
-                  href={`/boards/${board.id}`}
-                  className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 transition hover:bg-teal-50"
-                >
-                  <span className="line-clamp-1 text-sm font-bold text-slate-800">{board.name}</span>
-                  <span className="text-xs text-slate-400">{board._count.posts}</span>
+      <section className="grid gap-4 xl:grid-cols-5">
+        {sections.map((section) => (
+          <div key={section.title} className="rounded-[1.5rem] bg-white p-4 shadow-sm ring-1 ring-slate-100">
+            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${section.color}`}>{section.title}</span>
+            <p className="mt-3 text-sm font-bold text-slate-950">{section.desc}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {section.children.map((child) => (
+                <Link key={child} href={`/activity?search=${encodeURIComponent(child)}`} className="rounded-full bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700">
+                  {child}
                 </Link>
               ))}
-              {mainBoards.length === 0 && (
-                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-500">暂无板块数据</p>
-              )}
             </div>
-          </section>
-        </aside>
-      </div>
+          </div>
+        ))}
+      </section>
+
+      <main className="rounded-[1.75rem] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black tracking-normal text-slate-950">{tag ? `#${tag}` : search ? `搜索：${search}` : "最新动态"}</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {data.posts.length > 0 ? `${data.posts.length} 条内容` : "还没有内容，发布第一条动态吧"}
+            </p>
+          </div>
+          <Link href="/boards" className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 transition hover:bg-slate-200">
+            查看板块
+          </Link>
+        </div>
+        <PostFeed posts={data.posts} tags={tags} activeTag={tag} initialSearch={search} />
+      </main>
     </div>
   );
 }

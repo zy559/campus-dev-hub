@@ -52,7 +52,7 @@ export default function BottomNav() {
             <button
               onClick={() => {
                 setPublishOpen(false);
-                router.push("/posts/new?type=meet");
+                router.push("/posts/new?type=card");
               }}
               className="rounded-2xl bg-pink-50 p-4 text-left ring-1 ring-pink-100"
             >
