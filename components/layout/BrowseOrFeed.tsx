@@ -4,7 +4,7 @@ import LandingHero from "./LandingHero";
 import LandingShowcase from "./LandingShowcase";
 import AboutContact from "./AboutContact";
 import Spotlight from "@/components/ui/Spotlight";
-import DataFeed, { LandingPostSection } from "./DataFeed";
+import DataFeed from "./DataFeed";
 
 export default function BrowseOrFeed({
   session,
@@ -31,13 +31,6 @@ export default function BrowseOrFeed({
       <Suspense fallback={<ShowcaseSkeleton />}>
         <LandingShowcase />
       </Suspense>
-      <div className="bg-white dark:bg-slate-950 border-t border-slate-200/60 dark:border-white/5">
-        <div className="max-w-4xl mx-auto px-4 pb-16">
-          <Suspense fallback={<FeedSkeleton />}>
-            <LandingPostSection />
-          </Suspense>
-        </div>
-      </div>
       <AboutContact />
     </Spotlight>
   );

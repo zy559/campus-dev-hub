@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { cookies } from "next/headers";
 import BrowseOrFeed from "@/components/layout/BrowseOrFeed";
 
 export const revalidate = 30;
@@ -9,7 +8,16 @@ export default async function HomePage({
 }: {
   searchParams: { tag?: string; browse?: string; search?: string };
 }) {
-  const session = await getServerSession(authOptions);
+  const hasSessionCookie = Boolean(
+    cookies().get("next-auth.session-token") ||
+      cookies().get("__Secure-next-auth.session-token")
+  );
+  const session = hasSessionCookie
+    ? await import("next-auth").then(async ({ getServerSession }) => {
+        const { authOptions } = await import("@/lib/auth");
+        return getServerSession(authOptions);
+      })
+    : null;
   const isLoggedIn = !!session?.user?.id;
   const isBrowsing = searchParams.browse === "1";
   const tag = searchParams.tag;

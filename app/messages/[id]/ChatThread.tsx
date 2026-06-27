@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
 
@@ -16,25 +16,24 @@ export default function ChatThread({
   conversationId,
   initialMessages,
   currentUserId,
+  initialDraft,
 }: {
   conversationId: string;
   initialMessages: Message[];
   currentUserId: string;
+  initialDraft?: string;
 }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Mark as read on mount
   useEffect(() => {
     fetch(`/api/conversations/${conversationId}/read`, { method: "POST" }).catch(() => {});
   }, [conversationId]);
 
-  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Poll
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -44,6 +43,7 @@ export default function ChatThread({
         setMessages(data);
       } catch {}
     }, 5000);
+
     return () => clearInterval(interval);
   }, [conversationId]);
 
@@ -55,8 +55,8 @@ export default function ChatThread({
         body: JSON.stringify({ content }),
       });
       if (!res.ok) return false;
-      const newMsg = await res.json();
-      setMessages((prev) => [...prev, newMsg]);
+      const newMessage = await res.json();
+      setMessages((prev) => [...prev, newMessage]);
       return true;
     } catch {
       return false;
@@ -65,23 +65,26 @@ export default function ChatThread({
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto py-4 space-y-3">
+      <div className="flex-1 space-y-3 overflow-y-auto py-4">
         {messages.length === 0 && (
-          <p className="text-center text-subtle py-10">发送第一条消息吧</p>
+          <div className="py-10 text-center">
+            <p className="text-sm font-bold text-muted">发送第一条消息吧</p>
+            <p className="mt-2 text-xs text-subtle">可以用快捷开场白，或者先半匿名表达兴趣。</p>
+          </div>
         )}
-        {messages.map((msg) => (
+        {messages.map((message) => (
           <MessageBubble
-            key={msg.id}
-            content={msg.content}
-            isMine={msg.sender.id === currentUserId}
-            senderName={msg.sender.username}
-            createdAt={msg.createdAt}
+            key={message.id}
+            content={message.content}
+            isMine={message.sender.id === currentUserId}
+            senderName={message.sender.username}
+            createdAt={message.createdAt}
           />
         ))}
         <div ref={bottomRef} />
       </div>
-      <div className="py-3 border-t border-border">
-        <MessageInput onSend={handleSend} />
+      <div className="border-t border-border py-3">
+        <MessageInput onSend={handleSend} initialDraft={initialDraft} />
       </div>
     </>
   );

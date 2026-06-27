@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Suspense } from "react";
 import "./globals.css";
 import NavBar from "@/components/ui/NavBar";
 import Footer from "@/components/ui/Footer";
@@ -7,13 +8,13 @@ import RevealObserver from "@/components/ui/RevealObserver";
 import ContentShell from "@/components/layout/ContentShell";
 import BottomNav from "@/components/layout/BottomNav";
 import { Providers } from "./providers";
-import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -21,8 +22,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "围炉 · Campfire — 技术有温度",
-  description: "围炉 · Campfire — 技术有温度。写代码，也写日常。校园技术交流社区，分享、学习、组队。",
+  title: "围炉 · Campfire - 找到同校同频的人",
+  description:
+    "围炉是面向校园学生的伙伴社区，帮助你找到比赛队友、学习搭子、项目伙伴，并沉淀个人主页与成长记录。",
 };
 
 export default function RootLayout({
@@ -42,7 +44,6 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-ink min-h-screen flex flex-col relative`}>
-        {/* Subtle gradient background — fixed behind everything */}
         <div className="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
           <div className="absolute inset-0 bg-surface" />
           <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-[0.12] bg-accent" />
@@ -63,7 +64,9 @@ export default function RootLayout({
               <ContentShell>{children}</ContentShell>
             </Suspense>
           </main>
-          <div className="hidden lg:block"><Footer /></div>
+          <div className="hidden lg:block">
+            <Footer />
+          </div>
           <BottomNav />
         </Providers>
       </body>

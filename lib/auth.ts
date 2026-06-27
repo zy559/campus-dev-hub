@@ -1,7 +1,8 @@
+import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { db } from "./db";
+import { getLocalPreviewUser } from "./localPreviewAuth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,36 +13,33 @@ export const authOptions: NextAuthOptions = {
         password: { label: "密码", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
-          console.error("[authorize] missing credentials, got keys:", credentials ? Object.keys(credentials) : "null");
-          return null;
-        }
+        if (!credentials?.username || !credentials?.password) return null;
 
-        // 手动提取字段 — NextAuth 在 credentials 里塞了 csrfToken 等额外字段，Zod v4 .safeParse() 可能因此失败
         const username = String(credentials.username);
         const password = String(credentials.password);
-
-        if (username.length < 2 || username.length > 20) {
-          console.error("[authorize] username length invalid:", username.length);
-          return null;
-        }
-
-        const user = await db.user.findUnique({
-          where: { username },
+        const localPreviewUser = getLocalPreviewUser({
+          nodeEnv: process.env.NODE_ENV,
+          username,
+          password,
         });
 
-        if (!user) {
-          console.error("[authorize] user not found:", username);
+        if (localPreviewUser) return localPreviewUser;
+
+        if (username.length < 2 || username.length > 20) return null;
+
+        let user;
+        try {
+          user = await db.user.findUnique({ where: { username } });
+        } catch (error) {
+          console.error("[authorize] database unavailable:", error);
           return null;
         }
+
+        if (!user) return null;
 
         const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) return null;
 
-        if (!passwordMatch) {
-          return null;
-        }
-
-        // 检查是否被封禁
         if (user.bannedUntil) {
           const bannedUntil = new Date(user.bannedUntil);
           if (bannedUntil > new Date()) {
@@ -63,15 +61,11 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.username = user.name ?? undefined;
         token.role = (user as { role?: string }).role ?? "user";
-      }
-      // 支持外部直接注入 token（模拟登录用）
-      if (trigger === "update") {
-        // token 已在调用时被覆盖，保持不变
       }
       return token;
     },
@@ -79,7 +73,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.name = (token.username || token.name) as string;
-        (session.user as { role?: string }).role = token.role as string;
+        session.user.role = token.role as string;
       }
       return session;
     },

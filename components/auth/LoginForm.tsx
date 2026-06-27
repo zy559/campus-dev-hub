@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { LoginSchema } from "@/lib/validators";
+import { useState } from "react";
 import { ZodError } from "zod";
+import { LoginSchema } from "@/lib/validators";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -18,8 +18,8 @@ export default function LoginForm() {
 
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setErrors({});
     setServerError("");
 
@@ -28,8 +28,8 @@ export default function LoginForm() {
     } catch (err) {
       if (err instanceof ZodError) {
         const fieldErrors: Record<string, string> = {};
-        err.issues.forEach((e) => {
-          if (e.path[0]) fieldErrors[e.path[0] as string] = e.message;
+        err.issues.forEach((issue) => {
+          if (issue.path[0]) fieldErrors[issue.path[0] as string] = issue.message;
         });
         setErrors(fieldErrors);
         return;
@@ -47,7 +47,7 @@ export default function LoginForm() {
     setLoading(false);
 
     if (result?.error) {
-      setServerError("用户名或密码错误");
+      setServerError("用户名或密码错误。本地预览可使用 admin / admin123。");
       return;
     }
 
@@ -55,11 +55,25 @@ export default function LoginForm() {
     router.refresh();
   }
 
+  function fillLocalPreviewAccount() {
+    setUsername("admin");
+    setPassword("admin123");
+    setErrors({});
+    setServerError("");
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
+      <div className="rounded-xl border border-accent/20 bg-accent-subtle px-4 py-3 text-sm text-accent">
+        本地预览账号：<span className="font-semibold">admin</span> / <span className="font-semibold">admin123</span>
+        <button type="button" onClick={fillLocalPreviewAccount} className="ml-3 font-semibold underline underline-offset-4">
+          一键填入
+        </button>
+      </div>
+
       {serverError && (
-        <div className="bg-error-bg border border-error-border text-error px-4 py-3 rounded-lg" role="alert">
-          <span aria-hidden="true">⚠️ </span>{serverError}
+        <div className="rounded-lg border border-error-border bg-error-bg px-4 py-3 text-error" role="alert">
+          {serverError}
         </div>
       )}
 
@@ -71,8 +85,8 @@ export default function LoginForm() {
           id="username"
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+          onChange={(event) => setUsername(event.target.value)}
+          className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm transition-all focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
           placeholder="输入你的用户名"
           autoComplete="username"
           aria-invalid={!!errors.username}
@@ -90,10 +104,7 @@ export default function LoginForm() {
           <label htmlFor="password" className="block text-sm font-medium text-muted">
             密码
           </label>
-          <Link
-            href="/forgot-password"
-            className="text-xs text-accent hover:text-accent-hover transition-colors"
-          >
+          <Link href="/forgot-password" className="text-xs text-accent transition-colors hover:text-accent-hover">
             忘记密码？
           </Link>
         </div>
@@ -101,8 +112,8 @@ export default function LoginForm() {
           id="password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+          onChange={(event) => setPassword(event.target.value)}
+          className="mt-1 block w-full rounded-lg border border-border px-3 py-2.5 shadow-sm transition-all focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
           placeholder="输入密码"
           autoComplete="current-password"
           aria-invalid={!!errors.password}
@@ -115,11 +126,7 @@ export default function LoginForm() {
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-accent text-white py-2.5 px-4 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-      >
+      <button type="submit" disabled={loading} className="w-full rounded-lg bg-accent px-4 py-2.5 font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50">
         {loading ? "登录中..." : "登录"}
       </button>
     </form>

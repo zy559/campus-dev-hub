@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import PostCard from "@/components/posts/PostCard";
 
@@ -28,30 +28,31 @@ interface PostFeedProps {
   initialSearch?: string;
 }
 
-export default function PostFeed({ posts, tags, activeTag, initialSearch = "" }: PostFeedProps) {
+export default function PostFeed({
+  posts,
+  tags,
+  activeTag,
+  initialSearch = "",
+}: PostFeedProps) {
   const [search, setSearch] = useState(initialSearch);
   const [sort, setSort] = useState<SortKey>("latest");
 
   const filtered = useMemo(() => {
     let result = [...posts];
+    const q = search.trim().toLowerCase();
 
-    // Search filter
-    if (search.trim()) {
-      const q = search.trim().toLowerCase();
+    if (q) {
       result = result.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.content.toLowerCase().includes(q) ||
-          p.author.username.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.name.toLowerCase().includes(q))
+        (post) =>
+          post.title.toLowerCase().includes(q) ||
+          post.content.toLowerCase().includes(q) ||
+          post.author.username.toLowerCase().includes(q) ||
+          post.tags.some((tag) => tag.name.toLowerCase().includes(q))
       );
     }
 
-    // Sort
     if (sort === "popular") {
       result.sort((a, b) => b.commentCount - a.commentCount);
-    } else {
-      // latest — already in server order
     }
 
     return result;
@@ -59,11 +60,10 @@ export default function PostFeed({ posts, tags, activeTag, initialSearch = "" }:
 
   return (
     <>
-      {/* Search + Sort bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up stagger-1">
+      <div className="mb-6 flex flex-col gap-3 animate-fade-in-up stagger-1 sm:flex-row">
         <div className="relative flex-1">
           <svg
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-subtle pointer-events-none"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -76,83 +76,81 @@ export default function PostFeed({ posts, tags, activeTag, initialSearch = "" }:
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索帖子标题、内容、作者..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-surface-alt text-sm text-ink placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+            className="w-full rounded-xl border border-border bg-surface-alt py-2.5 pl-10 pr-4 text-sm text-ink transition-all placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-subtle/30 text-subtle flex items-center justify-center text-xs hover:bg-subtle/50 transition-colors"
+              className="absolute right-3 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-subtle/30 text-xs text-subtle transition-colors hover:bg-subtle/50"
               aria-label="清除搜索"
             >
-              ✕
+              ×
             </button>
           )}
         </div>
 
-        <div className="flex gap-2 items-center">
-          <span className="text-xs text-subtle whitespace-nowrap hidden sm:inline">排序：</span>
+        <div className="flex items-center gap-2">
+          <span className="hidden whitespace-nowrap text-xs text-subtle sm:inline">排序：</span>
           {(
             [
               { key: "latest", label: "最新" },
               { key: "popular", label: "最热" },
             ] as { key: SortKey; label: string }[]
-          ).map((opt) => (
+          ).map((option) => (
             <button
-              key={opt.key}
-              onClick={() => setSort(opt.key)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                sort === opt.key
+              key={option.key}
+              onClick={() => setSort(option.key)}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+                sort === option.key
                   ? "bg-ink text-white shadow-sm"
-                  : "bg-surface-alt text-muted hover:bg-accent-soft border border-border"
+                  : "border border-border bg-surface-alt text-muted hover:bg-accent-soft"
               }`}
             >
-              {opt.label}
+              {option.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Tag filter pills */}
-      <div className="flex flex-wrap gap-2 mb-8 animate-fade-in-up stagger-2">
+      <div className="mb-8 flex flex-wrap gap-2 animate-fade-in-up stagger-2">
         <Link
           href="/"
-          className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 min-h-[36px] ${
+          className={`min-h-[36px] rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 ${
             !activeTag
               ? "bg-ink text-white shadow-md"
-              : "bg-surface-alt text-muted hover:bg-accent-soft border border-border"
+              : "border border-border bg-surface-alt text-muted hover:bg-accent-soft"
           }`}
         >
           全部
         </Link>
-        {tags.map((t) => (
+        {tags.map((tag) => (
           <Link
-            key={t.id}
-            href={`/?tag=${t.name}`}
-            className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 min-h-[36px] ${
-              activeTag === t.name
+            key={tag.id}
+            href={`/?tag=${tag.name}`}
+            className={`min-h-[36px] rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 ${
+              activeTag === tag.name
                 ? "bg-ink text-white shadow-md"
-                : "bg-surface-alt text-muted hover:bg-accent-soft border border-border"
+                : "border border-border bg-surface-alt text-muted hover:bg-accent-soft"
             }`}
           >
-            {t.name}
+            {tag.name}
           </Link>
         ))}
       </div>
 
-      {/* Post list */}
       {filtered.length === 0 ? (
-        <div className="text-center py-20 animate-fade-in">
-          <div className="text-5xl mb-4" aria-hidden="true">
-            {search ? "🔍" : "📝"}
+        <div className="animate-fade-in py-20 text-center">
+          <div className="mb-4 text-5xl" aria-hidden="true">
+            {search ? "🔎" : "📝"}
           </div>
           {search ? (
             <>
-              <p className="text-muted text-lg">没有找到匹配「{search}」的帖子</p>
-              <p className="text-subtle mt-2">
+              <p className="text-lg text-muted">没有找到匹配“{search}”的帖子</p>
+              <p className="mt-2 text-subtle">
                 试试其他关键词，或者
                 <button
                   onClick={() => setSearch("")}
-                  className="text-accent hover:text-accent-hover font-medium ml-1 transition-colors"
+                  className="ml-1 font-medium text-accent transition-colors hover:text-accent-hover"
                 >
                   清除搜索
                 </button>
@@ -160,11 +158,11 @@ export default function PostFeed({ posts, tags, activeTag, initialSearch = "" }:
             </>
           ) : (
             <>
-              <p className="text-muted text-lg">暂无帖子</p>
-              <p className="text-subtle mt-2">成为第一个发帖的人吧</p>
+              <p className="text-lg text-muted">暂无帖子</p>
+              <p className="mt-2 text-subtle">成为第一个发布的人吧</p>
               <Link
                 href="/posts/new"
-                className="inline-block mt-4 text-accent hover:text-accent-hover font-medium transition-colors"
+                className="mt-4 inline-block font-medium text-accent transition-colors hover:text-accent-hover"
               >
                 发布第一篇帖子 →
               </Link>
@@ -173,11 +171,11 @@ export default function PostFeed({ posts, tags, activeTag, initialSearch = "" }:
         </div>
       ) : (
         <div className="space-y-4">
-          {filtered.map((post, i) => (
+          {filtered.map((post, index) => (
             <div
               key={post.id}
               className="animate-fade-in-up"
-              style={{ animationDelay: `${i * 0.06}s` }}
+              style={{ animationDelay: `${index * 0.06}s` }}
             >
               <PostCard {...post} />
             </div>
