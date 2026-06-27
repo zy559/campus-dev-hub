@@ -22,7 +22,7 @@ export default function BottomNav() {
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-white lg:hidden">
         <div className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2">
           <Tab href="/" label="推荐" icon="★" active={isActive("/")} />
-          <Tab href="/activity?search=遇见" label="喜欢" icon="♡" active={false} />
+          <Tab href="/activity" label="动态" icon="◎" active={isActive("/activity")} />
 
           <button onClick={() => setPublishOpen(true)} className="flex flex-col items-center justify-center gap-0.5">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-pink-500 text-3xl font-light leading-none text-white shadow-lg shadow-pink-200">
@@ -31,7 +31,7 @@ export default function BottomNav() {
             <span className="text-[11px] font-bold text-pink-500">发布</span>
           </button>
 
-          <Tab href="/activity" label="动态" icon="◎" active={isActive("/activity")} />
+          <Tab href="/messages" label="聊天" icon="○" active={isActive("/messages")} />
 
           {session ? (
             <button onClick={() => setProfileOpen(true)} className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 ${pathname.startsWith(`/profile/${session.user?.name}`) ? "text-pink-500" : "text-slate-700"}`}>
