@@ -37,17 +37,11 @@ export default function LoginForm() {
     }
 
     setLoading(true);
-
-    const result = await signIn("credentials", {
-      username,
-      password,
-      redirect: false,
-    });
-
+    const result = await signIn("credentials", { username, password, redirect: false });
     setLoading(false);
 
     if (result?.error) {
-      setServerError("用户名或密码错误。本地预览可使用 admin / admin123。");
+      setServerError("用户名或密码错误");
       return;
     }
 
@@ -55,22 +49,8 @@ export default function LoginForm() {
     router.refresh();
   }
 
-  function fillLocalPreviewAccount() {
-    setUsername("admin");
-    setPassword("admin123");
-    setErrors({});
-    setServerError("");
-  }
-
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
-      <div className="rounded-xl border border-accent/20 bg-accent-subtle px-4 py-3 text-sm text-accent">
-        本地预览账号：<span className="font-semibold">admin</span> / <span className="font-semibold">admin123</span>
-        <button type="button" onClick={fillLocalPreviewAccount} className="ml-3 font-semibold underline underline-offset-4">
-          一键填入
-        </button>
-      </div>
-
       {serverError && (
         <div className="rounded-lg border border-error-border bg-error-bg px-4 py-3 text-error" role="alert">
           {serverError}
