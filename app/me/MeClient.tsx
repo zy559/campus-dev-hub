@@ -28,12 +28,12 @@ export default function MeClient({
   }
 
   const items = [
-    { label: "个人资料", href: `/profile/${user.name}` },
-    { label: "我的帖子", href: `/profile/${user.name}` },
-    { label: "我喜欢的", href: "#liked" },
-    { label: "喜欢我的", href: "#liked-me" },
+    { label: "个人资料", href: `/profile/${user.name}/edit` },
+    { label: "我的帖子", href: "/me/posts" },
+    { label: "我喜欢的", href: "/me/liked" },
+    { label: "喜欢我的", href: "/me/liked-by" },
     { label: "历史评论", href: `/profile/${user.name}` },
-    { label: "我的收藏", href: "#liked" },
+    { label: "我的收藏", href: "/me/liked" },
     { label: "建议反馈", href: "/messages" },
     { label: "隐私政策", href: "/premium" },
   ];
@@ -64,6 +64,11 @@ export default function MeClient({
           {isAdmin && (
             <Link href="/admin" className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white">
               管理控制台
+            </Link>
+          )}
+          {isAdmin && (
+            <Link href="/admin/impersonate" className="rounded-xl bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-700 ring-1 ring-amber-100">
+              模拟登录
             </Link>
           )}
         </div>

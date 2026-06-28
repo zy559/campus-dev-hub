@@ -4,10 +4,7 @@
 
 /* ============================================================
    Design Tokens — Campus Dev Hub v5
-   Dual theme: light (white warm glass) ←→ dark (charcoal amber)
-
-   :root           = light  · white cream + glass
-   [data-theme="dark"] = dark · deep charcoal + warm amber
+   Theme: light white glass
    ============================================================ */
 
 /* ============================================================
@@ -47,44 +44,6 @@
   --hero-blob-opacity: 0.12;
 
   --cta-gradient: linear-gradient(135deg, oklch(0.72 0.11 185), oklch(0.58 0.13 210));
-}
-
-/* ============================================================
-   DARK THEME — deep charcoal + warm amber glass
-   ============================================================ */
-
-[data-theme="dark"] {
-  --ink: oklch(0.94 0.005 82);
-  --muted: oklch(0.74 0.008 78);
-  --subtle: oklch(0.54 0.010 78);
-  --surface: oklch(0.16 0.005 85);
-  --surface-alt: oklch(0.20 0.006 85);
-
-  --accent: oklch(0.74 0.12 185);
-  --accent-hover: oklch(0.80 0.11 185);
-  --accent-light: oklch(0.65 0.11 190);
-  --accent-subtle: oklch(0.26 0.05 190);
-  --accent-soft: oklch(0.32 0.06 195);
-
-  --glass-bg: oklch(0.20 0.005 85 / 0.72);
-  --glass-nav-bg: oklch(0.16 0.005 85 / 0.86);
-  --glass-border: oklch(1 0 0 / 0.08);
-  --glass-shadow: oklch(0 0 0 / 0.25);
-  --glass-blur: 24px;
-
-  --border: oklch(0.28 0.006 85);
-  --border-strong: oklch(0.38 0.006 85);
-
-  --error: oklch(0.68 0.20 25);
-  --error-bg: oklch(0.22 0.04 25);
-  --error-border: oklch(0.35 0.08 25);
-  --success: oklch(0.68 0.18 145);
-
-  --hero-overlay-from: oklch(0.14 0.005 85 / 0.70);
-  --hero-overlay-to: oklch(0.16 0.005 85);
-  --hero-blob-opacity: 0.18;
-
-  --cta-gradient: linear-gradient(135deg, oklch(0.74 0.12 185), oklch(0.64 0.12 215));
 }
 
 /* ============================================================

@@ -7,15 +7,10 @@ import { db } from "@/lib/db";
 type SessionTokenPayload = Record<string, unknown> & { id: string };
 
 function sessionCookieName() {
-  return process.env.NODE_ENV === "production"
-    ? "__Secure-next-auth.session-token"
-    : "next-auth.session-token";
+  return process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token";
 }
 
-async function writeSessionCookie(
-  tokenPayload: SessionTokenPayload,
-  body: Record<string, unknown> = { success: true }
-) {
+async function writeSessionCookie(tokenPayload: SessionTokenPayload, body: Record<string, unknown> = { success: true }) {
   const token = await encode({
     token: tokenPayload,
     secret: process.env.NEXTAUTH_SECRET || "",

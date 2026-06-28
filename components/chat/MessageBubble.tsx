@@ -1,22 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { avatarColor } from "@/lib/utils";
 
 interface MessageBubbleProps {
   content: string;
   isMine: boolean;
   senderName: string;
+  senderAvatar?: string | null;
   createdAt: string;
+  privateMode?: boolean;
 }
 
 function parseContent(content: string): { type: "text" | "image" | "video"; value: string }[] {
-  // Image: ![alt](url)  or  [img]url[/img]
   const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-  // Video: <video src="url" controls></video>
   const vidRegex = /<video src="([^"]+)"[^>]*><\/video>/g;
-
-  // Collect all matches
-  interface Match { index: number; end: number; type: "image" | "video"; value: string }
+  interface Match {
+    index: number;
+    end: number;
+    type: "image" | "video";
+    value: string;
+  }
   const matches: Match[] = [];
 
   let m: RegExpExecArray | null;
@@ -28,7 +32,6 @@ function parseContent(content: string): { type: "text" | "image" | "video"; valu
   }
   matches.sort((a, b) => a.index - b.index);
 
-  // Build parts
   const parts: { type: "text" | "image" | "video"; value: string }[] = [];
   let cursor = 0;
   for (const match of matches) {
@@ -47,45 +50,55 @@ function parseContent(content: string): { type: "text" | "image" | "video"; valu
   return parts.length > 0 ? parts : [{ type: "text", value: content }];
 }
 
-export default function MessageBubble({ content, isMine, senderName, createdAt }: MessageBubbleProps) {
+export default function MessageBubble({ content, isMine, senderName, senderAvatar, createdAt, privateMode }: MessageBubbleProps) {
   const parts = parseContent(content);
-  const textContent = parts.filter(p => p.type === "text").map(p => p.value).join(" ").trim();
+  const textContent = parts.filter((p) => p.type === "text").map((p) => p.value).join(" ").trim();
+  const mineClass = privateMode ? "bg-amber-500 text-white" : "bg-teal-600 text-white";
 
   return (
-    <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[75%]`}>
-        {!isMine && (
-          <p className="text-xs text-muted ml-1 mb-1">{senderName}</p>
-        )}
+    <div className={`flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"}`}>
+      {!isMine && <Avatar username={senderName} avatar={senderAvatar} />}
+      <div className="max-w-[75%]">
+        {!isMine && <p className="mb-1 ml-1 text-xs text-slate-500">{senderName}</p>}
 
-        {/* 文本内容 */}
         {textContent && (
           <div
-            className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
-              isMine
-                ? "bg-accent text-white rounded-br-md"
-                : "bg-surface-alt text-ink rounded-bl-md border border-border"
+            className={`whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
+              isMine ? `${mineClass} rounded-br-md` : "rounded-bl-md border border-slate-200 bg-white text-slate-900"
             }`}
           >
             {textContent}
           </div>
         )}
 
-        {/* 媒体内容 */}
-        {parts.filter(p => p.type === "image" || p.type === "video").map((part, i) => (
-          <div key={i} className={`mt-1.5 ${isMine ? "flex justify-end" : ""}`}>
-            {part.type === "image" ? (
-              <ImageWithFallback src={part.value} />
-            ) : (
-              <video src={part.value} controls className="max-w-full max-h-64 rounded-xl" preload="metadata" />
-            )}
-          </div>
-        ))}
+        {parts
+          .filter((p) => p.type === "image" || p.type === "video")
+          .map((part, i) => (
+            <div key={i} className={`mt-1.5 ${isMine ? "flex justify-end" : ""}`}>
+              {part.type === "image" ? (
+                <ImageWithFallback src={part.value} />
+              ) : (
+                <video src={part.value} controls className="max-h-64 max-w-full rounded-xl" preload="metadata" />
+              )}
+            </div>
+          ))}
 
-        <p className={`text-xs text-subtle mt-1 ${isMine ? "text-right mr-1" : "ml-1"}`}>
+        <p className={`mt-1 text-xs text-slate-500 ${isMine ? "mr-1 text-right" : "ml-1"}`}>
           {new Date(createdAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
         </p>
       </div>
+      {isMine && <Avatar username={senderName} avatar={senderAvatar} />}
+    </div>
+  );
+}
+
+function Avatar({ username, avatar }: { username: string; avatar?: string | null }) {
+  return (
+    <div
+      className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[10px] font-bold text-white"
+      style={{ backgroundColor: avatarColor(username) }}
+    >
+      {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : username.charAt(0).toUpperCase()}
     </div>
   );
 }
@@ -94,22 +107,21 @@ function ImageWithFallback({ src }: { src: string }) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
-  if (error) return (
-    <a href={src} target="_blank" rel="noopener noreferrer"
-      className="inline-block px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-xs text-accent underline">
-      📷 查看图片
-    </a>
-  );
+  if (error) {
+    return (
+      <a href={src} target="_blank" rel="noopener noreferrer" className="inline-block rounded-xl bg-slate-100 px-3 py-2 text-xs text-teal-700 underline">
+        查看图片
+      </a>
+    );
+  }
 
   return (
     <div className="relative">
-      {!loaded && (
-        <div className="w-48 h-36 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
-      )}
+      {!loaded && <div className="h-36 w-48 animate-pulse rounded-xl bg-slate-100" />}
       <img
         src={src}
         alt=""
-        className="max-w-full max-h-64 rounded-xl object-cover"
+        className="max-h-64 max-w-full rounded-xl object-cover"
         style={{ display: loaded ? "block" : "none" }}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}

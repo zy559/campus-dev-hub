@@ -36,11 +36,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://images.pexels.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.pexels.com" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("campus-dev-hub-theme");if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}else{document.documentElement.removeAttribute("data-theme")}})()`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.removeAttribute("data-theme")` }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-ink min-h-screen flex flex-col relative bg-[#f7fafc]`}>
         <div className="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">

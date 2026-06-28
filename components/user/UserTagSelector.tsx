@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface Tag {
   id: string;
@@ -39,7 +39,7 @@ export default function UserTagSelector({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-muted mb-2">
+      <label className="mb-2 block text-sm font-bold text-slate-700">
         {label} ({selectedTagIds.length}/{maxTags})
       </label>
       <div className="flex flex-wrap gap-2">
@@ -48,15 +48,16 @@ export default function UserTagSelector({
             key={tag.id}
             type="button"
             onClick={() => toggle(tag.id)}
-            className={`px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px] ${
+            className={`min-h-[36px] rounded-full px-3 py-2 text-sm font-bold transition-colors ${
               selectedTagIds.includes(tag.id)
-                ? "bg-accent text-white"
-                : "bg-surface-alt text-muted hover:bg-accent-soft"
+                ? "bg-teal-600 text-white"
+                : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-teal-50 hover:text-teal-700"
             }`}
           >
             {tag.name}
           </button>
         ))}
+        {tags.length === 0 && <p className="text-sm text-slate-500">暂无可选标签</p>}
       </div>
     </div>
   );

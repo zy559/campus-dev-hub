@@ -22,7 +22,7 @@ export default function LandingShowcase() {
           <h2 className="mt-3 text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">
             让校园信息变得好找。
           </h2>
-          <p className="mt-4 text-base leading-7 text-slate-500">
+          <p className="mt-4 text-base leading-7 text-slate-700">
             把人、机会和想法重新整理，让每个同学都更容易开始。
           </p>
         </div>
@@ -31,7 +31,7 @@ export default function LandingShowcase() {
           {features.map(([title, desc]) => (
             <div key={title} className="rounded-[1.75rem] border border-slate-100 bg-slate-50/80 p-6">
               <h3 className="text-xl font-black text-slate-950">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-500">{desc}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{desc}</p>
             </div>
           ))}
         </div>
@@ -42,12 +42,12 @@ export default function LandingShowcase() {
             <h2 className="mt-3 text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">
               从一张校园名片开始。
             </h2>
-            <p className="mt-5 text-base leading-7 text-slate-500">
+            <p className="mt-5 text-base leading-7 text-slate-700">
               用兴趣、目标、作品和正在寻找，替代杂乱水贴。喜欢就收藏，想聊就开口。
             </p>
             <Link
               href="/?browse=1"
-              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+              className="mt-8 inline-flex rounded-full bg-teal-600 px-7 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-teal-500"
             >
               体验今日遇见
             </Link>
@@ -69,9 +69,9 @@ export default function LandingShowcase() {
                     {mode}
                   </span>
                   <h3 className="mt-3 text-xl font-black text-slate-950">{title}</h3>
-                  <p className="mt-2 text-sm text-slate-500">{tags}</p>
+                  <p className="mt-2 text-sm text-slate-600">{tags}</p>
                   <div className="mt-5 flex gap-3">
-                    <button className="flex-1 rounded-full border border-slate-200 py-2 text-sm font-bold text-slate-500">
+                    <button className="flex-1 rounded-full border border-slate-200 bg-white py-2 text-sm font-bold text-slate-600">
                       跳过
                     </button>
                     <button className="flex-1 rounded-full bg-teal-600 py-2 text-sm font-bold text-white">

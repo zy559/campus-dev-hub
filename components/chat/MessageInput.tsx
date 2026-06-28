@@ -6,15 +6,17 @@ import EmojiPicker from "./EmojiPicker";
 const quickReplies = [
   "我看到你的需求，想聊聊具体情况。",
   "我们好像挺同频的，可以认识一下吗？",
-  "我想先匿名问一下，如果合适再互相介绍。",
+  "我想先简单了解一下，如果合适再互相介绍。",
 ];
 
 export default function MessageInput({
   onSend,
   initialDraft = "",
+  privateMode,
 }: {
   onSend: (content: string) => Promise<boolean>;
   initialDraft?: string;
+  privateMode?: boolean;
 }) {
   const [content, setContent] = useState(initialDraft);
   const [sending, setSending] = useState(false);
@@ -77,9 +79,7 @@ export default function MessageInput({
         return;
       }
       const { url } = await res.json();
-      const markdown = file.type.startsWith("video")
-        ? `<video src="${url}" controls></video>`
-        : `![${file.name}](${url})`;
+      const markdown = file.type.startsWith("video") ? `<video src="${url}" controls></video>` : `![${file.name}](${url})`;
       setContent((prev) => prev + (prev ? "\n" : "") + markdown);
     } catch {
       alert("上传失败");
@@ -90,14 +90,16 @@ export default function MessageInput({
   }
 
   return (
-    <div className="space-y-3 border-t border-border pt-3">
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+    <div className="space-y-3">
+      <div className="flex gap-2 overflow-x-auto">
         {quickReplies.map((reply) => (
           <button
             key={reply}
             type="button"
             onClick={() => insertText(reply)}
-            className="shrink-0 rounded-full bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700 transition hover:bg-teal-100"
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              privateMode ? "bg-amber-50 text-amber-700 hover:bg-amber-100" : "bg-teal-50 text-teal-700 hover:bg-teal-100"
+            }`}
           >
             {reply}
           </button>
@@ -112,32 +114,21 @@ export default function MessageInput({
           onKeyDown={handleKeyDown}
           rows={1}
           placeholder="输入消息... Enter 发送，Shift + Enter 换行"
-          className="w-full resize-none rounded-2xl border border-border bg-surface-alt px-4 py-3 pr-32 text-sm text-ink transition-all placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+          className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-32 text-sm text-slate-900 transition-all placeholder:text-slate-500 focus:border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-100"
         />
         <div className="absolute bottom-3.5 right-2 flex items-center gap-1">
           <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowEmoji(!showEmoji)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-lg transition-colors hover:bg-surface-alt"
-              title="表情"
-            >
-              ☺
+            <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="flex h-8 w-8 items-center justify-center rounded-lg text-lg transition-colors hover:bg-slate-50" title="表情">
+              🙂
             </button>
             {showEmoji && <EmojiPicker onSelect={insertEmoji} onClose={() => setShowEmoji(false)} />}
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,video/*"
-            onChange={handleFile}
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept="image/*,video/*" onChange={handleFile} className="hidden" />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-alt hover:text-ink"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
             title="上传图片或视频，最大 10MB"
           >
             {uploading ? "…" : "+"}
@@ -146,7 +137,9 @@ export default function MessageInput({
             type="button"
             onClick={submit}
             disabled={!content.trim() || sending}
-            className="flex h-8 w-12 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white transition-colors hover:bg-accent-hover disabled:opacity-30"
+            className={`flex h-8 w-12 items-center justify-center rounded-lg text-xs font-bold text-white transition-colors disabled:opacity-30 ${
+              privateMode ? "bg-amber-500 hover:bg-amber-400" : "bg-teal-600 hover:bg-teal-500"
+            }`}
             title="发送"
           >
             发送

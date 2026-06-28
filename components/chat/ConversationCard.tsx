@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { avatarColor } from "@/lib/utils";
 
 interface ConversationCardProps {
   id: string;
@@ -10,19 +11,24 @@ export default function ConversationCard({ id, otherUser, lastMessage }: Convers
   return (
     <Link
       href={`/messages/${id}`}
-      className="glass-lift rounded-xl p-4 flex items-center gap-4"
+      className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white/88 p-4 shadow-sm backdrop-blur transition hover:border-teal-200 hover:shadow-md"
     >
-      <div className="w-10 h-10 rounded-full bg-accent-soft flex items-center justify-center text-accent font-bold text-sm flex-shrink-0">
-        {otherUser.username.charAt(0).toUpperCase()}
+      <div
+        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+        style={{ backgroundColor: avatarColor(otherUser.username) }}
+      >
+        {otherUser.avatar ? <img src={otherUser.avatar} alt="" className="h-full w-full rounded-full object-cover" /> : otherUser.username.charAt(0).toUpperCase()}
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-ink">{otherUser.username}</p>
-        {lastMessage && (
-          <p className="text-sm text-muted truncate">{lastMessage.content}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold text-slate-950">{otherUser.username}</p>
+        {lastMessage ? (
+          <p className="truncate text-sm text-slate-600">{lastMessage.content}</p>
+        ) : (
+          <p className="text-sm text-slate-500">还没有消息</p>
         )}
       </div>
       {lastMessage && (
-        <span className="text-xs text-subtle flex-shrink-0">
+        <span className="flex-shrink-0 text-xs text-slate-500">
           {new Date(lastMessage.createdAt).toLocaleDateString("zh-CN")}
         </span>
       )}

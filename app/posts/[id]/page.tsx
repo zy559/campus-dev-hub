@@ -10,7 +10,10 @@ import { avatarColor, fullDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-interface Tag { id: string; name: string; }
+interface Tag {
+  id: string;
+  name: string;
+}
 
 async function getPost(id: string) {
   const post = await db.post.findUnique({
@@ -23,7 +26,9 @@ async function getPost(id: string) {
   });
   if (!post) return null;
   return {
-    id: post.id, title: post.title, content: post.content,
+    id: post.id,
+    title: post.title,
+    content: post.content,
     author: post.author,
     authorId: post.authorId,
     tags: post.tags.map((pt) => pt.tag),
@@ -32,15 +37,8 @@ async function getPost(id: string) {
   };
 }
 
-export default async function PostDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const [post, session] = await Promise.all([
-    getPost(params.id),
-    getServerSession(authOptions),
-  ]);
+export default async function PostDetailPage({ params }: { params: { id: string } }) {
+  const [post, session] = await Promise.all([getPost(params.id), getServerSession(authOptions)]);
 
   if (!post) notFound();
 
@@ -49,52 +47,55 @@ export default async function PostDetailPage({
   const canDelete = currentUserId && (isAdmin || currentUserId === post.authorId);
 
   return (
-    <div className="py-6">
-      <nav className="mb-6 text-sm text-muted animate-fade-in" aria-label="面包屑导航">
-        <Link href="/" className="hover:text-accent transition-colors">首页</Link>
-        <span className="mx-2" aria-hidden="true">/</span>
-        <span className="text-ink">帖子</span>
-      </nav>
+    <article className="mx-auto max-w-3xl py-4 pb-24 lg:pb-8">
+      <Link href="/activity" className="mb-4 inline-flex text-sm font-semibold text-slate-600 transition hover:text-teal-700">
+        ← 返回动态
+      </Link>
 
-      <h1 className="text-4xl font-bold text-ink mb-4 animate-fade-in-up">{post.title}</h1>
+      <section className="rounded-2xl border border-slate-200/80 bg-white/88 p-5 shadow-sm backdrop-blur sm:p-7">
+        <h1 className="text-2xl font-black leading-tight text-slate-950 sm:text-4xl">{post.title}</h1>
 
-      <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border animate-fade-in-up stagger-1">
-        <Link href={`/profile/${post.author.username}`}>
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ring-2 ring-white/50 shadow-sm transition-transform duration-200 hover:scale-105"
-            style={{ backgroundColor: avatarColor(post.author.username) }}
-          >
-            {post.author.username.charAt(0).toUpperCase()}
-          </div>
-        </Link>
-        <div className="flex-1">
-          <Link href={`/profile/${post.author.username}`} className="font-semibold text-ink hover:text-accent transition-colors">
-            {post.author.username}
+        <div className="mt-4 flex items-center gap-3 border-b border-slate-100 pb-4">
+          <Link href={`/profile/${post.author.username}`}>
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full font-bold text-white ring-2 ring-white/70 shadow-sm"
+              style={{ backgroundColor: avatarColor(post.author.username) }}
+            >
+              {post.author.username.charAt(0).toUpperCase()}
+            </div>
           </Link>
-          <p className="text-sm text-muted">{fullDate(post.createdAt)}</p>
-        </div>
-        {canDelete && <PostDeleteButton postId={post.id} />}
-      </div>
-
-      {post.tags.length > 0 && (
-        <div className="flex gap-2 mb-6 animate-fade-in-up stagger-2">
-          {post.tags.map((tag: Tag) => (
-            <Link key={tag.id} href={`/?tag=${tag.name}`}
-              className="px-3 py-2 bg-accent-subtle text-accent text-sm rounded-full hover:bg-accent-soft transition-all duration-200 min-h-[36px] inline-flex items-center">
-              {tag.name}
+          <div className="min-w-0 flex-1">
+            <Link href={`/profile/${post.author.username}`} className="font-semibold text-slate-900 transition hover:text-teal-700">
+              {post.author.username}
             </Link>
-          ))}
+            <p className="text-sm text-slate-500">{fullDate(post.createdAt)}</p>
+          </div>
+          {canDelete && <PostDeleteButton postId={post.id} />}
         </div>
-      )}
 
-      <div className="mb-10 animate-fade-in-up stagger-3">
-        <PostContent content={post.content} />
-      </div>
+        {post.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {post.tags.map((tag: Tag) => (
+              <Link
+                key={tag.id}
+                href={`/activity?tag=${encodeURIComponent(tag.name)}`}
+                className="inline-flex min-h-[32px] items-center rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-700 transition hover:bg-teal-100"
+              >
+                {tag.name}
+              </Link>
+            ))}
+          </div>
+        )}
 
-      <section className="border-t border-border pt-8 animate-fade-in-up stagger-4">
-        <h2 className="text-2xl font-bold text-ink mb-6">评论 ({post.commentCount})</h2>
+        <div className="mt-6">
+          <PostContent content={post.content} />
+        </div>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-slate-200/80 bg-white/88 p-5 shadow-sm backdrop-blur sm:p-7">
+        <h2 className="mb-5 text-xl font-black text-slate-950">评论 ({post.commentCount})</h2>
         <CommentSection postId={post.id} />
       </section>
-    </div>
+    </article>
   );
 }

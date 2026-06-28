@@ -114,7 +114,7 @@ export default function ProfileRecommendationFeed({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "发起聊天失败");
-      router.push(`/messages/${data.id}?opener=${encodeURIComponent(draft)}`);
+      router.push(`/messages/${data.id}?opener=${encodeURIComponent(draft)}${anonymous ? "&mode=private" : ""}`);
     } catch {
       alert("发起聊天失败，请先确认已经登录。");
     } finally {

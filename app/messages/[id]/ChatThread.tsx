@@ -17,11 +17,13 @@ export default function ChatThread({
   initialMessages,
   currentUserId,
   initialDraft,
+  privateMode,
 }: {
   conversationId: string;
   initialMessages: Message[];
   currentUserId: string;
   initialDraft?: string;
+  privateMode?: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -65,11 +67,17 @@ export default function ChatThread({
 
   return (
     <>
+      {privateMode && (
+        <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+          隐私聊天模式：适合先轻量开口，注意不要发送敏感个人信息。
+        </div>
+      )}
+
       <div className="flex-1 space-y-3 overflow-y-auto py-4">
         {messages.length === 0 && (
           <div className="py-10 text-center">
-            <p className="text-sm font-bold text-muted">发送第一条消息吧</p>
-            <p className="mt-2 text-xs text-subtle">可以用快捷开场白，或者先半匿名表达兴趣。</p>
+            <p className="text-sm font-bold text-slate-600">发送第一条消息吧</p>
+            <p className="mt-2 text-xs text-slate-500">可以用快捷开场白，或者先用隐私模式表达兴趣。</p>
           </div>
         )}
         {messages.map((message) => (
@@ -78,13 +86,15 @@ export default function ChatThread({
             content={message.content}
             isMine={message.sender.id === currentUserId}
             senderName={message.sender.username}
+            senderAvatar={message.sender.avatar}
             createdAt={message.createdAt}
+            privateMode={privateMode}
           />
         ))}
         <div ref={bottomRef} />
       </div>
-      <div className="border-t border-border py-3">
-        <MessageInput onSend={handleSend} initialDraft={initialDraft} />
+      <div className="border-t border-slate-200/80 py-3">
+        <MessageInput onSend={handleSend} initialDraft={initialDraft} privateMode={privateMode} />
       </div>
     </>
   );

@@ -133,7 +133,7 @@ export default async function ActivityFeed({
   return (
     <div className="space-y-4 py-3 pb-24 lg:pb-6">
       {isBrowsing && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-teal-100 bg-white/80 px-5 py-4 text-teal-900 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-teal-100 bg-white/85 px-5 py-4 text-teal-900 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium">你正在以游客身份浏览。登录后可以发布、评论、私信和使用同频聊天。</p>
           <Link href="/login" className="inline-flex justify-center rounded-full bg-teal-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-teal-500">
             立即登录
@@ -141,30 +141,30 @@ export default async function ActivityFeed({
         </div>
       )}
 
-      <section className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
+      <section className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-black text-teal-700">动态</p>
             <h1 className="mt-1 truncate text-2xl font-black tracking-normal text-slate-950">按栏目找内容</h1>
           </div>
           <div className="flex min-w-0 shrink-0 items-center gap-2">
-            <Link href="/top" className="hidden max-w-[220px] items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white sm:inline-flex" title={topPost ? topPost.title : "Top榜单"}>
+            <Link href="/top" className="hidden max-w-[220px] items-center gap-2 rounded-full bg-teal-600 px-4 py-2 text-sm font-black text-white sm:inline-flex" title={topPost ? topPost.title : "Top榜单"}>
               <span className="shrink-0">Top</span>
-              <span className="truncate text-white/80">{topPost ? topPost.title : "榜单"}</span>
+              <span className="truncate text-white/85">{topPost ? topPost.title : "榜单"}</span>
             </Link>
-            <Link href="/top" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white sm:hidden">
+            <Link href="/top" className="rounded-full bg-teal-600 px-4 py-2 text-sm font-black text-white sm:hidden">
               Top
             </Link>
-            <Link href="/posts/new?type=post" className="rounded-full bg-teal-600 px-4 py-2 text-sm font-black text-white transition hover:bg-teal-500">
+            <Link href="/posts/new?type=post" className="rounded-full bg-white px-4 py-2 text-sm font-black text-teal-700 ring-1 ring-teal-100 transition hover:bg-teal-50">
               发布
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white/75 p-3 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
+      <section className="rounded-2xl bg-white/80 p-3 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
         <div className="flex gap-2 overflow-x-auto pb-1">
-          <Link href="/activity" className={`shrink-0 rounded-full px-4 py-2 text-sm font-black transition ${!activeLabel ? "bg-teal-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-100 hover:bg-teal-50 hover:text-teal-700"}`}>
+          <Link href="/activity" className={`shrink-0 rounded-full px-4 py-2 text-sm font-black transition ${!activeLabel ? "bg-teal-600 text-white" : "bg-white text-slate-700 ring-1 ring-slate-100 hover:bg-teal-50 hover:text-teal-700"}`}>
             全部
           </Link>
           {ACTIVITY_SECTIONS.map((section) => (
@@ -185,7 +185,7 @@ export default async function ActivityFeed({
               key={child}
               href={`/activity?tag=${encodeURIComponent(child)}`}
               className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition ${
-                tag === child ? "bg-slate-950 text-white" : "bg-white text-slate-600 ring-1 ring-slate-100 hover:bg-teal-50 hover:text-teal-700"
+                tag === child ? "bg-teal-600 text-white" : "bg-white text-slate-700 ring-1 ring-slate-100 hover:bg-teal-50 hover:text-teal-700"
               }`}
             >
               {child}
@@ -194,13 +194,11 @@ export default async function ActivityFeed({
         </div>
       </section>
 
-      <main className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
+      <main className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-black tracking-normal text-slate-950">
-              {tag ? `#${tag}` : search ? `搜索：${search}` : "动态广场"}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <h2 className="text-xl font-black tracking-normal text-slate-950">{tag ? `#${tag}` : search ? `搜索：${search}` : "动态广场"}</h2>
+            <p className="mt-1 text-sm text-slate-600">
               {data.posts.length > 0 ? `${data.posts.length} 条内容` : "还没有内容，发布第一条动态吧"}
             </p>
           </div>
