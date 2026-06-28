@@ -1,3 +1,4 @@
+const { request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../utils/mock");
 
 Page({
@@ -7,10 +8,30 @@ Page({
   },
 
   onLoad(options) {
+    const id = options.id;
     const allCards = getLocalList(LOCAL_PROFILE_CARDS_KEY).concat(profileCards);
-    const id = options.id || allCards[0].id;
-    const card = allCards.find((item) => item.id === id) || allCards[0];
-    this.setData({ card });
+    const localCard = allCards.find((item) => item.id === id);
+    if (localCard) {
+      this.setData({ card: localCard });
+      return;
+    }
+
+    if (id) {
+      this.loadRemoteCard(id);
+      return;
+    }
+
+    this.setData({ card: allCards[0] || null });
+  },
+
+  loadRemoteCard(id) {
+    request({ url: `/api/profile-cards?id=${id}` })
+      .then((res) => {
+        this.setData({ card: res.card });
+      })
+      .catch(() => {
+        wx.showToast({ title: "资料卡加载失败", icon: "none" });
+      });
   },
 
   likeCard() {
@@ -33,7 +54,7 @@ Page({
   deleteCard() {
     wx.showModal({
       title: "删除资料卡",
-      content: "当前是本地 mock 预览，接入后可删除真实资料卡。",
+      content: "当前版本先支持发布和展示，线上删除会放到管理员与我的资料卡管理里统一处理。",
       confirmText: "知道了",
       showCancel: false
     });

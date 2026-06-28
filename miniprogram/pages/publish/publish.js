@@ -16,6 +16,9 @@ Page({
     nickname: "",
     school: "",
     intro: "",
+    needsText: "",
+    interestsText: "",
+    cover: "",
     activeTemplate: "比赛组队",
     templateKeys: Object.keys(templates),
     submitting: false
@@ -42,7 +45,11 @@ Page({
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
-      success: () => wx.showToast({ title: "已选择图片", icon: "success" })
+      success: (res) => {
+        const file = res.tempFiles && res.tempFiles[0];
+        this.setData({ cover: file ? file.tempFilePath : "" });
+        wx.showToast({ title: "已选择图片", icon: "success" });
+      }
     });
   },
 
@@ -58,21 +65,68 @@ Page({
   submitCard() {
     const nickname = this.data.nickname.trim();
     const intro = this.data.intro.trim();
+    const needs = this.parseTags(this.data.needsText, ["等待匹配", "同频交流"]);
+    const interests = this.parseTags(this.data.interestsText, ["校园", "交友", "组队"]);
+
     if (!nickname || !intro) {
       wx.showToast({ title: "请填写昵称和介绍", icon: "none" });
       return;
     }
 
-    const card = {
-      id: `local-card-${Date.now()}`,
+    const payload = {
       name: nickname,
       meta: this.data.school.trim() || "校园同学",
-      needs: ["等待匹配", "同频交流"],
-      interests: ["校园", "交友", "组队"],
       intro,
+      needs,
+      interests,
+      cover: ""
+    };
+
+    if (!getToken()) {
+      wx.showToast({ title: "未登录，已保存本地预览", icon: "none" });
+      this.saveLocalCard(payload);
+      return;
+    }
+
+    this.setData({ submitting: true });
+    request({
+      url: "/api/profile-cards",
+      method: "POST",
+      data: payload
+    })
+      .then((res) => {
+        wx.showToast({ title: "发布成功", icon: "success" });
+        wx.navigateTo({ url: `/pages/profile-card-detail/profile-card-detail?id=${res.card.id}&remote=1` });
+      })
+      .catch(() => {
+        wx.showToast({ title: "发布失败，已存本地", icon: "none" });
+        this.saveLocalCard(payload);
+      })
+      .finally(() => {
+        this.setData({ submitting: false });
+      });
+  },
+
+  parseTags(value, fallback) {
+    const tags = value
+      .split(/[\n,，、\s]+/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .slice(0, 6);
+    return tags.length > 0 ? Array.from(new Set(tags)) : fallback;
+  },
+
+  saveLocalCard(payload) {
+    const card = {
+      id: `local-card-${Date.now()}`,
+      name: payload.name,
+      meta: payload.meta,
+      needs: payload.needs,
+      interests: payload.interests,
+      intro: payload.intro,
       signal: "新发布",
       imageTone: "teal",
-      cover: ""
+      cover: this.data.cover || payload.cover || ""
     };
     const next = [card].concat(getLocalList(LOCAL_PROFILE_CARDS_KEY));
     wx.setStorageSync(LOCAL_PROFILE_CARDS_KEY, next);

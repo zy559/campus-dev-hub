@@ -11,9 +11,12 @@
   </view>
 
   <view wx:if="{{mode === 'card'}}" class="form glass">
-    <view class="photo-upload" bindtap="chooseImage">
-      <text>+</text>
-      <text>上传一张清晰照片</text>
+    <view class="photo-upload {{cover ? 'has-cover' : ''}}" bindtap="chooseImage">
+      <image wx:if="{{cover}}" class="cover-preview" src="{{cover}}" mode="aspectFill" />
+      <block wx:else>
+        <text>+</text>
+        <text>上传一张清晰照片</text>
+      </block>
     </view>
     <view class="field">
       <text>昵称</text>
@@ -22,6 +25,14 @@
     <view class="field">
       <text>学校/年级</text>
       <input value="{{school}}" data-key="school" bindinput="input" placeholder="例如：北华航天工业学院 · 大三" />
+    </view>
+    <view class="field">
+      <text>想找什么</text>
+      <input value="{{needsText}}" data-key="needsText" bindinput="input" placeholder="例如：找对象、找搭子、比赛队友" />
+    </view>
+    <view class="field">
+      <text>兴趣标签</text>
+      <input value="{{interestsText}}" data-key="interestsText" bindinput="input" placeholder="例如：前端、跑步、电影" />
     </view>
     <view class="field">
       <text>自我介绍 / 需求</text>
@@ -34,7 +45,7 @@
       <view class="between">
         <view>
           <text class="template-title">发布模板</text>
-          <text class="template-desc">把关键说明写清楚，减少水贴。</text>
+          <text class="template-desc">把关键信息写清楚，减少水贴。</text>
         </view>
         <button bindtap="applyTemplate">套用</button>
       </view>
@@ -55,5 +66,5 @@
     </view>
   </view>
 
-  <button class="submit" bindtap="submit">发布</button>
+  <button class="submit" bindtap="submit">{{submitting ? "发布中..." : "发布"}}</button>
 </view>

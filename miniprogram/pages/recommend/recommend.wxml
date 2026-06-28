@@ -24,11 +24,12 @@
     </view>
   </scroll-view>
 
-  <view class="profile-shell glass" bindtap="openCardDetail">
-    <view class="match-badge">{{currentCard.signal}}</view>
+  <view wx:if="{{currentCard}}" class="profile-shell glass" bindtap="openCardDetail">
+    <view class="match-badge">{{currentCard.signal || "校园匹配"}}</view>
     <view class="profile-card">
       <view class="photo {{currentCard.imageTone}}">
-        <view class="photo-mark">{{currentCard.name[0]}}</view>
+        <image wx:if="{{currentCard.cover}}" class="cover-image" src="{{currentCard.cover}}" mode="aspectFill" />
+        <view wx:else class="photo-mark">{{currentCard.name[0]}}</view>
         <view class="photo-caption">
           <text>{{currentCard.meta}}</text>
         </view>
@@ -64,10 +65,16 @@
     </view>
   </view>
 
-  <view class="actions safe-bottom">
+  <view wx:else class="empty glass">
+    <text class="empty-title">这个分类暂时没有资料卡</text>
+    <text class="empty-desc">可以切回全部，或者发布第一张资料卡。</text>
+    <button bindtap="goPublishCard">发布资料卡</button>
+  </view>
+
+  <view class="actions safe-bottom" wx:if="{{currentCard}}">
     <button class="action skip" bindtap="nextCard">跳过</button>
     <button class="action like" bindtap="likeCard">喜欢</button>
     <button class="action chat" bindtap="startChat">聊天</button>
   </view>
-  <button class="private-btn" bindtap="privateChat">匿名开口</button>
+  <button wx:if="{{currentCard}}" class="private-btn" bindtap="privateChat">匿名开口</button>
 </view>

@@ -1,3 +1,4 @@
+const { request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../utils/mock");
 
 const filters = ["全部", "找对象", "找搭子", "找队友", "找朋友"];
@@ -10,7 +11,8 @@ Page({
     cards: profileCards,
     currentIndex: 0,
     currentCard: profileCards[0],
-    showGuide: true
+    showGuide: true,
+    loading: false
   },
 
   onLoad() {
@@ -24,23 +26,39 @@ Page({
   },
 
   loadCards() {
-    const allCards = getLocalList(LOCAL_PROFILE_CARDS_KEY).concat(profileCards);
-    this.setData({ allCards }, () => this.syncCards());
+    const localCards = getLocalList(LOCAL_PROFILE_CARDS_KEY);
+    this.setData({ loading: true });
+    request({ url: "/api/profile-cards?limit=30" })
+      .then((res) => {
+        const remoteCards = Array.isArray(res.cards) ? res.cards : [];
+        const allCards = remoteCards.concat(localCards, profileCards);
+        this.setData({ allCards }, () => this.syncCards());
+      })
+      .catch(() => {
+        const allCards = localCards.concat(profileCards);
+        this.setData({ allCards }, () => this.syncCards());
+      })
+      .finally(() => {
+        this.setData({ loading: false });
+      });
   },
 
   getCurrentList() {
-    const { activeFilter } = this.data;
-    if (activeFilter === "全部") return this.data.allCards;
-    const list = this.data.allCards.filter((card) => {
+    const { activeFilter, allCards } = this.data;
+    if (activeFilter === "全部") return allCards;
+    return allCards.filter((card) => {
+      const needs = Array.isArray(card.needs) ? card.needs.join(" ") : "";
+      const interests = Array.isArray(card.interests) ? card.interests.join(" ") : "";
+      const text = `${needs} ${interests} ${card.intro || ""}`;
+
       if (activeFilter === "找队友") {
-        return card.needs.some((item) => item.includes("队友") || item.includes("比赛"));
+        return /队友|组队|比赛|项目/.test(text);
       }
       if (activeFilter === "找朋友") {
-        return card.needs.some((item) => item.includes("朋友"));
+        return /朋友|同好|兴趣|聊天|交流/.test(text);
       }
-      return card.needs.some((item) => item.includes(activeFilter));
+      return text.includes(activeFilter);
     });
-    return list.length > 0 ? list : this.data.allCards;
   },
 
   syncCards() {
@@ -48,7 +66,7 @@ Page({
     this.setData({
       cards,
       currentIndex: 0,
-      currentCard: cards[0]
+      currentCard: cards[0] || null
     });
   },
 
@@ -57,6 +75,7 @@ Page({
   },
 
   nextCard() {
+    if (!this.data.cards.length) return;
     const next = (this.data.currentIndex + 1) % this.data.cards.length;
     this.setData({
       currentIndex: next,
@@ -65,6 +84,7 @@ Page({
   },
 
   likeCard() {
+    if (!this.data.currentCard) return;
     wx.showToast({ title: "已加入喜欢", icon: "success" });
     this.nextCard();
   },
@@ -78,7 +98,9 @@ Page({
   },
 
   openCardDetail() {
-    wx.navigateTo({ url: `/pages/profile-card-detail/profile-card-detail?id=${this.data.currentCard.id}` });
+    if (!this.data.currentCard) return;
+    const remote = this.data.currentCard.remote ? "&remote=1" : "";
+    wx.navigateTo({ url: `/pages/profile-card-detail/profile-card-detail?id=${this.data.currentCard.id}${remote}` });
   },
 
   closeGuide() {
