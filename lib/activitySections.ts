@@ -33,15 +33,8 @@ export const ACTIVITY_SECTIONS = [
   },
 ] as const;
 
-export const ACTIVITY_TAGS = ACTIVITY_SECTIONS.flatMap((section) => [
-  section.title,
-  ...section.children,
-]);
+export const ACTIVITY_TAGS = ACTIVITY_SECTIONS.flatMap((section) => [section.title, ...section.children]);
 
 export function isProfileCardPost(post: { title: string; content: string }) {
-  return (
-    post.content.startsWith(PROFILE_CARD_MARKER) ||
-    post.content.startsWith("[资料卡]") ||
-    post.title.startsWith("资料卡：")
-  );
+  return post.content.startsWith(PROFILE_CARD_MARKER) || post.content.startsWith("[资料卡]") || post.title.startsWith("资料卡：");
 }
