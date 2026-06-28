@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { encode, getToken } from "next-auth/jwt";
+import { decode, encode } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -150,9 +150,13 @@ export async function getRequestUser(request: Request): Promise<AppAuthUser | nu
     };
   }
 
-  const token = await getToken({
-    req: request as Parameters<typeof getToken>[0]["req"],
-    secret: process.env.NEXTAUTH_SECRET,
+  const authHeader = request.headers.get("authorization") || "";
+  const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice("Bearer ".length).trim() : "";
+  if (!bearerToken) return null;
+
+  const token = await decode({
+    token: bearerToken,
+    secret: process.env.NEXTAUTH_SECRET || "",
   });
 
   if (!token?.id) return null;

@@ -1,3 +1,4 @@
+const { getToken, request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, LOCAL_POSTS_KEY, getLocalList } = require("../../utils/mock");
 
 const templates = {
@@ -16,7 +17,8 @@ Page({
     school: "",
     intro: "",
     activeTemplate: "比赛组队",
-    templateKeys: Object.keys(templates)
+    templateKeys: Object.keys(templates),
+    submitting: false
   },
 
   setMode(event) {
@@ -45,6 +47,7 @@ Page({
   },
 
   submit() {
+    if (this.data.submitting) return;
     if (this.data.mode === "card") {
       this.submitCard();
       return;
@@ -84,6 +87,37 @@ Page({
       return;
     }
 
+    if (!getToken()) {
+      wx.showToast({ title: "未登录，已保存本地预览", icon: "none" });
+      this.saveLocalPost(title, content);
+      return;
+    }
+
+    this.setData({ submitting: true });
+    request({
+      url: "/api/posts",
+      method: "POST",
+      data: {
+        title,
+        content,
+        tagIds: [],
+        tagNames: [this.data.activeTemplate]
+      }
+    })
+      .then((post) => {
+        wx.showToast({ title: "发布成功", icon: "success" });
+        wx.navigateTo({ url: `/pages/post-detail/post-detail?id=${post.id}&remote=1` });
+      })
+      .catch(() => {
+        wx.showToast({ title: "发布失败，已存本地", icon: "none" });
+        this.saveLocalPost(title, content);
+      })
+      .finally(() => {
+        this.setData({ submitting: false });
+      });
+  },
+
+  saveLocalPost(title, content) {
     const post = {
       id: `local-post-${Date.now()}`,
       title,
