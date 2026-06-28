@@ -1,4 +1,18 @@
+const { request } = require("../../utils/request");
 const { LOCAL_POSTS_KEY, getLocalList, sections, posts, topPosts } = require("../../utils/mock");
+
+function normalizeRemotePost(post) {
+  return {
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    author: post.author?.username || "同学",
+    tag: post.tags?.[0]?.name || post.board?.name || "动态",
+    comments: post.commentCount || 0,
+    time: "刚刚",
+    remote: true
+  };
+}
 
 Page({
   data: {
@@ -20,12 +34,16 @@ Page({
   },
 
   loadPosts() {
-    const allPosts = getLocalList(LOCAL_POSTS_KEY).concat(posts);
-    this.setData({ posts: allPosts }, () => this.syncPosts());
-  },
-
-  onReady() {
-    this.syncPosts();
+    request({ url: "/api/posts?limit=20" })
+      .then((data) => {
+        const remotePosts = (data.posts || []).map(normalizeRemotePost);
+        const localPosts = getLocalList(LOCAL_POSTS_KEY);
+        this.setData({ posts: remotePosts.concat(localPosts) }, () => this.syncPosts());
+      })
+      .catch(() => {
+        const fallbackPosts = getLocalList(LOCAL_POSTS_KEY).concat(posts);
+        this.setData({ posts: fallbackPosts }, () => this.syncPosts());
+      });
   },
 
   selectSection(event) {
@@ -61,6 +79,7 @@ Page({
 
   openPost(event) {
     const id = event.currentTarget.dataset.id;
-    wx.navigateTo({ url: `/pages/post-detail/post-detail?id=${id}` });
+    const remote = event.currentTarget.dataset.remote === "true";
+    wx.navigateTo({ url: `/pages/post-detail/post-detail?id=${id}${remote ? "&remote=1" : ""}` });
   }
 });

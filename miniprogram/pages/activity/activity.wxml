@@ -34,7 +34,7 @@
   </view>
 
   <view class="feed">
-    <view wx:for="{{visiblePosts}}" wx:key="id" data-id="{{item.id}}" bindtap="openPost" class="post card">
+    <view wx:for="{{visiblePosts}}" wx:key="id" data-id="{{item.id}}" data-remote="{{item.remote}}" bindtap="openPost" class="post card">
       <view class="between">
         <view class="row author">
           <view class="small-avatar">{{item.author[0]}}</view>
