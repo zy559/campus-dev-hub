@@ -22,9 +22,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "围炉 · Campfire - 找到同校同频的人",
-  description:
-    "围炉是面向校园学生的伙伴社区，帮助你找到比赛队友、学习搭子、项目伙伴，并沉淀个人主页与成长记录。",
+  title: "围炉 Campfire - 找到同校同频的人",
+  description: "围炉是面向校园学生的伙伴社区，帮助你找到比赛队友、学习搭子、项目伙伴和同频朋友。",
 };
 
 export default function RootLayout({
@@ -39,21 +38,22 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.pexels.com" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("campus-dev-hub-theme");if(t==="light"){document.documentElement.removeAttribute("data-theme")}else{document.documentElement.setAttribute("data-theme","dark")}})()`,
+            __html: `(function(){var t=localStorage.getItem("campus-dev-hub-theme");if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}else{document.documentElement.removeAttribute("data-theme")}})()`,
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-ink min-h-screen flex flex-col relative`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-ink min-h-screen flex flex-col relative bg-[#f7fafc]`}>
         <div className="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
-          <div className="absolute inset-0 bg-surface" />
-          <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-[0.12] bg-accent" />
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.08] bg-accent" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f4fbfb_42%,#f8fafc_100%)]" />
+          <div className="absolute left-[-12%] top-[-10%] h-[420px] w-[420px] rounded-full bg-teal-100/55 blur-3xl" />
+          <div className="absolute right-[-10%] top-[18%] h-[360px] w-[360px] rounded-full bg-sky-100/55 blur-3xl" />
+          <div className="absolute bottom-[-16%] left-[24%] h-[420px] w-[420px] rounded-full bg-emerald-50/80 blur-3xl" />
         </div>
 
         <Providers>
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md focus:outline-none"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:outline-none"
           >
             跳转到主要内容
           </a>

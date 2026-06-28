@@ -11,16 +11,18 @@ export default function BrowseOrFeed({
   isBrowsing,
   tag,
   search,
+  viewer,
 }: {
   session: boolean;
   isBrowsing: boolean;
   tag?: string;
   search: string;
+  viewer?: { id: string; role: string };
 }) {
   if (session || isBrowsing) {
     return (
       <Suspense fallback={<FeedSkeleton />}>
-        <DataFeed tag={tag} search={search} isBrowsing={isBrowsing && !session} />
+        <DataFeed tag={tag} search={search} isBrowsing={isBrowsing && !session} viewer={viewer} />
       </Suspense>
     );
   }

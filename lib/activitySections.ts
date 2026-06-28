@@ -42,6 +42,6 @@ export function isProfileCardPost(post: { title: string; content: string }) {
   return (
     post.content.startsWith(PROFILE_CARD_MARKER) ||
     post.content.startsWith("[资料卡]") ||
-    post.title.startsWith("资料卡｜")
+    post.title.startsWith("资料卡：")
   );
 }

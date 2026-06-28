@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { AdminMonitorMetrics } from "@/lib/adminMetrics";
 
 interface UserRow {
@@ -17,9 +17,17 @@ interface UserRow {
   commentCount: number;
 }
 
+interface ProfileCardRow {
+  id: string;
+  title: string;
+  author: { username: string; email: string };
+  createdAt: string;
+}
+
 interface AdminPanelProps {
   monitor: AdminMonitorMetrics;
   users: UserRow[];
+  profileCards: ProfileCardRow[];
 }
 
 const STATUS_LABEL = {
@@ -28,9 +36,10 @@ const STATUS_LABEL = {
   todo: "待接入",
 } as const;
 
-export default function AdminPanel({ monitor, users }: AdminPanelProps) {
+export default function AdminPanel({ monitor, users, profileCards }: AdminPanelProps) {
   const [search, setSearch] = useState("");
   const [list, setList] = useState(users);
+  const [cards, setCards] = useState(profileCards);
   const [msg, setMsg] = useState("");
 
   const filtered = list.filter((user) => {
@@ -68,9 +77,14 @@ export default function AdminPanel({ monitor, users }: AdminPanelProps) {
   }
 
   async function deletePost(postId: string) {
-    if (!confirm("确定删除这篇帖子？")) return;
+    if (!confirm("确定删除这篇内容？")) return;
     const res = await fetch(`/api/admin/posts/${postId}`, { method: "DELETE" });
-    setMsg(res.ok ? "帖子已删除" : "删除失败");
+    if (res.ok) {
+      setMsg("内容已删除");
+      setCards((prev) => prev.filter((card) => card.id !== postId));
+    } else {
+      setMsg("删除失败");
+    }
   }
 
   async function impersonate(user: UserRow) {
@@ -93,21 +107,46 @@ export default function AdminPanel({ monitor, users }: AdminPanelProps) {
       <MonitorOverview monitor={monitor} />
 
       <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-ink">资料卡管理</h2>
+            <p className="mt-1 text-sm text-muted">管理员可以删除任何同学发布的资料卡。</p>
+          </div>
+          <span className="rounded-full bg-accent-subtle px-3 py-1 text-xs font-medium text-accent">{cards.length} 张</span>
+        </div>
+        <div className="space-y-2">
+          {cards.length === 0 ? (
+            <p className="rounded-xl bg-surface-alt p-4 text-sm text-muted">暂无资料卡。</p>
+          ) : (
+            cards.map((card) => (
+              <div key={card.id} className="flex items-center justify-between gap-3 rounded-xl bg-surface-alt px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink">{card.title}</p>
+                  <p className="mt-1 text-xs text-subtle">
+                    {card.author.username} · {card.author.email} · {new Date(card.createdAt).toLocaleDateString("zh-CN")}
+                  </p>
+                </div>
+                <button onClick={() => deletePost(card.id)} className="shrink-0 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
+                  删除
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-ink">用户与内容治理</h2>
-            <p className="mt-1 text-sm text-muted">处理警告、禁言、封禁和帖子删除。</p>
+            <p className="mt-1 text-sm text-muted">处理警告、禁言、封禁、模拟登录和帖子删除。</p>
           </div>
           <div className="rounded-full bg-accent-subtle px-3 py-1 text-xs font-medium text-accent">
             {filtered.length} / {list.length} 位用户
           </div>
         </div>
 
-        {msg && (
-          <div className="mb-4 rounded-xl bg-accent-subtle px-4 py-2 text-sm text-accent">
-            {msg}
-          </div>
-        )}
+        {msg && <div className="mb-4 rounded-xl bg-accent-subtle px-4 py-2 text-sm text-accent">{msg}</div>}
 
         <input
           type="search"
@@ -258,10 +297,7 @@ function UserGovernanceCard({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => impersonate(user)}
-            className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 transition hover:bg-teal-100"
-          >
+          <button onClick={() => impersonate(user)} className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 transition hover:bg-teal-100">
             模拟登录
           </button>
           <button
@@ -302,12 +338,12 @@ function UserGovernanceCard({
 }
 
 function UserPosts({ userId, onDelete }: { userId: string; onDelete: (id: string) => void }) {
-  const [posts, setPosts] = useState<Array<{ id: string; title: string; createdAt: string }>>([]);
+  const [posts, setPosts] = useState<Array<{ id: string; title: string; createdAt: string; author: { id: string } }>>([]);
   const [loaded, setLoaded] = useState(false);
 
   async function load() {
     if (loaded) return;
-    const res = await fetch("/api/posts?limit=50");
+    const res = await fetch("/api/posts?limit=50&includeCards=1");
     const data = await res.json();
     setPosts((data.posts || []).filter((post: { author: { id: string } }) => post.author.id === userId));
     setLoaded(true);

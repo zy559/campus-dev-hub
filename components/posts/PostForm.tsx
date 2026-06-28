@@ -44,13 +44,13 @@ export default function PostForm() {
       return;
     }
 
-    const fullContent = [content, ...images.map((url, index) => `![图片${index + 1}](${url})`)].join("\n\n");
+    const fullContent = [content.trim(), ...images.map((url, index) => `![图片${index + 1}](${url})`)].join("\n\n");
     setLoading(true);
     const res = await fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title,
+        title: title.trim(),
         content: fullContent,
         tagIds: [],
         tagNames: [section, childTag],
@@ -70,7 +70,7 @@ export default function PostForm() {
     <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5 pb-24 lg:pb-0">
       {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
         <h2 className="text-lg font-black text-slate-950">选择栏目</h2>
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
           {ACTIVITY_SECTIONS.map((item) => (
@@ -105,14 +105,14 @@ export default function PostForm() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
         <label className="block">
           <span className="text-sm font-bold text-slate-700">标题</span>
           <input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="一句话说明你想发布什么"
-            className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-base outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
           />
         </label>
         <label className="mt-4 block">
@@ -122,12 +122,12 @@ export default function PostForm() {
             onChange={(event) => setContent(event.target.value)}
             rows={6}
             placeholder="写清楚时间、地点、需求、联系方式或补充说明。"
-            className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
+            className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm leading-6 outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
           />
         </label>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-black text-slate-950">图片</h2>
@@ -150,7 +150,16 @@ export default function PostForm() {
         {images.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
             {images.map((src) => (
-              <img key={src} src={src} alt="" className="aspect-square rounded-2xl object-cover" />
+              <div key={src} className="relative">
+                <img src={src} alt="" className="aspect-square w-full rounded-2xl object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setImages((prev) => prev.filter((url) => url !== src))}
+                  className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-0.5 text-xs font-bold text-slate-600"
+                >
+                  删除
+                </button>
+              </div>
             ))}
           </div>
         )}

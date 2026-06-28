@@ -11,8 +11,8 @@ export const RegisterSchema = z.object({
     .string()
     .min(6, "密码至少 6 个字符")
     .max(100, "密码最多 100 个字符")
-    .regex(/[a-zA-Z]/, "密码需包含至少一个字母")
-    .regex(/[0-9]/, "密码需包含至少一个数字"),
+    .regex(/[a-zA-Z]/, "密码需要包含至少一个字母")
+    .regex(/[0-9]/, "密码需要包含至少一个数字"),
   tagIds: z.array(z.string()).max(5, "最多选择 5 个兴趣标签").optional(),
   code: z.string().length(6, "验证码为 6 位数字").optional(),
 });

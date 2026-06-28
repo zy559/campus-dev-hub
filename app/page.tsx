@@ -19,6 +19,9 @@ export default async function HomePage({
       })
     : null;
   const isLoggedIn = !!session?.user?.id;
+  const viewer = session?.user
+    ? { id: session.user.id, role: session.user.role || "user" }
+    : undefined;
   const isBrowsing = searchParams.browse === "1";
   const tag = searchParams.tag;
   const search = searchParams.search || "";
@@ -29,6 +32,7 @@ export default async function HomePage({
       isBrowsing={isBrowsing}
       tag={tag}
       search={search}
+      viewer={viewer}
     />
   );
 }

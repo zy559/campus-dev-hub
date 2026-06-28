@@ -27,47 +27,68 @@ export default function MeClient({
     setLiked([]);
   }
 
+  const items = [
+    { label: "个人资料", href: `/profile/${user.name}` },
+    { label: "我的帖子", href: `/profile/${user.name}` },
+    { label: "我喜欢的", href: "#liked" },
+    { label: "喜欢我的", href: "#liked-me" },
+    { label: "历史评论", href: `/profile/${user.name}` },
+    { label: "我的收藏", href: "#liked" },
+    { label: "建议反馈", href: "/messages" },
+    { label: "隐私政策", href: "/premium" },
+  ];
+
   return (
-    <main className="space-y-4 py-3 pb-24 lg:pb-6">
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-teal-600 text-xl font-black text-white">
-              {user.name.slice(0, 1).toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <h1 className="truncate text-2xl font-black text-slate-950">{user.name}</h1>
-              <p className="truncate text-sm text-slate-500">{user.email}</p>
-            </div>
+    <main className="mx-auto max-w-4xl space-y-4 py-4 pb-24 lg:pb-6">
+      <section className="rounded-[1.75rem] bg-white/78 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="truncate text-3xl font-black text-slate-950">{user.name}</h1>
+            <p className="mt-2 truncate text-base text-slate-400">{user.email || "围炉同学"}</p>
           </div>
-          <button onClick={() => signOut({ callbackUrl: "/" })} className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600">
-            退出
-          </button>
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-100 to-sky-100 text-3xl font-black text-teal-700 ring-1 ring-white">
+            {user.name.slice(0, 1).toUpperCase()}
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-3 gap-6 text-left">
+          <Stat value="0" label="已发帖" />
+          <Stat value={String(liked.length)} label="我喜欢的" />
+          <Stat value="0" label="喜欢我的" />
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/posts/new?type=card" className="rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-100">
+            完善资料卡
+          </Link>
+          {isAdmin && (
+            <Link href="/admin" className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white">
+              管理控制台
+            </Link>
+          )}
         </div>
       </section>
 
-      {isAdmin && (
-        <section className="rounded-2xl bg-slate-950 p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-black text-teal-300">管理员</p>
-              <h2 className="mt-1 text-2xl font-black text-white">控制台</h2>
-              <p className="mt-2 text-sm text-slate-300">手机端也可以从这里进入数据监控和用户治理。</p>
-            </div>
-            <Link href="/admin" className="shrink-0 rounded-full bg-teal-500 px-4 py-2 text-sm font-black text-white">
-              进入
-            </Link>
-          </div>
-        </section>
-      )}
+      <Link href="/activity?tag=活动讲座" className="flex items-center justify-between rounded-2xl bg-sky-50/90 px-5 py-4 text-sky-700 ring-1 ring-sky-100">
+        <span className="text-base font-bold">进学校信息流看看</span>
+        <span className="text-2xl text-sky-400">›</span>
+      </Link>
 
-      <section className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-[1.75rem] bg-white/78 p-3 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+          {items.map((item) => (
+            <Link key={item.label} href={item.href} className="flex items-center justify-between rounded-2xl px-4 py-4 text-lg font-medium text-slate-700 hover:bg-slate-50">
+              <span>{item.label}</span>
+              <span className="text-2xl text-slate-300">›</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section id="liked" className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-2xl bg-white/78 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-black text-teal-700">我喜欢的</p>
-              <h2 className="mt-1 text-3xl font-black text-slate-950">{liked.length}</h2>
-            </div>
+            <p className="text-sm font-black text-teal-700">我喜欢的</p>
             {liked.length > 0 && (
               <button onClick={clearLikes} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500">
                 清空
@@ -85,22 +106,28 @@ export default function MeClient({
               ))
             )}
           </div>
-          <Link href="/" className="mt-4 inline-flex rounded-full bg-teal-600 px-4 py-2 text-sm font-black text-white">
-            继续推荐
-          </Link>
         </div>
 
-        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <div id="liked-me" className="rounded-2xl bg-white/78 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur-xl">
           <p className="text-sm font-black text-sky-700">喜欢我的</p>
-          <h2 className="mt-1 text-3xl font-black text-slate-950">0</h2>
-          <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
-            这里先预留入口。当前喜欢数据保存在本机，后续接入数据库后可以展示真实喜欢你的人。
-          </p>
-          <Link href="/posts/new?type=card" className="mt-4 inline-flex rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white">
-            完善资料卡
-          </Link>
+          <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">后续接入数据库后展示真实喜欢你的人。</p>
         </div>
       </section>
+
+      <div className="pb-4 text-center">
+        <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm font-bold text-slate-400">
+          退出登录
+        </button>
+      </div>
     </main>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <p className="text-3xl font-black text-slate-950">{value}</p>
+      <p className="mt-1 text-sm text-slate-400">{label}</p>
+    </div>
   );
 }

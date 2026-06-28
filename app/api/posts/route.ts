@@ -13,7 +13,7 @@ const normalPostWhere = {
   NOT: [
     { content: { startsWith: PROFILE_CARD_MARKER } },
     { content: { startsWith: "[资料卡]" } },
-    { title: { startsWith: "资料卡｜" } },
+    { title: { startsWith: "资料卡：" } },
   ],
 };
 

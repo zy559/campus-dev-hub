@@ -36,7 +36,7 @@ async function getProfileCards(): Promise<ProfileCardItem[]> {
       OR: [
         { content: { startsWith: PROFILE_CARD_MARKER } },
         { content: { startsWith: "[资料卡]" } },
-        { title: { startsWith: "资料卡｜" } },
+        { title: { startsWith: "资料卡：" } },
       ],
     },
     include: {
@@ -54,7 +54,7 @@ async function getProfileCards(): Promise<ProfileCardItem[]> {
       id: post.id,
       authorId: post.author.id,
       username: post.author.username,
-      name: readField(post.content, "昵称") || post.title.replace("资料卡｜", "") || post.author.username,
+      name: readField(post.content, "昵称") || post.title.replace("资料卡：", "") || post.author.username,
       meta: readField(post.content, "学校") || "校园同学",
       needs: needs ? needs.split("、").filter(Boolean) : post.tags.map((item) => item.tag.name).slice(0, 3),
       interests: interests ? interests.split("、").filter(Boolean) : post.tags.map((item) => item.tag.name).slice(0, 4),
@@ -94,11 +94,19 @@ const fallbackCards: ProfileCardItem[] = [
 
 export default async function DataFeed({
   isBrowsing,
+  viewer,
 }: {
   tag?: string;
   search: string;
   isBrowsing: boolean;
+  viewer?: { id: string; role: string };
 }) {
   const cards = await getProfileCards().catch(() => []);
-  return <ProfileRecommendationFeed cards={cards.length > 0 ? cards : fallbackCards} isBrowsing={isBrowsing} />;
+  return (
+    <ProfileRecommendationFeed
+      cards={cards.length > 0 ? cards : fallbackCards}
+      isBrowsing={isBrowsing}
+      viewer={viewer}
+    />
+  );
 }

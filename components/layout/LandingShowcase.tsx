@@ -3,8 +3,8 @@ import Link from "next/link";
 const features = [
   ["机会雷达", "比赛、活动、讲座、招募，不再靠偶然刷到。"],
   ["同频卡片", "找朋友、搭子、队友，也可以认真找对象。"],
-  ["组队卡", "目标、角色、时间说清楚，合适的人更容易加入。"],
-  ["校园名片", "作品、经历、标签和正在寻找，让优秀被看见。"],
+  ["组队广场", "目标、角色、时间说清楚，合适的人更容易加入。"],
+  ["个人展示", "作品、经历、标签和正在寻找，让优秀被看见。"],
 ];
 
 const meetCards = [
@@ -20,16 +20,16 @@ export default function LandingShowcase() {
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-bold text-teal-600">围炉的特色</p>
           <h2 className="mt-3 text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">
-            微墙发散，围炉帮你行动。
+            让校园信息变得好找。
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-500">
-            把校园里的机会、人和想法重新组织起来，让每个同学都更容易开始。
+            把人、机会和想法重新整理，让每个同学都更容易开始。
           </p>
         </div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {features.map(([title, desc]) => (
-            <div key={title} className="rounded-[1.75rem] border border-slate-100 bg-slate-50 p-6">
+            <div key={title} className="rounded-[1.75rem] border border-slate-100 bg-slate-50/80 p-6">
               <h3 className="text-xl font-black text-slate-950">{title}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-500">{desc}</p>
             </div>
@@ -43,30 +43,28 @@ export default function LandingShowcase() {
               从一张校园名片开始。
             </h2>
             <p className="mt-5 text-base leading-7 text-slate-500">
-              不是只看头像。围炉用兴趣、目标、作品和正在寻找，把朋友、搭子、队友和对象都放进更真实的校园语境里。
+              用兴趣、目标、作品和正在寻找，替代杂乱水贴。喜欢就收藏，想聊就开口。
             </p>
             <Link
-              href="/?search=遇见"
+              href="/?browse=1"
               className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
             >
-              体验遇见
+              体验今日遇见
             </Link>
           </div>
 
           <div className="relative mx-auto w-full max-w-sm">
-            <div className="absolute -left-8 top-10 h-40 w-40 rounded-full bg-cyan-200/70 blur-3xl" />
-            <div className="absolute -right-8 bottom-6 h-44 w-44 rounded-full bg-emerald-200/80 blur-3xl" />
             <div className="relative h-[420px]">
               {meetCards.map(([mode, title, tags], index) => (
                 <div
                   key={mode}
-                  className="absolute left-1/2 top-1/2 w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white bg-white p-5 shadow-2xl shadow-slate-200"
+                  className="absolute left-1/2 top-1/2 w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white bg-white/90 p-5 shadow-2xl shadow-slate-200 backdrop-blur"
                   style={{
                     transform: `translate(-50%, -50%) translate(${(index - 1) * 22}px, ${index * 18}px) rotate(${(index - 1) * 5}deg)`,
                     zIndex: 10 - index,
                   }}
                 >
-                  <div className="h-40 rounded-[1.4rem] bg-gradient-to-br from-teal-100 via-cyan-100 to-white" />
+                  <div className="h-40 rounded-[1.4rem] bg-gradient-to-br from-white via-teal-50 to-sky-100" />
                   <span className="mt-5 inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-black text-teal-700">
                     {mode}
                   </span>

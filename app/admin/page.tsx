@@ -4,6 +4,7 @@ import AdminPanel from "./AdminPanel";
 import { authOptions } from "@/lib/auth";
 import { buildAdminMonitorMetrics } from "@/lib/adminMetrics";
 import { db } from "@/lib/db";
+import { PROFILE_CARD_MARKER } from "@/lib/activitySections";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,7 @@ export default async function AdminPage() {
     newConversations7d,
     recentUsers,
     boards,
+    profileCards,
   ] = await Promise.all([
     db.user.findMany({
       select: {
@@ -86,6 +88,23 @@ export default async function AdminPage() {
       },
       orderBy: { sortOrder: "asc" },
     }),
+    db.post.findMany({
+      where: {
+        OR: [
+          { content: { startsWith: PROFILE_CARD_MARKER } },
+          { content: { startsWith: "[资料卡]" } },
+          { title: { startsWith: "资料卡：" } },
+        ],
+      },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        author: { select: { username: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 80,
+    }),
   ]).catch(() => [
     [],
     EMPTY_METRICS.totalUsers,
@@ -97,6 +116,7 @@ export default async function AdminPage() {
     EMPTY_METRICS.newComments7d,
     EMPTY_METRICS.newConversations7d,
     EMPTY_METRICS.recentUsers,
+    [],
     [],
   ] as const);
 
@@ -117,7 +137,7 @@ export default async function AdminPage() {
   });
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 lg:px-8 lg:pb-8">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium text-accent">Admin Monitor</p>
@@ -139,6 +159,10 @@ export default async function AdminPage() {
           createdAt: user.createdAt.toISOString(),
           postCount: user._count.posts,
           commentCount: user._count.comments,
+        }))}
+        profileCards={profileCards.map((card) => ({
+          ...card,
+          createdAt: card.createdAt.toISOString(),
         }))}
       />
     </main>

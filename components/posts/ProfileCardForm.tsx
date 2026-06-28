@@ -7,18 +7,29 @@ import { PROFILE_CARD_MARKER } from "@/lib/activitySections";
 const NEEDS = ["找对象", "找朋友", "找饭搭子", "找比赛队友", "找自习搭子", "找运动搭子"];
 const INTERESTS = ["摄影", "美食", "电影", "前端", "羽毛球", "考研", "旅行", "音乐"];
 
-export default function ProfileCardForm() {
+export interface ProfileCardFormInitialValue {
+  postId?: string;
+  nickname?: string;
+  school?: string;
+  intro?: string;
+  needs?: string[];
+  interests?: string[];
+  images?: string[];
+}
+
+export default function ProfileCardForm({ initialValue }: { initialValue?: ProfileCardFormInitialValue }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [nickname, setNickname] = useState("");
-  const [school, setSchool] = useState("");
-  const [intro, setIntro] = useState("");
-  const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [images, setImages] = useState<string[]>([]);
+  const [nickname, setNickname] = useState(initialValue?.nickname || "");
+  const [school, setSchool] = useState(initialValue?.school || "");
+  const [intro, setIntro] = useState(initialValue?.intro || "");
+  const [selectedNeeds, setSelectedNeeds] = useState<string[]>(initialValue?.needs || []);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(initialValue?.interests || []);
+  const [images, setImages] = useState<string[]>(initialValue?.images || []);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const isEditing = Boolean(initialValue?.postId);
 
   async function upload(file: File) {
     setUploading(true);
@@ -49,23 +60,23 @@ export default function ProfileCardForm() {
     setLoading(true);
     const content = [
       PROFILE_CARD_MARKER,
-      `昵称：${nickname}`,
-      school ? `学校：${school}` : "",
+      `昵称：${nickname.trim()}`,
+      school.trim() ? `学校：${school.trim()}` : "",
       `想找：${selectedNeeds.join("、")}`,
       selectedInterests.length ? `兴趣：${selectedInterests.join("、")}` : "",
       "",
-      intro,
+      intro.trim(),
       "",
       ...images.map((url, index) => `![资料卡图片${index + 1}](${url})`),
     ]
       .filter(Boolean)
       .join("\n");
 
-    const res = await fetch("/api/posts", {
-      method: "POST",
+    const res = await fetch(isEditing ? `/api/posts/${initialValue?.postId}` : "/api/posts", {
+      method: isEditing ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title: `资料卡｜${nickname}`,
+        title: `资料卡：${nickname.trim()}`,
         content,
         tagIds: [],
         tagNames: ["资料卡", ...selectedNeeds, ...selectedInterests.slice(0, 2)],
@@ -74,7 +85,7 @@ export default function ProfileCardForm() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error || "发布失败");
+      setError(data.error || (isEditing ? "保存失败" : "发布失败"));
       return;
     }
     router.push("/");
@@ -85,7 +96,7 @@ export default function ProfileCardForm() {
     <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5 pb-24 lg:pb-0">
       {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-slate-950">上传照片</h2>
@@ -112,9 +123,18 @@ export default function ProfileCardForm() {
         />
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
           {images.map((src) => (
-            <img key={src} src={src} alt="" className="aspect-[3/4] rounded-2xl object-cover" />
+            <div key={src} className="relative">
+              <img src={src} alt="" className="aspect-[3/4] w-full rounded-2xl object-cover" />
+              <button
+                type="button"
+                onClick={() => setImages((prev) => prev.filter((url) => url !== src))}
+                className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-0.5 text-xs font-bold text-slate-600"
+              >
+                删除
+              </button>
+            </div>
           ))}
-          {images.length === 0 && (
+          {images.length < 6 && (
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
@@ -126,17 +146,17 @@ export default function ProfileCardForm() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="昵称" value={nickname} onChange={setNickname} placeholder="例如：林同学" />
-          <Field label="学校/年级" value={school} onChange={setSchool} placeholder="例如：河农大 · 大三" />
+          <Field label="学校/年级" value={school} onChange={setSchool} placeholder="例如：北华航天工业学院 · 大三" />
         </div>
       </section>
 
       <ChoiceGroup title="我想找" items={NEEDS} selected={selectedNeeds} setSelected={setSelectedNeeds} />
       <ChoiceGroup title="兴趣标签" items={INTERESTS} selected={selectedInterests} setSelected={setSelectedInterests} />
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
         <label className="text-sm font-bold text-slate-700">自我介绍 / 需求</label>
         <textarea
           value={intro}
@@ -144,13 +164,13 @@ export default function ProfileCardForm() {
           rows={5}
           maxLength={180}
           placeholder="简单说明你是谁、想认识什么样的人、希望一起做什么。"
-          className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
+          className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
         />
         <p className="mt-1 text-right text-xs text-slate-400">{intro.length}/180</p>
       </section>
 
       <button disabled={loading} className="w-full rounded-2xl bg-teal-600 py-3 text-base font-black text-white transition hover:bg-teal-500 disabled:opacity-60">
-        {loading ? "发布中..." : "发布资料卡"}
+        {loading ? "保存中..." : isEditing ? "保存资料卡" : "发布资料卡"}
       </button>
     </form>
   );
@@ -164,7 +184,7 @@ function Field({ label, value, onChange, placeholder }: { label: string; value: 
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm outline-none focus:border-teal-300 focus:ring-2 focus:ring-teal-100"
       />
     </label>
   );
@@ -186,7 +206,7 @@ function ChoiceGroup({
   }
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+    <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-white/70 backdrop-blur">
       <h2 className="text-lg font-black text-slate-950">{title}</h2>
       <div className="mt-4 flex flex-wrap gap-2">
         {items.map((item) => (
@@ -197,7 +217,7 @@ function ChoiceGroup({
             className={`rounded-full px-4 py-2 text-sm font-bold transition ${
               selected.includes(item)
                 ? "bg-teal-600 text-white"
-                : "bg-slate-50 text-slate-600 hover:bg-teal-50 hover:text-teal-700"
+                : "bg-white text-slate-600 ring-1 ring-slate-100 hover:bg-teal-50 hover:text-teal-700"
             }`}
           >
             {item}
