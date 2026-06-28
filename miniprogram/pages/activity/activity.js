@@ -17,12 +17,13 @@ function normalizeRemotePost(post) {
 Page({
   data: {
     sections,
-    activeSection: "机会",
+    activeSection: "全部",
     activeTag: "全部",
-    currentChildren: sections[0].children,
+    currentChildren: [],
     topPost: topPosts[0],
     posts: [],
-    visiblePosts: []
+    visiblePosts: [],
+    emptyText: ""
   },
 
   onLoad() {
@@ -46,12 +47,20 @@ Page({
       });
   },
 
+  selectAll() {
+    this.setData({
+      activeSection: "全部",
+      activeTag: "全部",
+      currentChildren: []
+    }, () => this.syncPosts());
+  },
+
   selectSection(event) {
     const activeSection = event.currentTarget.dataset.value;
     const section = sections.find((item) => item.title === activeSection) || sections[0];
     this.setData({
       activeSection,
-      activeTag: "全部",
+      activeTag: "栏目全部",
       currentChildren: section.children
     }, () => this.syncPosts());
   },
@@ -61,12 +70,21 @@ Page({
   },
 
   syncPosts() {
-    const { activeTag, currentChildren } = this.data;
-    const visiblePosts = this.data.posts.filter((post) => {
-      if (activeTag !== "全部") return post.tag === activeTag;
-      return currentChildren.includes(post.tag);
+    const { activeSection, activeTag, currentChildren, posts: allPosts } = this.data;
+    let visiblePosts = allPosts;
+
+    if (activeSection !== "全部") {
+      if (activeTag === "栏目全部") {
+        visiblePosts = allPosts.filter((post) => currentChildren.includes(post.tag));
+      } else {
+        visiblePosts = allPosts.filter((post) => post.tag === activeTag);
+      }
+    }
+
+    this.setData({
+      visiblePosts,
+      emptyText: visiblePosts.length === 0 ? "这个栏目还没有内容，发第一条动态吧" : ""
     });
-    this.setData({ visiblePosts: visiblePosts.length > 0 ? visiblePosts : this.data.posts });
   },
 
   goPublish() {

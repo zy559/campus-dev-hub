@@ -74,6 +74,30 @@
   gap: 18rpx;
 }
 
+.empty {
+  padding: 44rpx 28rpx;
+  text-align: center;
+}
+
+.empty text {
+  display: block;
+  color: #64748b;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.empty button {
+  margin-top: 24rpx;
+  min-width: 160rpx;
+  min-height: 72rpx;
+  border-radius: 999rpx;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 900;
+}
+
 .top-preview {
   display: flex;
   align-items: center;

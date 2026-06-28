@@ -13,12 +13,13 @@
   <view class="glass nav-card">
     <scroll-view scroll-x enhanced show-scrollbar="{{false}}">
       <view class="row-scroll">
+        <button bindtap="selectAll" class="pill {{activeSection === '全部' ? 'pill-active' : ''}}">全部</button>
         <button wx:for="{{sections}}" wx:key="title" data-value="{{item.title}}" bindtap="selectSection" class="pill {{activeSection === item.title ? 'pill-active' : ''}}">{{item.title}}</button>
       </view>
     </scroll-view>
-    <scroll-view class="tag-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <scroll-view wx:if="{{activeSection !== '全部'}}" class="tag-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="row-scroll">
-        <button data-value="全部" bindtap="selectTag" class="sub-pill {{activeTag === '全部' ? 'sub-active' : ''}}">全部</button>
+        <button data-value="栏目全部" bindtap="selectTag" class="sub-pill {{activeTag === '栏目全部' ? 'sub-active' : ''}}">栏目全部</button>
         <button wx:for="{{currentChildren}}" wx:key="*this" data-value="{{item}}" bindtap="selectTag" class="sub-pill {{activeTag === item ? 'sub-active' : ''}}">{{item}}</button>
       </view>
     </scroll-view>
@@ -33,7 +34,12 @@
     <view class="top-rank">Top</view>
   </view>
 
-  <view class="feed">
+  <view wx:if="{{emptyText}}" class="empty card">
+    <text>{{emptyText}}</text>
+    <button bindtap="goPublish">去发布</button>
+  </view>
+
+  <view wx:else class="feed">
     <view wx:for="{{visiblePosts}}" wx:key="id" data-id="{{item.id}}" data-remote="{{item.remote}}" bindtap="openPost" class="post card">
       <view class="between">
         <view class="row author">
