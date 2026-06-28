@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { CommentSchema } from "@/lib/validators";
+import { getRequestUser } from "@/lib/wechatAuth";
 
 export async function GET(request: Request) {
   try {
@@ -38,9 +37,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const requestUser = await getRequestUser(request);
 
-    if (!session?.user?.id) {
+    if (!requestUser?.id) {
       return NextResponse.json(
         { error: "请先登录" },
         { status: 401 }
@@ -48,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // 检查是否被禁言
-    const user = await db.user.findUnique({ where: { id: session.user.id }, select: { muted: true } });
+    const user = await db.user.findUnique({ where: { id: requestUser.id }, select: { muted: true } });
     if (user?.muted) {
       return NextResponse.json(
         { error: "你已被禁言，暂时无法评论" },
@@ -81,7 +80,7 @@ export async function POST(request: Request) {
       data: {
         content,
         postId,
-        authorId: session.user.id,
+        authorId: requestUser.id,
       },
       include: {
         author: {

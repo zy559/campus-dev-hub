@@ -1,4 +1,4 @@
-const { request } = require("../../utils/request");
+const { getToken, request } = require("../../utils/request");
 const { LOCAL_POSTS_KEY, getLocalList, posts, postComments } = require("../../utils/mock");
 
 function normalizeRemotePost(post) {
@@ -13,11 +13,22 @@ function normalizeRemotePost(post) {
   };
 }
 
+function normalizeRemoteComment(comment) {
+  return {
+    id: comment.id,
+    author: comment.author?.username || "同学",
+    content: comment.content,
+    time: "刚刚"
+  };
+}
+
 Page({
   data: {
     post: null,
     comments: [],
-    input: ""
+    input: "",
+    isRemote: false,
+    submitting: false
   },
 
   onLoad(options) {
@@ -34,12 +45,24 @@ Page({
         const normalized = normalizeRemotePost(post);
         this.setData({
           post: normalized,
-          comments: []
+          isRemote: true
         });
+        this.loadRemoteComments(normalized.id);
       })
       .catch(() => {
         wx.showToast({ title: "读取线上帖子失败", icon: "none" });
         this.loadLocalPost(id);
+      });
+  },
+
+  loadRemoteComments(postId) {
+    request({ url: `/api/comments?postId=${postId}` })
+      .then((comments) => {
+        this.setData({ comments: comments.map(normalizeRemoteComment) });
+      })
+      .catch(() => {
+        wx.showToast({ title: "评论加载失败", icon: "none" });
+        this.setData({ comments: [] });
       });
   },
 
@@ -49,6 +72,7 @@ Page({
     const post = allPosts.find((item) => item.id === postId) || allPosts[0];
     this.setData({
       post,
+      isRemote: false,
       comments: postComments[post.id] || []
     });
   },
@@ -63,6 +87,39 @@ Page({
       wx.showToast({ title: "先写点内容", icon: "none" });
       return;
     }
+    if (this.data.isRemote && getToken()) {
+      this.submitRemoteComment(content);
+      return;
+    }
+    this.submitLocalComment(content);
+  },
+
+  submitRemoteComment(content) {
+    if (this.data.submitting) return;
+    this.setData({ submitting: true });
+    request({
+      url: "/api/comments",
+      method: "POST",
+      data: {
+        postId: this.data.post.id,
+        content
+      }
+    })
+      .then((comment) => {
+        const next = this.data.comments.concat(normalizeRemoteComment(comment));
+        this.setData({ comments: next, input: "" });
+        wx.showToast({ title: "评论已发布", icon: "success" });
+      })
+      .catch(() => {
+        wx.showToast({ title: "评论失败，已存本地", icon: "none" });
+        this.submitLocalComment(content);
+      })
+      .finally(() => {
+        this.setData({ submitting: false });
+      });
+  },
+
+  submitLocalComment(content) {
     const next = this.data.comments.concat({
       id: `comment-${Date.now()}`,
       author: "我",

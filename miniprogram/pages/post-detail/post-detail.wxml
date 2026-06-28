@@ -45,6 +45,6 @@
 
   <view class="comment-bar safe-bottom">
     <input value="{{input}}" bindinput="input" placeholder="写评论，补充你知道的信息..." />
-    <button bindtap="submitComment">发送</button>
+    <button bindtap="submitComment" loading="{{submitting}}">发送</button>
   </view>
 </view>
