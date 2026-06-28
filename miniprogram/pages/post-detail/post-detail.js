@@ -105,9 +105,8 @@ Page({
         content
       }
     })
-      .then((comment) => {
-        const next = this.data.comments.concat(normalizeRemoteComment(comment));
-        this.setData({ comments: next, input: "" });
+      .then(() => {
+        this.setData({ input: "" });
         this.loadRemoteComments(this.data.post.id);
         wx.showToast({ title: "评论已发布", icon: "success" });
       })

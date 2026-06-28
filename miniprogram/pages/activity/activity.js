@@ -79,7 +79,8 @@ Page({
 
   openPost(event) {
     const id = event.currentTarget.dataset.id;
-    const remote = event.currentTarget.dataset.remote === "true";
+    const remoteValue = event.currentTarget.dataset.remote;
+    const remote = remoteValue === true || remoteValue === "true";
     wx.navigateTo({ url: `/pages/post-detail/post-detail?id=${id}${remote ? "&remote=1" : ""}` });
   }
 });

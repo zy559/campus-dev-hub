@@ -11,6 +11,8 @@
       <text class="tag">{{post.tag}}</text>
     </view>
 
+    <text class="source-tag">{{isRemote ? "线上帖子" : "本地预览"}}</text>
+
     <text class="post-title">{{post.title}}</text>
     <text class="post-content">{{post.content}}</text>
 
