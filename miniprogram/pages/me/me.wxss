@@ -28,6 +28,23 @@
   color: #64748b;
 }
 
+.login-state {
+  margin-top: 26rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 22rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  color: #64748b;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.login-state.online {
+  background: #ecfdf5;
+  border-color: #99f6e4;
+  color: #0f766e;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -64,6 +81,12 @@
   border: 1rpx solid #e2e8f0;
   font-size: 24rpx;
   font-weight: 900;
+}
+
+.quick button.primary {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
 }
 
 .quick button.admin {

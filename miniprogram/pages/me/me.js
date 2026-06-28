@@ -1,13 +1,19 @@
+const { clearAuth, getStoredUser, getToken, loginWithWechat } = require("../../utils/request");
+
+const guestUser = {
+  name: "未登录同学",
+  school: "登录后同步你的校园身份",
+  posts: 14,
+  liked: 6,
+  likedBy: 2,
+  role: "user"
+};
+
 Page({
   data: {
-    user: {
-      name: "林同学",
-      school: "北华航天工业学院",
-      posts: 14,
-      liked: 6,
-      likedBy: 2,
-      role: "admin"
-    },
+    isLoggedIn: false,
+    loginLoading: false,
+    user: guestUser,
     highlights: [
       { label: "同频匹配", value: "82%" },
       { label: "活跃天数", value: "12" },
@@ -23,6 +29,48 @@ Page({
       { label: "建议反馈", path: "" },
       { label: "隐私政策", path: "" }
     ]
+  },
+
+  onShow() {
+    this.syncAuthState();
+  },
+
+  syncAuthState() {
+    const apiUser = getStoredUser();
+    const isLoggedIn = Boolean(getToken() && apiUser);
+    this.setData({
+      isLoggedIn,
+      user: isLoggedIn
+        ? {
+            ...guestUser,
+            name: apiUser.username || "微信用户",
+            school: apiUser.bio || "微信小程序已登录",
+            role: apiUser.role || "user"
+          }
+        : guestUser
+    });
+  },
+
+  login() {
+    if (this.data.loginLoading) return;
+    this.setData({ loginLoading: true });
+    loginWithWechat()
+      .then(() => {
+        this.syncAuthState();
+        wx.showToast({ title: "登录成功", icon: "success" });
+      })
+      .catch(() => {
+        wx.showToast({ title: "微信登录失败", icon: "none" });
+      })
+      .finally(() => {
+        this.setData({ loginLoading: false });
+      });
+  },
+
+  logout() {
+    clearAuth();
+    this.syncAuthState();
+    wx.showToast({ title: "已退出登录", icon: "success" });
   },
 
   openMenu(event) {

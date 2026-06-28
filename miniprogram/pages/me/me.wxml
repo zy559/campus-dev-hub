@@ -9,6 +9,10 @@
       <view class="avatar">{{user.name[0]}}</view>
     </view>
 
+    <view class="login-state {{isLoggedIn ? 'online' : ''}}">
+      <text>{{isLoggedIn ? "微信已登录" : "登录后可同步发布、评论和聊天"}}</text>
+    </view>
+
     <view class="stats">
       <view>
         <text class="num">{{user.posts}}</text>
@@ -25,6 +29,8 @@
     </view>
 
     <view class="quick">
+      <button wx:if="{{!isLoggedIn}}" class="primary" loading="{{loginLoading}}" bindtap="login">微信登录</button>
+      <button wx:else bindtap="logout">退出登录</button>
       <button bindtap="openMenu" data-path="/pages/profile-edit/profile-edit">编辑资料</button>
       <button wx:if="{{user.role === 'admin'}}" class="admin" bindtap="adminLogin">模拟登录</button>
     </view>

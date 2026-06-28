@@ -6,6 +6,10 @@ function getToken() {
   return wx.getStorageSync(TOKEN_KEY) || "";
 }
 
+function getStoredUser() {
+  return wx.getStorageSync(USER_KEY) || null;
+}
+
 function setAuth({ token, user }) {
   wx.setStorageSync(TOKEN_KEY, token);
   wx.setStorageSync(USER_KEY, user);
@@ -75,6 +79,7 @@ module.exports = {
   TOKEN_KEY,
   USER_KEY,
   getToken,
+  getStoredUser,
   setAuth,
   clearAuth,
   request,
