@@ -108,11 +108,12 @@ Page({
       .then((comment) => {
         const next = this.data.comments.concat(normalizeRemoteComment(comment));
         this.setData({ comments: next, input: "" });
+        this.loadRemoteComments(this.data.post.id);
         wx.showToast({ title: "评论已发布", icon: "success" });
       })
-      .catch(() => {
-        wx.showToast({ title: "评论失败，已存本地", icon: "none" });
-        this.submitLocalComment(content);
+      .catch((error) => {
+        console.error("remote comment failed", error);
+        wx.showToast({ title: "评论失败，请稍后重试", icon: "none" });
       })
       .finally(() => {
         this.setData({ submitting: false });

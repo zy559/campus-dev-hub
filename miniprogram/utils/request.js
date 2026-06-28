@@ -36,10 +36,12 @@ function request({ url, method = "GET", data, header = {} }) {
         if (res.statusCode === 401) {
           clearAuth();
           wx.showToast({ title: "请先登录", icon: "none" });
+          console.error("request unauthorized", url, res.data);
           reject(res);
           return;
         }
         if (res.statusCode < 200 || res.statusCode >= 300) {
+          console.error("request failed", url, res.statusCode, res.data);
           reject(res);
           return;
         }
