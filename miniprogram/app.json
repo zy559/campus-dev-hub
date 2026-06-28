@@ -1,0 +1,53 @@
+{
+  "pages": [
+    "pages/recommend/recommend",
+    "pages/activity/activity",
+    "pages/publish/publish",
+    "pages/messages/messages",
+    "pages/me/me",
+    "pages/me-liked/me-liked",
+    "pages/me-liked-by/me-liked-by",
+    "pages/me-posts/me-posts",
+    "pages/top/top",
+    "pages/profile-card-detail/profile-card-detail",
+    "pages/post-detail/post-detail",
+    "pages/chat/chat",
+    "pages/profile-edit/profile-edit"
+  ],
+  "window": {
+    "navigationBarTitleText": "围炉",
+    "navigationBarBackgroundColor": "#f7fbfb",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7fbfb"
+  },
+  "tabBar": {
+    "color": "#64748b",
+    "selectedColor": "#0f766e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/recommend/recommend",
+        "text": "推荐"
+      },
+      {
+        "pagePath": "pages/activity/activity",
+        "text": "动态"
+      },
+      {
+        "pagePath": "pages/publish/publish",
+        "text": "发布"
+      },
+      {
+        "pagePath": "pages/messages/messages",
+        "text": "聊天"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我"
+      }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,143 @@
+.header {
+  margin-bottom: 24rpx;
+}
+
+.header-desc {
+  display: block;
+  margin-top: 12rpx;
+  color: #64748b;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.switch {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12rpx;
+  padding: 12rpx;
+  margin-bottom: 22rpx;
+}
+
+.switch button {
+  min-height: 72rpx;
+  border-radius: 999rpx;
+  background: transparent;
+  color: #475569;
+  font-size: 26rpx;
+  font-weight: 900;
+}
+
+.switch button.active {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.form {
+  padding: 28rpx;
+}
+
+.photo-upload {
+  height: 320rpx;
+  border-radius: 28rpx;
+  background: radial-gradient(circle at 50% 28%, rgba(255,255,255,0.95), transparent 20%),
+    linear-gradient(135deg, #ffffff, #ccfbf1, #dbeafe);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #0f766e;
+  font-size: 28rpx;
+  font-weight: 900;
+  margin-bottom: 24rpx;
+}
+
+.photo-upload text:first-child {
+  font-size: 72rpx;
+  line-height: 1;
+}
+
+.field {
+  margin-top: 24rpx;
+}
+
+.field text {
+  display: block;
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+  font-weight: 900;
+  color: #334155;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 24rpx;
+  background: #ffffff;
+  border: 1rpx solid #e2e8f0;
+  color: #0f172a;
+  font-size: 28rpx;
+  padding: 22rpx 24rpx;
+}
+
+.field textarea {
+  min-height: 220rpx;
+  line-height: 1.6;
+}
+
+.template {
+  padding: 22rpx;
+  border-radius: 28rpx;
+  background: rgba(236, 253, 245, 0.85);
+  color: #0f766e;
+  border: 1rpx solid #ccfbf1;
+}
+
+.template-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 900;
+}
+
+.template-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #0f766e;
+}
+
+.template button {
+  min-width: 100rpx;
+  min-height: 58rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #0f766e;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.template-row {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.template-row button {
+  flex-shrink: 0;
+  padding: 0 22rpx;
+}
+
+.template-row button.selected {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.submit {
+  margin-top: 28rpx;
+  min-height: 88rpx;
+  border-radius: 999rpx;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 900;
+}

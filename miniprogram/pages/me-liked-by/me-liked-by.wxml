@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="header glass">
+    <text class="eyebrow">新的可能</text>
+    <view class="section-title">喜欢我的</view>
+    <text class="desc">这些同学对你的资料卡感兴趣，可以从轻量聊天开始。</text>
+  </view>
+
+  <view class="card-list">
+    <view wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard" class="person-card card">
+      <view class="avatar-large {{item.imageTone}}">{{item.name[0]}}</view>
+      <view class="person-main">
+        <view class="between">
+          <view>
+            <text class="person-name">{{item.name}}</text>
+            <text class="person-meta">{{item.meta}}</text>
+          </view>
+          <text class="signal">想认识你</text>
+        </view>
+        <text class="intro">{{item.intro}}</text>
+        <view class="chips">
+          <text wx:for="{{item.interests}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

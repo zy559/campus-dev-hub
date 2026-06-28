@@ -1,0 +1,28 @@
+<view class="chat-page">
+  <view class="chat-head glass">
+    <view class="avatar">周</view>
+    <view class="head-main">
+      <text class="name">周同学</text>
+      <text class="desc">你和 TA 的对话</text>
+    </view>
+    <text class="mode {{mode === 'private' ? 'private' : ''}}">{{mode === 'private' ? '隐私模式' : '普通模式'}}</text>
+  </view>
+
+  <view wx:if="{{mode === 'private'}}" class="private-tip">隐私聊天模式：适合先轻量开口，请勿发送敏感个人信息。</view>
+
+  <scroll-view class="messages" scroll-y enhanced>
+    <view wx:for="{{messages}}" wx:key="id" class="bubble-row {{item.mine ? 'mine' : ''}}">
+      <view wx:if="{{!item.mine}}" class="mini-avatar">周</view>
+      <view>
+        <view class="bubble {{item.mine ? (mode === 'private' ? 'mine-private' : 'mine-normal') : ''}}">{{item.text}}</view>
+        <text class="time">{{item.time}}</text>
+      </view>
+      <view wx:if="{{item.mine}}" class="mini-avatar me">我</view>
+    </view>
+  </scroll-view>
+
+  <view class="input-bar safe-bottom">
+    <input value="{{input}}" bindinput="input" placeholder="输入消息..." />
+    <button bindtap="send" class="{{mode === 'private' ? 'private-send' : ''}}">发送</button>
+  </view>
+</view>

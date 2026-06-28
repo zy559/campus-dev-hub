@@ -1,0 +1,50 @@
+<view class="page detail-page">
+  <view wx:if="{{post}}" class="post-main glass">
+    <view class="post-head">
+      <view class="row author">
+        <view class="small-avatar">{{post.author[0]}}</view>
+        <view>
+          <text class="author-name">{{post.author}}</text>
+          <text class="post-time">{{post.time}}</text>
+        </view>
+      </view>
+      <text class="tag">{{post.tag}}</text>
+    </view>
+
+    <text class="post-title">{{post.title}}</text>
+    <text class="post-content">{{post.content}}</text>
+
+    <view class="post-actions">
+      <button bindtap="startChat">私信作者</button>
+      <button class="ghost">收藏</button>
+    </view>
+  </view>
+
+  <view class="comments glass">
+    <view class="comments-head">
+      <view>
+        <text class="eyebrow">评论</text>
+        <view class="comments-title">{{comments.length}} 条讨论</view>
+      </view>
+      <text class="comments-tip">优先补充信息，少发水贴</text>
+    </view>
+
+    <view class="comment-list">
+      <view wx:for="{{comments}}" wx:key="id" class="comment-item">
+        <view class="comment-avatar">{{item.author[0]}}</view>
+        <view class="comment-body">
+          <view class="between">
+            <text class="comment-author">{{item.author}}</text>
+            <text class="comment-time">{{item.time}}</text>
+          </view>
+          <text class="comment-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="comment-bar safe-bottom">
+    <input value="{{input}}" bindinput="input" placeholder="写评论，补充你知道的信息..." />
+    <button bindtap="submitComment">发送</button>
+  </view>
+</view>

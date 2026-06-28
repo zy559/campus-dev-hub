@@ -1,0 +1,56 @@
+<view class="page">
+  <view class="between title-row glass">
+    <view>
+      <text class="eyebrow">动态</text>
+      <view class="section-title">按栏目找内容</view>
+    </view>
+    <view class="title-actions">
+      <button class="top-btn" bindtap="goTop">Top · {{topPost.title}}</button>
+      <button class="publish-btn" bindtap="goPublish">发布</button>
+    </view>
+  </view>
+
+  <view class="glass nav-card">
+    <scroll-view scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="row-scroll">
+        <button wx:for="{{sections}}" wx:key="title" data-value="{{item.title}}" bindtap="selectSection" class="pill {{activeSection === item.title ? 'pill-active' : ''}}">{{item.title}}</button>
+      </view>
+    </scroll-view>
+    <scroll-view class="tag-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="row-scroll">
+        <button data-value="全部" bindtap="selectTag" class="sub-pill {{activeTag === '全部' ? 'sub-active' : ''}}">全部</button>
+        <button wx:for="{{currentChildren}}" wx:key="*this" data-value="{{item}}" bindtap="selectTag" class="sub-pill {{activeTag === item ? 'sub-active' : ''}}">{{item}}</button>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="top-preview card" bindtap="goTop">
+    <view>
+      <text class="eyebrow">Top 榜单</text>
+      <text class="top-title">#{{topPost.rank}} {{topPost.title}}</text>
+      <text class="top-meta">{{topPost.comments}} 条评论 · 热度 {{topPost.heat}}</text>
+    </view>
+    <view class="top-rank">Top</view>
+  </view>
+
+  <view class="feed">
+    <view wx:for="{{visiblePosts}}" wx:key="id" data-id="{{item.id}}" bindtap="openPost" class="post card">
+      <view class="between">
+        <view class="row author">
+          <view class="small-avatar">{{item.author[0]}}</view>
+          <view>
+            <text class="author-name">{{item.author}}</text>
+            <text class="post-time">{{item.time}}</text>
+          </view>
+        </view>
+        <text class="tag">{{item.tag}}</text>
+      </view>
+      <text class="post-title">{{item.title}}</text>
+      <text class="post-content">{{item.content}}</text>
+      <view class="post-footer">
+        <text>{{item.comments}} 条评论</text>
+        <text>查看详情</text>
+      </view>
+    </view>
+  </view>
+</view>

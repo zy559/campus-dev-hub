@@ -1,0 +1,28 @@
+import { describe, expect, it } from "vitest";
+import {
+  buildCode2SessionUrl,
+  buildWechatLocalEmail,
+  buildWechatUsername,
+} from "@/lib/wechatAuth";
+
+describe("wechat auth helpers", () => {
+  it("builds the official code2Session url", () => {
+    const url = buildCode2SessionUrl({
+      appId: "wx-app",
+      appSecret: "secret",
+      code: "login-code",
+    });
+
+    expect(url.toString()).toBe(
+      "https://api.weixin.qq.com/sns/jscode2session?appid=wx-app&secret=secret&js_code=login-code&grant_type=authorization_code"
+    );
+  });
+
+  it("builds a deterministic internal email for openid", () => {
+    expect(buildWechatLocalEmail("OPEN-ID")).toBe("wx_open-id@wechat.local");
+  });
+
+  it("builds a valid bounded username from openid", () => {
+    expect(buildWechatUsername("abcdef1234567890")).toBe("微信用户7890");
+  });
+});

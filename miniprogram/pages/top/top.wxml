@@ -1,0 +1,36 @@
+<view class="page">
+  <view class="hero glass">
+    <text class="eyebrow">校园热点</text>
+    <view class="section-title">Top 榜单</view>
+    <text class="hero-desc">把最值得看的组队、机会、经验和校园讨论放在前面，减少信息差。</text>
+
+    <view class="hero-stats">
+      <view>
+        <text class="stat-num">{{topPosts.length}}</text>
+        <text class="stat-label">上榜内容</text>
+      </view>
+      <view>
+        <text class="stat-num">{{todayHeat}}</text>
+        <text class="stat-label">今日热度</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="rank-list">
+    <view wx:for="{{topPosts}}" wx:key="id" data-id="{{item.id}}" bindtap="openPost" class="rank-card card">
+      <view class="rank-no {{item.rank === 1 ? 'gold' : ''}}">#{{item.rank}}</view>
+      <view class="rank-main">
+        <view class="between">
+          <text class="tag">{{item.tag}}</text>
+          <text class="heat">热度 {{item.heat}}</text>
+        </view>
+        <text class="rank-title">{{item.title}}</text>
+        <text class="rank-content">{{item.content}}</text>
+        <view class="rank-footer">
+          <text>{{item.author}}</text>
+          <text>{{item.comments}} 条评论</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

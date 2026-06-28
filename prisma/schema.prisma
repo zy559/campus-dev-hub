@@ -30,6 +30,23 @@ model User {
   conversation1  Conversation[] @relation("Participant1")
   conversation2  Conversation[] @relation("Participant2")
   messages       Message[]
+  wechatIdentities WechatIdentity[]
+}
+
+model WechatIdentity {
+  id        String   @id @default(uuid())
+  userId    String
+  appId     String
+  openid    String
+  unionid   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, openid])
+  @@index([userId])
+  @@index([unionid])
 }
 
 model Post {

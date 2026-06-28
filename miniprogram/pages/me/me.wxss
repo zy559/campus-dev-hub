@@ -1,0 +1,135 @@
+.profile {
+  padding: 32rpx;
+}
+
+.profile-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.profile-copy {
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 48rpx;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.school {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: #64748b;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28rpx;
+  margin-top: 52rpx;
+}
+
+.num {
+  display: block;
+  font-size: 42rpx;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.label {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.quick {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 34rpx;
+}
+
+.quick button {
+  margin: 0;
+  min-height: 68rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  color: #475569;
+  border: 1rpx solid #e2e8f0;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.quick button.admin {
+  background: #ecfdf5;
+  color: #0f766e;
+  border-color: #99f6e4;
+}
+
+.highlight-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14rpx;
+  margin: 20rpx 0;
+}
+
+.highlight {
+  padding: 22rpx 12rpx;
+  text-align: center;
+}
+
+.highlight-value {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.highlight-label {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.notice {
+  margin: 22rpx 0;
+  padding: 22rpx 28rpx;
+  border-radius: 24rpx;
+  background: #ecfdf5;
+  color: #0f766e;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.menu {
+  padding: 12rpx 20rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 96rpx;
+  padding: 0 18rpx;
+  border-bottom: 1rpx solid #f1f5f9;
+  color: #334155;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.menu-item:last-child {
+  border-bottom: 0;
+}
+
+.arrow {
+  color: #94a3b8;
+  font-size: 44rpx;
+}

@@ -1,0 +1,73 @@
+<view class="page">
+  <view wx:if="{{showGuide}}" class="guide glass">
+    <view>
+      <text class="eyebrow">第一次来围炉？</text>
+      <text class="guide-title">先看今日遇见，也可以发布资料卡，让同学主动找到你；想找机会和组队去动态页。</text>
+    </view>
+    <view class="guide-actions">
+      <button class="small-primary" bindtap="goPublishCard">发资料卡</button>
+      <button class="small-ghost" bindtap="closeGuide">知道了</button>
+    </view>
+  </view>
+
+  <view class="header between">
+    <view>
+      <text class="eyebrow">今日遇见</text>
+      <view class="section-title">推荐</view>
+    </view>
+    <button class="mini-btn" bindtap="nextCard">换一张</button>
+  </view>
+
+  <scroll-view class="filter-row" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="filter-inner">
+      <button wx:for="{{filters}}" wx:key="*this" data-value="{{item}}" bindtap="selectFilter" class="pill {{activeFilter === item ? 'pill-active' : ''}}">{{item}}</button>
+    </view>
+  </scroll-view>
+
+  <view class="profile-shell glass" bindtap="openCardDetail">
+    <view class="match-badge">{{currentCard.signal}}</view>
+    <view class="profile-card">
+      <view class="photo {{currentCard.imageTone}}">
+        <view class="photo-mark">{{currentCard.name[0]}}</view>
+        <view class="photo-caption">
+          <text>{{currentCard.meta}}</text>
+        </view>
+      </view>
+      <view class="profile-body">
+        <view class="between top-line">
+          <view class="identity">
+            <text class="name">{{currentCard.name}}</text>
+            <text class="meta">{{currentCard.meta}}</text>
+          </view>
+          <view class="online">
+            <text>在线</text>
+            <text>可聊</text>
+          </view>
+        </view>
+
+        <view class="chip-block">
+          <text class="block-title">TA 想找</text>
+          <view class="chips">
+            <text wx:for="{{currentCard.needs}}" wx:key="*this" class="chip strong">{{item}}</text>
+          </view>
+        </view>
+
+        <view class="chip-block">
+          <text class="block-title">兴趣</text>
+          <view class="chips">
+            <text wx:for="{{currentCard.interests}}" wx:key="*this" class="chip">{{item}}</text>
+          </view>
+        </view>
+
+        <text class="intro">“{{currentCard.intro}}”</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions safe-bottom">
+    <button class="action skip" bindtap="nextCard">跳过</button>
+    <button class="action like" bindtap="likeCard">喜欢</button>
+    <button class="action chat" bindtap="startChat">聊天</button>
+  </view>
+  <button class="private-btn" bindtap="privateChat">匿名开口</button>
+</view>

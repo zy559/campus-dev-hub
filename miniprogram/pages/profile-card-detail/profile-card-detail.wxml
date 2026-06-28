@@ -1,0 +1,51 @@
+<view class="page detail-page" wx:if="{{card}}">
+  <view class="hero glass">
+    <view class="match-badge">{{card.signal}}</view>
+    <view class="photo {{card.imageTone}}">
+      <view class="photo-mark">{{card.name[0]}}</view>
+      <view class="photo-caption">
+        <text>{{card.meta}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="info glass">
+    <view class="between top-line">
+      <view class="identity">
+        <text class="name">{{card.name}}</text>
+        <text class="meta">{{card.meta}}</text>
+      </view>
+      <view class="online">
+        <text>在线</text>
+        <text>可聊</text>
+      </view>
+    </view>
+
+    <view class="chip-block">
+      <text class="block-title">TA 想找</text>
+      <view class="chips">
+        <text wx:for="{{card.needs}}" wx:key="*this" class="chip strong">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="chip-block">
+      <text class="block-title">兴趣</text>
+      <view class="chips">
+        <text wx:for="{{card.interests}}" wx:key="*this" class="chip">{{item}}</text>
+      </view>
+    </view>
+
+    <text class="intro">“{{card.intro}}”</text>
+
+    <view class="manage-row">
+      <button bindtap="editCard">编辑资料卡</button>
+      <button class="danger" bindtap="deleteCard">删除</button>
+    </view>
+  </view>
+
+  <view class="actions safe-bottom">
+    <button class="action ghost" bindtap="privateChat">匿名开口</button>
+    <button class="action like" bindtap="likeCard">{{liked ? "已喜欢" : "喜欢"}}</button>
+    <button class="action chat" bindtap="startChat">聊天</button>
+  </view>
+</view>

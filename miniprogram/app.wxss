@@ -1,0 +1,119 @@
+page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #ffffff 0%, #f1fbfa 48%, #f8fafc 100%);
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 24rpx 140rpx;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1rpx solid rgba(255, 255, 255, 0.88);
+  border-radius: 32rpx;
+  box-shadow: 0 18rpx 50rpx rgba(15, 118, 110, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.section-title {
+  font-size: 44rpx;
+  line-height: 1.15;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.eyebrow {
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+.muted {
+  color: #475569;
+}
+
+.subtle {
+  color: #64748b;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 56rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  background: #ffffff;
+  color: #475569;
+  border: 1rpx solid #e2e8f0;
+}
+
+.pill-active {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84rpx;
+  border-radius: 999rpx;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #0f766e;
+  border: 1rpx solid #ccfbf1;
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
+.card {
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1rpx solid #e2e8f0;
+  box-shadow: 0 12rpx 36rpx rgba(15, 23, 42, 0.05);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #14b8a6, #38bdf8);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.safe-bottom {
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}
