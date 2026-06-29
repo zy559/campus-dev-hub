@@ -5,6 +5,34 @@ import { getRequestUser } from "@/lib/wechatAuth";
 const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm"];
 
+function guessContentType(fileName: string) {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith(".png")) return "image/png";
+  if (lower.endsWith(".gif")) return "image/gif";
+  if (lower.endsWith(".webp")) return "image/webp";
+  if (lower.endsWith(".mp4")) return "video/mp4";
+  if (lower.endsWith(".webm")) return "video/webm";
+  return "image/jpeg";
+}
+
+async function readUploadFile(request: Request) {
+  const contentType = request.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const body = await request.json();
+    const base64 = typeof body.base64 === "string" ? body.base64 : "";
+    const fileName = typeof body.fileName === "string" ? body.fileName : `upload-${Date.now()}.jpg`;
+    const type = typeof body.contentType === "string" ? body.contentType : guessContentType(fileName);
+    if (!base64) return null;
+
+    const binary = Buffer.from(base64.replace(/^data:[^;]+;base64,/, ""), "base64");
+    return new File([binary], fileName, { type });
+  }
+
+  const formData = await request.formData();
+  return formData.get("file") as File | null;
+}
+
 export async function POST(request: Request) {
   try {
     const requestUser = await getRequestUser(request);
@@ -13,8 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Please login first" }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const file = formData.get("file") as File | null;
+    const file = await readUploadFile(request);
 
     if (!file) {
       return NextResponse.json({ error: "Please choose a file" }, { status: 400 });

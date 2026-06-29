@@ -75,28 +75,45 @@ function request({ url, method = "GET", data, header = {} }) {
 }
 
 function uploadFile({ filePath, name = "file" }) {
-  const token = getToken();
-  return new Promise((resolve, reject) => {
-    wx.uploadFile({
-      url: `${API_BASE_URL}/api/upload`,
-      filePath,
-      name,
-      header: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      },
+  return compressImage(filePath)
+    .then((compressedPath) => readFileBase64(compressedPath))
+    .then((base64) => request({
+      url: "/api/upload",
+      method: "POST",
+      data: {
+        base64,
+        fileName: `${name}-${Date.now()}.jpg`,
+        contentType: "image/jpeg"
+      }
+    }));
+}
+
+function compressImage(filePath) {
+  return new Promise((resolve) => {
+    if (!filePath || !wx.compressImage) {
+      resolve(filePath);
+      return;
+    }
+    wx.compressImage({
+      src: filePath,
+      quality: 72,
       success(res) {
-        let data = res.data;
-        try {
-          data = JSON.parse(res.data || "{}");
-        } catch {
-          data = {};
-        }
-        handleResponse({
-          res: { statusCode: res.statusCode, data },
-          url: "/api/upload",
-          resolve,
-          reject
-        });
+        resolve(res.tempFilePath || filePath);
+      },
+      fail() {
+        resolve(filePath);
+      }
+    });
+  });
+}
+
+function readFileBase64(filePath) {
+  return new Promise((resolve, reject) => {
+    wx.getFileSystemManager().readFile({
+      filePath,
+      encoding: "base64",
+      success(res) {
+        resolve(res.data || "");
       },
       fail: reject
     });

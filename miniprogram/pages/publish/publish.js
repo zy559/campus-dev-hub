@@ -111,13 +111,13 @@ Page({
     this.submitPost();
   },
 
-  uploadImageIfNeeded(filePath) {
+  uploadImageIfNeeded(filePath, name = "file") {
     if (!filePath || isRemoteUrl(filePath)) return Promise.resolve(filePath || "");
-    return uploadFile({ filePath }).then((res) => res.url || "");
+    return uploadFile({ filePath, name }).then((res) => res.url || "");
   },
 
-  uploadImageOrEmpty(filePath) {
-    return this.uploadImageIfNeeded(filePath).catch((error) => {
+  uploadImageOrEmpty(filePath, name) {
+    return this.uploadImageIfNeeded(filePath, name).catch((error) => {
       console.error("upload image failed", error);
       wx.showToast({ title: "图片上传失败，先无图发布", icon: "none" });
       return "";
@@ -149,7 +149,7 @@ Page({
     }
 
     this.setData({ submitting: true });
-    this.uploadImageOrEmpty(this.data.cover)
+    this.uploadImageOrEmpty(this.data.cover, "profile-card")
       .then((cover) => {
         const payload = {
           name: nickname,
@@ -219,7 +219,7 @@ Page({
     }
 
     this.setData({ submitting: true });
-    this.uploadImageOrEmpty(this.data.postImage)
+    this.uploadImageOrEmpty(this.data.postImage, "post")
       .then((imageUrl) => request({
         url: "/api/posts",
         method: "POST",
