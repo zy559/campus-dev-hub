@@ -8,6 +8,7 @@ const ALLOWED_HOSTS = [
   "res.cloudinary.com",
   "qcloud.la",
   "tcb.qcloud.la",
+  "bing.net",
 ];
 
 function isAllowedImageUrl(url: URL) {
