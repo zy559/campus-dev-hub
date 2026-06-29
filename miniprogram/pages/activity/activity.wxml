@@ -51,6 +51,7 @@
         </view>
         <text class="tag">{{item.tag}}</text>
       </view>
+      <image wx:if="{{item.images && item.images.length}}" class="post-image" src="{{item.images[0]}}" mode="aspectFill" />
       <text class="post-title">{{item.title}}</text>
       <text class="post-content">{{item.content}}</text>
       <view class="post-footer">

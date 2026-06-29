@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     const formattedPosts = posts.map((post) => ({
       id: post.id,
       title: post.title,
-      content: post.content.slice(0, 300),
+      content: post.content.includes("[IMAGES]") ? post.content : post.content.slice(0, 300),
       author: post.author,
       tags: post.tags.map((pt: PostTagItem) => pt.tag),
       board: post.board ?? undefined,

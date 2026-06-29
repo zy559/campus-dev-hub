@@ -87,6 +87,13 @@
   color: #1e293b;
 }
 
+.post-image {
+  width: 100%;
+  margin-top: 24rpx;
+  border-radius: 26rpx;
+  background: #f1f5f9;
+}
+
 .post-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;

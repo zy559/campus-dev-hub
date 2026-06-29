@@ -14,6 +14,7 @@
     <text class="source-tag">{{isRemote ? "线上帖子" : "本地预览"}}</text>
 
     <text class="post-title">{{post.title}}</text>
+    <image wx:for="{{post.images}}" wx:key="*this" class="post-image" src="{{item}}" mode="widthFix" />
     <text class="post-content">{{post.content}}</text>
 
     <view class="post-actions">

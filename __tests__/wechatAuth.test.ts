@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   buildCode2SessionUrl,
   buildWechatLocalEmail,
   buildWechatUsername,
+  resolveBearerTokenUser,
 } from "@/lib/wechatAuth";
 
 describe("wechat auth helpers", () => {
@@ -24,5 +25,30 @@ describe("wechat auth helpers", () => {
 
   it("builds a valid bounded username from openid", () => {
     expect(buildWechatUsername("abcdef1234567890")).toBe("微信用户7890");
+  });
+
+  it("hydrates bearer token role from the database", async () => {
+    const findUnique = vi.fn().mockResolvedValue({
+      id: "user-1",
+      username: "admin",
+      email: "admin@example.com",
+      role: "admin",
+    });
+
+    const user = await resolveBearerTokenUser(
+      {
+        id: "user-1",
+        username: "old-admin",
+        email: "admin@example.com",
+        role: "user",
+      },
+      { user: { findUnique } }
+    );
+
+    expect(user).toMatchObject({
+      id: "user-1",
+      username: "admin",
+      role: "admin",
+    });
   });
 });

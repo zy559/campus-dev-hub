@@ -1,8 +1,9 @@
 <view class="page detail-page" wx:if="{{card}}">
   <view class="hero glass">
-    <view class="match-badge">{{card.signal}}</view>
+    <view class="match-badge">{{card.signal || "校园匹配"}}</view>
     <view class="photo {{card.imageTone}}">
-      <view class="photo-mark">{{card.name[0]}}</view>
+      <image wx:if="{{card.cover}}" class="cover-image" src="{{card.cover}}" mode="aspectFill" />
+      <view wx:else class="photo-mark">{{card.name[0]}}</view>
       <view class="photo-caption">
         <text>{{card.meta}}</text>
       </view>

@@ -25,6 +25,15 @@ export interface AppAuthUser {
   role: string;
 }
 
+interface UserRoleStore {
+  user: {
+    findUnique(args: {
+      where: { id: string };
+      select: { id: true; username: true; email: true; role: true };
+    }): Promise<AppAuthUser | null>;
+  };
+}
+
 export function buildCode2SessionUrl({ appId, appSecret, code }: WechatCode2SessionInput) {
   const url = new URL("https://api.weixin.qq.com/sns/jscode2session");
   url.searchParams.set("appid", appId);
@@ -139,6 +148,18 @@ export async function issueAppToken(user: { id: string; username: string; email:
   });
 }
 
+export async function resolveBearerTokenUser(
+  tokenUser: AppAuthUser,
+  store: UserRoleStore = db
+): Promise<AppAuthUser> {
+  const freshUser = await store.user.findUnique({
+    where: { id: tokenUser.id },
+    select: { id: true, username: true, email: true, role: true },
+  });
+
+  return freshUser || tokenUser;
+}
+
 export async function getRequestUser(request: Request): Promise<AppAuthUser | null> {
   const session = await getServerSession(authOptions);
   if (session?.user?.id) {
@@ -160,10 +181,10 @@ export async function getRequestUser(request: Request): Promise<AppAuthUser | nu
   });
 
   if (!token?.id) return null;
-  return {
+  return resolveBearerTokenUser({
     id: String(token.id),
     username: String(token.username || token.name || ""),
     email: typeof token.email === "string" ? token.email : null,
     role: String(token.role || "user"),
-  };
+  });
 }

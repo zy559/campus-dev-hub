@@ -20,6 +20,22 @@ function clearAuth() {
   wx.removeStorageSync(USER_KEY);
 }
 
+function handleResponse({ res, url, resolve, reject }) {
+  if (res.statusCode === 401) {
+    clearAuth();
+    wx.showToast({ title: "请先登录", icon: "none" });
+    console.error("request unauthorized", url, res.data);
+    reject(res);
+    return;
+  }
+  if (res.statusCode < 200 || res.statusCode >= 300) {
+    console.error("request failed", url, res.statusCode, res.data);
+    reject(res);
+    return;
+  }
+  resolve(res.data);
+}
+
 function request({ url, method = "GET", data, header = {} }) {
   const token = getToken();
   return new Promise((resolve, reject) => {
@@ -33,19 +49,36 @@ function request({ url, method = "GET", data, header = {} }) {
         ...header
       },
       success(res) {
-        if (res.statusCode === 401) {
-          clearAuth();
-          wx.showToast({ title: "请先登录", icon: "none" });
-          console.error("request unauthorized", url, res.data);
-          reject(res);
-          return;
+        handleResponse({ res, url, resolve, reject });
+      },
+      fail: reject
+    });
+  });
+}
+
+function uploadFile({ filePath, name = "file" }) {
+  const token = getToken();
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${API_BASE_URL}/api/upload`,
+      filePath,
+      name,
+      header: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      },
+      success(res) {
+        let data = res.data;
+        try {
+          data = JSON.parse(res.data || "{}");
+        } catch {
+          data = {};
         }
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          console.error("request failed", url, res.statusCode, res.data);
-          reject(res);
-          return;
-        }
-        resolve(res.data);
+        handleResponse({
+          res: { statusCode: res.statusCode, data },
+          url: "/api/upload",
+          resolve,
+          reject
+        });
       },
       fail: reject
     });
@@ -85,5 +118,6 @@ module.exports = {
   setAuth,
   clearAuth,
   request,
+  uploadFile,
   loginWithWechat
 };

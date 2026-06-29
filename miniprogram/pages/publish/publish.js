@@ -1,7 +1,8 @@
-const { getToken, request } = require("../../utils/request");
+const { getToken, request, uploadFile } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, LOCAL_POSTS_KEY, getLocalList } = require("../../utils/mock");
 
 const EDITING_PROFILE_CARD_KEY = "weiluo_editing_profile_card_id";
+const IMAGE_MARKER = "[IMAGES]";
 
 const templates = {
   比赛组队: "比赛/项目：\n目标：\n目前进度：\n缺少角色：\n时间安排：\n联系方式：",
@@ -9,6 +10,16 @@ const templates = {
   找对象: "关于我：\n想认识：\n兴趣/生活节奏：\n希望怎么开始：",
   二手闲置: "物品：\n成色：\n价格：\n交易地点：\n补充说明："
 };
+
+function isRemoteUrl(value) {
+  return /^https?:\/\//.test(value || "");
+}
+
+function withImages(content, images) {
+  const cleanImages = images.filter(Boolean);
+  if (!cleanImages.length) return content;
+  return `${content}\n\n${IMAGE_MARKER}\n${JSON.stringify(cleanImages)}`;
+}
 
 Page({
   data: {
@@ -21,6 +32,7 @@ Page({
     needsText: "",
     interestsText: "",
     cover: "",
+    postImage: "",
     editingCardId: "",
     activeTemplate: "比赛组队",
     templateKeys: Object.keys(templates),
@@ -29,8 +41,7 @@ Page({
 
   onLoad(options) {
     const cardId = options.cardId || "";
-    if (!cardId) return;
-    this.loadEditingCard(cardId);
+    if (cardId) this.loadEditingCard(cardId);
   },
 
   onShow() {
@@ -78,13 +89,14 @@ Page({
     this.setData({ content: templates[this.data.activeTemplate] });
   },
 
-  chooseImage() {
+  chooseImage(event) {
+    const target = event.currentTarget.dataset.target || "cover";
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
       success: (res) => {
         const file = res.tempFiles && res.tempFiles[0];
-        this.setData({ cover: file ? file.tempFilePath : "" });
+        this.setData({ [target]: file ? file.tempFilePath : "" });
         wx.showToast({ title: "已选择图片", icon: "success" });
       }
     });
@@ -99,6 +111,11 @@ Page({
     this.submitPost();
   },
 
+  uploadImageIfNeeded(filePath) {
+    if (!filePath || isRemoteUrl(filePath)) return Promise.resolve(filePath || "");
+    return uploadFile({ filePath }).then((res) => res.url || "");
+  },
+
   submitCard() {
     const nickname = this.data.nickname.trim();
     const intro = this.data.intro.trim();
@@ -110,34 +127,43 @@ Page({
       return;
     }
 
-    const payload = {
-      name: nickname,
-      meta: this.data.school.trim() || "校园同学",
-      intro,
-      needs,
-      interests,
-      cover: ""
-    };
-
     if (!getToken()) {
       wx.showToast({ title: "未登录，已保存本地预览", icon: "none" });
-      this.saveLocalCard(payload);
+      this.saveLocalCard({
+        name: nickname,
+        meta: this.data.school.trim() || "校园同学",
+        intro,
+        needs,
+        interests,
+        cover: this.data.cover
+      });
       return;
     }
 
     this.setData({ submitting: true });
-    request({
-      url: "/api/profile-cards",
-      method: this.data.editingCardId ? "PUT" : "POST",
-      data: this.data.editingCardId ? { id: this.data.editingCardId, ...payload } : payload
-    })
+    this.uploadImageIfNeeded(this.data.cover)
+      .then((cover) => {
+        const payload = {
+          name: nickname,
+          meta: this.data.school.trim() || "校园同学",
+          intro,
+          needs,
+          interests,
+          cover
+        };
+
+        return request({
+          url: "/api/profile-cards",
+          method: this.data.editingCardId ? "PUT" : "POST",
+          data: this.data.editingCardId ? { id: this.data.editingCardId, ...payload } : payload
+        });
+      })
       .then((res) => {
         wx.showToast({ title: this.data.editingCardId ? "修改成功" : "发布成功", icon: "success" });
         wx.navigateTo({ url: `/pages/profile-card-detail/profile-card-detail?id=${res.card.id}&remote=1` });
       })
       .catch(() => {
-        wx.showToast({ title: "发布失败，已存本地", icon: "none" });
-        this.saveLocalCard(payload);
+        wx.showToast({ title: "发布失败，请稍后重试", icon: "none" });
       })
       .finally(() => {
         this.setData({ submitting: false });
@@ -163,7 +189,7 @@ Page({
       intro: payload.intro,
       signal: "新发布",
       imageTone: "teal",
-      cover: this.data.cover || payload.cover || ""
+      cover: payload.cover || ""
     };
     const next = [card].concat(getLocalList(LOCAL_PROFILE_CARDS_KEY));
     wx.setStorageSync(LOCAL_PROFILE_CARDS_KEY, next);
@@ -180,39 +206,40 @@ Page({
 
     if (!getToken()) {
       wx.showToast({ title: "未登录，已保存本地预览", icon: "none" });
-      this.saveLocalPost(title, content);
+      this.saveLocalPost(title, content, this.data.postImage ? [this.data.postImage] : []);
       return;
     }
 
     this.setData({ submitting: true });
-    request({
-      url: "/api/posts",
-      method: "POST",
-      data: {
-        title,
-        content,
-        tagIds: [],
-        tagNames: [this.data.activeTemplate]
-      }
-    })
+    this.uploadImageIfNeeded(this.data.postImage)
+      .then((imageUrl) => request({
+        url: "/api/posts",
+        method: "POST",
+        data: {
+          title,
+          content: withImages(content, imageUrl ? [imageUrl] : []),
+          tagIds: [],
+          tagNames: [this.data.activeTemplate]
+        }
+      }))
       .then((post) => {
         wx.showToast({ title: "发布成功", icon: "success" });
         wx.navigateTo({ url: `/pages/post-detail/post-detail?id=${post.id}&remote=1` });
       })
       .catch(() => {
-        wx.showToast({ title: "发布失败，已存本地", icon: "none" });
-        this.saveLocalPost(title, content);
+        wx.showToast({ title: "发布失败，请稍后重试", icon: "none" });
       })
       .finally(() => {
         this.setData({ submitting: false });
       });
   },
 
-  saveLocalPost(title, content) {
+  saveLocalPost(title, content, images = []) {
     const post = {
       id: `local-post-${Date.now()}`,
       title,
       content,
+      images,
       author: "我",
       tag: this.data.activeTemplate,
       comments: 0,

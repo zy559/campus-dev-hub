@@ -1,16 +1,38 @@
 const { request } = require("../../utils/request");
 const { LOCAL_POSTS_KEY, getLocalList, sections, posts, topPosts } = require("../../utils/mock");
 
-function normalizeRemotePost(post) {
+const IMAGE_MARKER = "[IMAGES]";
+
+function parsePostMedia(content, fallbackImages) {
+  const images = Array.isArray(fallbackImages) ? fallbackImages : [];
+  const value = String(content || "");
+  const markerIndex = value.indexOf(IMAGE_MARKER);
+  if (markerIndex === -1) {
+    return { content: value, images };
+  }
+
+  const text = value.slice(0, markerIndex).trim();
+  const rawImages = value.slice(markerIndex + IMAGE_MARKER.length).trim();
+  try {
+    const parsed = JSON.parse(rawImages);
+    return { content: text, images: Array.isArray(parsed) ? parsed.filter(Boolean) : images };
+  } catch {
+    return { content: text, images };
+  }
+}
+
+function normalizePost(post, remote = false) {
+  const media = parsePostMedia(post.content, post.images);
   return {
     id: post.id,
     title: post.title,
-    content: post.content,
-    author: post.author?.username || "同学",
-    tag: post.tags?.[0]?.name || post.board?.name || "动态",
-    comments: post.commentCount || 0,
+    content: media.content,
+    images: media.images,
+    author: post.author?.username || post.author || "同学",
+    tag: post.tags?.[0]?.name || post.board?.name || post.tag || "动态",
+    comments: post.commentCount || post.comments || 0,
     time: "刚刚",
-    remote: true
+    remote
   };
 }
 
@@ -37,12 +59,14 @@ Page({
   loadPosts() {
     request({ url: "/api/posts?limit=20" })
       .then((data) => {
-        const remotePosts = (data.posts || []).map(normalizeRemotePost);
-        const localPosts = getLocalList(LOCAL_POSTS_KEY);
+        const remotePosts = (data.posts || []).map((post) => normalizePost(post, true));
+        const localPosts = getLocalList(LOCAL_POSTS_KEY).map((post) => normalizePost(post));
         this.setData({ posts: remotePosts.concat(localPosts) }, () => this.syncPosts());
       })
       .catch(() => {
-        const fallbackPosts = getLocalList(LOCAL_POSTS_KEY).concat(posts);
+        const fallbackPosts = getLocalList(LOCAL_POSTS_KEY)
+          .concat(posts)
+          .map((post) => normalizePost(post));
         this.setData({ posts: fallbackPosts }, () => this.syncPosts());
       });
   },

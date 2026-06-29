@@ -11,7 +11,7 @@
   </view>
 
   <view wx:if="{{mode === 'card'}}" class="form glass">
-    <view class="photo-upload {{cover ? 'has-cover' : ''}}" bindtap="chooseImage">
+    <view class="photo-upload {{cover ? 'has-cover' : ''}}" data-target="cover" bindtap="chooseImage">
       <image wx:if="{{cover}}" class="cover-preview" src="{{cover}}" mode="aspectFill" />
       <block wx:else>
         <text>+</text>
@@ -56,6 +56,14 @@
       </scroll-view>
     </view>
 
+    <view class="photo-upload post-upload {{postImage ? 'has-cover' : ''}}" data-target="postImage" bindtap="chooseImage">
+      <image wx:if="{{postImage}}" class="cover-preview" src="{{postImage}}" mode="aspectFill" />
+      <block wx:else>
+        <text>+</text>
+        <text>给动态添加图片</text>
+      </block>
+    </view>
+
     <view class="field">
       <text>标题</text>
       <input value="{{title}}" data-key="title" bindinput="input" placeholder="一句话说明你想发布什么" />
@@ -66,5 +74,5 @@
     </view>
   </view>
 
-  <button class="submit" bindtap="submit">{{submitting ? "发布中..." : "发布"}}</button>
+  <button class="submit" bindtap="submit" loading="{{submitting}}">{{submitting ? "发布中..." : "发布"}}</button>
 </view>

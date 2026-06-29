@@ -1,15 +1,38 @@
 const { getToken, request } = require("../../utils/request");
 const { LOCAL_POSTS_KEY, getLocalList, posts, postComments } = require("../../utils/mock");
 
-function normalizeRemotePost(post) {
+const IMAGE_MARKER = "[IMAGES]";
+
+function parsePostMedia(content, fallbackImages) {
+  const images = Array.isArray(fallbackImages) ? fallbackImages : [];
+  const value = String(content || "");
+  const markerIndex = value.indexOf(IMAGE_MARKER);
+  if (markerIndex === -1) {
+    return { content: value, images };
+  }
+
+  const text = value.slice(0, markerIndex).trim();
+  const rawImages = value.slice(markerIndex + IMAGE_MARKER.length).trim();
+  try {
+    const parsed = JSON.parse(rawImages);
+    return { content: text, images: Array.isArray(parsed) ? parsed.filter(Boolean) : images };
+  } catch {
+    return { content: text, images };
+  }
+}
+
+function normalizePost(post, remote = false) {
+  const media = parsePostMedia(post.content, post.images);
   return {
     id: post.id,
     title: post.title,
-    content: post.content,
-    author: post.author?.username || "同学",
-    tag: post.tags?.[0]?.name || "动态",
-    comments: post.commentCount || 0,
-    time: "刚刚"
+    content: media.content,
+    images: media.images,
+    author: post.author?.username || post.author || "同学",
+    tag: post.tags?.[0]?.name || post.tag || "动态",
+    comments: post.commentCount || post.comments || 0,
+    time: "刚刚",
+    remote
   };
 }
 
@@ -42,7 +65,7 @@ Page({
   loadRemotePost(id) {
     request({ url: `/api/posts/${id}` })
       .then((post) => {
-        const normalized = normalizeRemotePost(post);
+        const normalized = normalizePost(post, true);
         this.setData({
           post: normalized,
           isRemote: true
@@ -71,7 +94,7 @@ Page({
     const postId = id || allPosts[0].id;
     const post = allPosts.find((item) => item.id === postId) || allPosts[0];
     this.setData({
-      post,
+      post: normalizePost(post),
       isRemote: false,
       comments: postComments[post.id] || []
     });
