@@ -8,6 +8,7 @@
     "pages/me-liked/me-liked",
     "pages/me-liked-by/me-liked-by",
     "pages/me-posts/me-posts",
+    "pages/admin/admin",
     "pages/top/top",
     "pages/profile-card-detail/profile-card-detail",
     "pages/post-detail/post-detail",

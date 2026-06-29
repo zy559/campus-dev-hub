@@ -1,0 +1,62 @@
+<view class="page admin-page">
+  <view class="hero glass">
+    <view>
+      <text class="eyebrow">Admin</text>
+      <view class="section-title">数据管理</view>
+      <text class="desc">查看线上帖子和资料卡，发现违规内容可以直接删除。</text>
+    </view>
+    <button loading="{{loading}}" bindtap="loadData">刷新</button>
+  </view>
+
+  <view class="stats">
+    <view class="stat card">
+      <text class="stat-num">{{usersCount}}</text>
+      <text class="stat-label">用户</text>
+    </view>
+    <view class="stat card">
+      <text class="stat-num">{{posts.length}}</text>
+      <text class="stat-label">帖子</text>
+    </view>
+    <view class="stat card">
+      <text class="stat-num">{{profileCards.length}}</text>
+      <text class="stat-label">资料卡</text>
+    </view>
+  </view>
+
+  <view class="tabs glass">
+    <button data-tab="posts" bindtap="switchTab" class="{{activeTab === 'posts' ? 'active' : ''}}">帖子</button>
+    <button data-tab="cards" bindtap="switchTab" class="{{activeTab === 'cards' ? 'active' : ''}}">资料卡</button>
+  </view>
+
+  <view wx:if="{{activeTab === 'posts'}}" class="list">
+    <view wx:if="{{posts.length === 0}}" class="empty card">暂无帖子</view>
+    <view wx:for="{{posts}}" wx:key="id" class="item card">
+      <view class="item-main" data-id="{{item.id}}" bindtap="openPost">
+        <view class="between">
+          <text class="tag">{{item.tag}}</text>
+          <text class="time">{{item.time}}</text>
+        </view>
+        <text class="title">{{item.title}}</text>
+        <text class="content">{{item.content}}</text>
+        <text class="meta">{{item.author}} · {{item.comments}} 条评论</text>
+      </view>
+      <button class="danger" data-id="{{item.id}}" catchtap="deletePost">删除</button>
+    </view>
+  </view>
+
+  <view wx:else class="list">
+    <view wx:if="{{profileCards.length === 0}}" class="empty card">暂无资料卡</view>
+    <view wx:for="{{profileCards}}" wx:key="id" class="item card">
+      <view class="item-main" data-id="{{item.id}}" bindtap="openCard">
+        <view class="between">
+          <text class="tag">{{item.meta}}</text>
+          <text class="time">{{item.time}}</text>
+        </view>
+        <text class="title">{{item.name}}</text>
+        <text class="content">{{item.intro}}</text>
+        <text class="meta">{{item.author}}</text>
+      </view>
+      <button class="danger" data-id="{{item.id}}" catchtap="deleteCard">删除</button>
+    </view>
+  </view>
+</view>
