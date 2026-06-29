@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ACTIVITY_SECTIONS } from "@/lib/activitySections";
+import { buildPostContentWithImages } from "@/lib/postMedia";
 
 const POST_TEMPLATES: Record<string, { title: string; placeholder: string; sample: string }> = {
   比赛组队: {
@@ -111,7 +112,7 @@ export default function PostForm() {
       return;
     }
 
-    const fullContent = [content.trim(), ...images.map((url, index) => `![图片${index + 1}](${url})`)].join("\n\n");
+    const fullContent = buildPostContentWithImages(content.trim(), images);
     setLoading(true);
     const res = await fetch("/api/posts", {
       method: "POST",

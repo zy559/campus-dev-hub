@@ -1,4 +1,6 @@
-const { clearAuth, getStoredUser, getToken, loginWithWechat } = require("../../utils/request");
+const { clearAuth, getStoredUser, getToken, loginWithWechat, request, setAuth } = require("../../utils/request");
+
+const ADMIN_AUTH_BACKUP_KEY = "weiluo_admin_auth_backup";
 
 const guestUser = {
   name: "未登录同学",
@@ -6,7 +8,8 @@ const guestUser = {
   posts: 14,
   liked: 6,
   likedBy: 2,
-  role: "user"
+  role: "user",
+  impersonating: false
 };
 
 Page({
@@ -33,6 +36,7 @@ Page({
 
   onShow() {
     this.syncAuthState();
+    this.refreshProfile();
   },
 
   syncAuthState() {
@@ -44,11 +48,33 @@ Page({
         ? {
             ...guestUser,
             name: apiUser.username || "微信用户",
-            school: apiUser.bio || "微信小程序已登录",
-            role: apiUser.role || "user"
+            school: apiUser.impersonating ? "管理员代登录中" : (apiUser.bio || "微信小程序已登录"),
+            role: apiUser.role || "user",
+            impersonating: Boolean(apiUser.impersonating)
           }
         : guestUser
     });
+  },
+
+  refreshProfile() {
+    if (!getToken()) return;
+    request({ url: "/api/user/profile" })
+      .then((data) => {
+        if (!data.user) return;
+        const current = getStoredUser() || {};
+        setAuth({
+          token: getToken(),
+          user: {
+            ...current,
+            ...data.user,
+            impersonating: Boolean(current.impersonating),
+            impersonatorId: current.impersonatorId,
+            impersonatorName: current.impersonatorName
+          }
+        });
+        this.syncAuthState();
+      })
+      .catch(() => {});
   },
 
   login() {
@@ -69,6 +95,7 @@ Page({
 
   logout() {
     clearAuth();
+    wx.removeStorageSync(ADMIN_AUTH_BACKUP_KEY);
     this.syncAuthState();
     wx.showToast({ title: "已退出登录", icon: "success" });
   },
@@ -82,16 +109,50 @@ Page({
     wx.showToast({ title: "后续接入真实数据", icon: "none" });
   },
 
-  adminLogin() {
+  impersonateUser() {
     wx.showModal({
-      title: "管理员模拟登录",
+      title: "管理员代登录",
       editable: true,
-      placeholderText: "输入用户名",
-      success(res) {
-        if (res.confirm) {
-          wx.showToast({ title: `已模拟：${res.content || "用户"}`, icon: "success" });
+      placeholderText: "输入用户名 / 邮箱 / 用户ID",
+      success: (res) => {
+        const query = String(res.content || "").trim();
+        if (!res.confirm || !query) return;
+
+        const currentToken = getToken();
+        const currentUser = getStoredUser();
+        if (!currentToken || !currentUser) {
+          wx.showToast({ title: "请先登录管理员账号", icon: "none" });
+          return;
         }
+
+        wx.setStorageSync(ADMIN_AUTH_BACKUP_KEY, { token: currentToken, user: currentUser });
+        request({
+          url: "/api/admin/impersonate",
+          method: "POST",
+          data: { query }
+        })
+          .then((data) => {
+            setAuth(data);
+            this.syncAuthState();
+            wx.showToast({ title: `已切换：${data.user.username}`, icon: "success" });
+          })
+          .catch(() => {
+            wx.removeStorageSync(ADMIN_AUTH_BACKUP_KEY);
+            wx.showToast({ title: "代登录失败", icon: "none" });
+          });
       }
     });
+  },
+
+  restoreAdmin() {
+    const backup = wx.getStorageSync(ADMIN_AUTH_BACKUP_KEY);
+    if (!backup || !backup.token || !backup.user) {
+      wx.showToast({ title: "请重新登录管理员", icon: "none" });
+      return;
+    }
+    setAuth(backup);
+    wx.removeStorageSync(ADMIN_AUTH_BACKUP_KEY);
+    this.syncAuthState();
+    wx.showToast({ title: "已返回管理员", icon: "success" });
   }
 });

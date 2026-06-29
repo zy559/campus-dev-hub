@@ -38,9 +38,9 @@
 
     <text class="intro">“{{card.intro}}”</text>
 
-    <view class="manage-row">
-      <button bindtap="editCard">编辑资料卡</button>
-      <button class="danger" bindtap="deleteCard">删除</button>
+    <view wx:if="{{canEdit || canDelete}}" class="manage-row">
+      <button wx:if="{{canEdit}}" bindtap="editCard">编辑资料卡</button>
+      <button wx:if="{{canDelete}}" class="danger" bindtap="deleteCard">删除资料卡</button>
     </view>
   </view>
 

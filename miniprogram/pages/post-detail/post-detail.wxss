@@ -101,6 +101,10 @@
   margin-top: 32rpx;
 }
 
+.post-actions.three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .post-actions button {
   min-height: 78rpx;
   border-radius: 999rpx;
@@ -114,6 +118,12 @@
   background: #ffffff;
   color: #0f766e;
   border: 1rpx solid #ccfbf1;
+}
+
+.post-actions button.danger {
+  background: #ffffff;
+  color: #dc2626;
+  border: 1rpx solid #fecaca;
 }
 
 .comments {

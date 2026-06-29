@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { parsePostMedia } from "@/lib/postMedia";
 import { avatarColor, relativeTime } from "@/lib/utils";
 
 interface Tag {
@@ -21,15 +22,15 @@ interface PostCardProps {
 }
 
 function extractFirstMedia(content: string): { url: string; type: "image" | "video" } | null {
-  const imgMatch = content.match(/!\[[^\]]*\]\(([^)]+)\)/);
-  if (imgMatch) return { url: imgMatch[1], type: "image" };
+  const media = parsePostMedia(content);
+  if (media.images[0]) return { url: media.images[0], type: "image" };
   const vidMatch = content.match(/<video src="([^"]+)"/);
   if (vidMatch) return { url: vidMatch[1], type: "video" };
   return null;
 }
 
 function stripMarkdown(text: string): string {
-  return text
+  return parsePostMedia(text).text
     .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
     .replace(/<video[^>]*>[^<]*<\/video>/g, "")
     .replace(/#{1,6}\s/g, "")

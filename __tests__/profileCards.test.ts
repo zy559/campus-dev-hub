@@ -46,4 +46,22 @@ describe("profile card helpers", () => {
 
     expect(card).toBeNull();
   });
+
+  it("parses legacy markdown profile cards from web", () => {
+    const card = parseProfileCardPost({
+      id: "post-3",
+      content: `[PROFILE_CARD]\n昵称：Alex\n学校：Campus\n想找：队友、朋友\n兴趣：AI、Design\n\nLooking for teammates\n\n![资料卡图片1](https://example.com/legacy.jpg)`,
+      createdAt: new Date("2026-06-28T00:00:00.000Z"),
+      author: { id: "user-3", username: "legacy", avatar: null },
+    });
+
+    expect(card).toMatchObject({
+      name: "Alex",
+      meta: "Campus",
+      intro: "Looking for teammates",
+      needs: ["队友", "朋友"],
+      interests: ["AI", "Design"],
+      cover: "https://example.com/legacy.jpg",
+    });
+  });
 });

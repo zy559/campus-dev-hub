@@ -17,11 +17,16 @@ const ProfileCardSchema = z.object({
   cover: z.string().max(500).optional(),
 });
 
+function canManageProfileCard(user: { id: string; role: string } | null, post: { authorId: string }) {
+  return Boolean(user && (user.role === "admin" || user.id === post.authorId));
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const limit = Math.min(30, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+    const requestUser = await getRequestUser(request);
 
     const posts = await db.post.findMany({
       where: {
@@ -42,7 +47,9 @@ export async function GET(request: Request) {
     if (id) {
       const card = cards[0];
       if (!card) return NextResponse.json({ error: "Profile card not found" }, { status: 404 });
-      return NextResponse.json({ card });
+      const post = posts[0];
+      const canManage = post ? canManageProfileCard(requestUser, post) : false;
+      return NextResponse.json({ card: { ...card, canEdit: canManage, canDelete: canManage } });
     }
 
     return NextResponse.json({ cards });
@@ -128,7 +135,7 @@ export async function PUT(request: Request) {
     if (!existing || !existing.content.startsWith(PROFILE_CARD_MARKER)) {
       return NextResponse.json({ error: "Profile card not found" }, { status: 404 });
     }
-    if (existing.authorId !== requestUser.id) {
+    if (!canManageProfileCard(requestUser, existing)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -166,7 +173,7 @@ export async function DELETE(request: Request) {
     if (!existing || !existing.content.startsWith(PROFILE_CARD_MARKER)) {
       return NextResponse.json({ error: "Profile card not found" }, { status: 404 });
     }
-    if (existing.authorId !== requestUser.id && requestUser.role !== "admin") {
+    if (!canManageProfileCard(requestUser, existing)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

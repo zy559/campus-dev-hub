@@ -1,34 +1,7 @@
 import { db } from "@/lib/db";
 import { PROFILE_CARD_MARKER } from "@/lib/activitySections";
+import { parseProfileCardPost } from "@/lib/profileCards";
 import ProfileRecommendationFeed, { ProfileCardItem } from "./ProfileRecommendationFeed";
-
-function extractImages(content: string) {
-  return Array.from(content.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)).map((match) => match[1]);
-}
-
-function readField(content: string, label: string) {
-  const line = content.split("\n").find((item) => item.startsWith(`${label}：`));
-  return line?.replace(`${label}：`, "").trim() || "";
-}
-
-function readIntro(content: string) {
-  return content
-    .split("\n")
-    .filter((line) => {
-      const trimmed = line.trim();
-      return (
-        trimmed &&
-        trimmed !== PROFILE_CARD_MARKER &&
-        !trimmed.startsWith("昵称：") &&
-        !trimmed.startsWith("学校：") &&
-        !trimmed.startsWith("想找：") &&
-        !trimmed.startsWith("兴趣：") &&
-        !trimmed.startsWith("![")
-      );
-    })
-    .join("\n")
-    .trim();
-}
 
 async function getProfileCards(): Promise<ProfileCardItem[]> {
   const posts = await db.post.findMany({
@@ -47,22 +20,21 @@ async function getProfileCards(): Promise<ProfileCardItem[]> {
     take: 20,
   });
 
-  return posts.map((post) => {
-    const needs = readField(post.content, "想找");
-    const interests = readField(post.content, "兴趣");
-    return {
-      id: post.id,
-      authorId: post.author.id,
-      username: post.author.username,
-      name: readField(post.content, "昵称") || post.title.replace("资料卡：", "") || post.author.username,
-      meta: readField(post.content, "学校") || "校园同学",
-      needs: needs ? needs.split("、").filter(Boolean) : post.tags.map((item) => item.tag.name).slice(0, 3),
-      interests: interests ? interests.split("、").filter(Boolean) : post.tags.map((item) => item.tag.name).slice(0, 4),
-      intro: readIntro(post.content) || "这个同学暂时还没有填写更多介绍，可以先礼貌开口聊聊。",
-      images: extractImages(post.content),
-      createdAt: post.createdAt.toISOString(),
-    };
-  });
+  return posts
+    .map((post) => parseProfileCardPost(post))
+    .filter((card): card is NonNullable<typeof card> => Boolean(card))
+    .map((card) => ({
+      id: card.id,
+      authorId: card.author.id,
+      username: card.author.username,
+      name: card.name,
+      meta: card.meta,
+      needs: card.needs,
+      interests: card.interests,
+      intro: card.intro,
+      images: card.cover ? [card.cover] : [],
+      createdAt: card.createdAt,
+    }));
 }
 
 const fallbackCards: ProfileCardItem[] = [

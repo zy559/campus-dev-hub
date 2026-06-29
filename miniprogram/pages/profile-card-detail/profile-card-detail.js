@@ -4,7 +4,9 @@ const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../u
 Page({
   data: {
     card: null,
-    liked: false
+    liked: false,
+    canEdit: false,
+    canDelete: false
   },
 
   onLoad(options) {
@@ -12,7 +14,7 @@ Page({
     const allCards = getLocalList(LOCAL_PROFILE_CARDS_KEY).concat(profileCards);
     const localCard = allCards.find((item) => item.id === id);
     if (localCard) {
-      this.setData({ card: localCard });
+      this.setData({ card: localCard, canEdit: true, canDelete: true });
       return;
     }
 
@@ -27,7 +29,12 @@ Page({
   loadRemoteCard(id) {
     request({ url: `/api/profile-cards?id=${id}` })
       .then((res) => {
-        this.setData({ card: res.card });
+        const card = res.card || null;
+        this.setData({
+          card,
+          canEdit: Boolean(card && card.canEdit),
+          canDelete: Boolean(card && card.canDelete)
+        });
       })
       .catch(() => {
         wx.showToast({ title: "资料卡加载失败", icon: "none" });
@@ -71,6 +78,10 @@ Page({
 
   editCard() {
     const card = this.data.card;
+    if (!this.data.canEdit) {
+      wx.showToast({ title: "无权编辑这张资料卡", icon: "none" });
+      return;
+    }
     if (card && card.remote) {
       wx.setStorageSync("weiluo_editing_profile_card_id", card.id);
       wx.switchTab({ url: "/pages/publish/publish" });
@@ -82,6 +93,10 @@ Page({
   deleteCard() {
     const card = this.data.card;
     if (!card) return;
+    if (!this.data.canDelete) {
+      wx.showToast({ title: "无权删除这张资料卡", icon: "none" });
+      return;
+    }
 
     wx.showModal({
       title: "删除资料卡",

@@ -2,23 +2,28 @@ const { request } = require("../../utils/request");
 const { LOCAL_POSTS_KEY, getLocalList, sections, posts, topPosts } = require("../../utils/mock");
 
 const IMAGE_MARKER = "[IMAGES]";
+const MARKDOWN_IMAGE_RE = /!\[[^\]]*\]\(([^)]+)\)/g;
 
 function parsePostMedia(content, fallbackImages) {
   const images = Array.isArray(fallbackImages) ? fallbackImages : [];
   const value = String(content || "");
   const markerIndex = value.indexOf(IMAGE_MARKER);
-  if (markerIndex === -1) {
-    return { content: value, images };
+  if (markerIndex !== -1) {
+    const text = value.slice(0, markerIndex).trim();
+    const rawImages = value.slice(markerIndex + IMAGE_MARKER.length).trim();
+    try {
+      const parsed = JSON.parse(rawImages);
+      return { content: text, images: Array.isArray(parsed) ? parsed.filter(Boolean) : images };
+    } catch {
+      return { content: text, images };
+    }
   }
 
-  const text = value.slice(0, markerIndex).trim();
-  const rawImages = value.slice(markerIndex + IMAGE_MARKER.length).trim();
-  try {
-    const parsed = JSON.parse(rawImages);
-    return { content: text, images: Array.isArray(parsed) ? parsed.filter(Boolean) : images };
-  } catch {
-    return { content: text, images };
-  }
+  const markdownImages = Array.from(value.matchAll(MARKDOWN_IMAGE_RE), (match) => match[1]).filter(Boolean);
+  return {
+    content: value.replace(MARKDOWN_IMAGE_RE, "").replace(/\n{3,}/g, "\n\n").trim(),
+    images: markdownImages.length ? markdownImages : images
+  };
 }
 
 function normalizePost(post, remote = false) {

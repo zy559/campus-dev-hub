@@ -46,10 +46,12 @@ export async function GET(request: Request) {
       db.post.count({ where }),
     ]);
 
+    const hasMarkdownImage = (content: string) => /!\[[^\]]*\]\([^)]+\)/.test(content);
+
     const formattedPosts = posts.map((post) => ({
       id: post.id,
       title: post.title,
-      content: post.content.includes("[IMAGES]") ? post.content : post.content.slice(0, 300),
+      content: post.content.includes("[IMAGES]") || hasMarkdownImage(post.content) ? post.content : post.content.slice(0, 300),
       author: post.author,
       tags: post.tags.map((pt: PostTagItem) => pt.tag),
       board: post.board ?? undefined,

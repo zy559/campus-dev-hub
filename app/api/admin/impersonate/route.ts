@@ -3,11 +3,18 @@ import { getServerSession } from "next-auth";
 import { encode } from "next-auth/jwt";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getRequestUser, issueAppToken } from "@/lib/wechatAuth";
 
 type SessionTokenPayload = Record<string, unknown> & { id: string };
 
+export const dynamic = "force-dynamic";
+
 function sessionCookieName() {
   return process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+}
+
+function isBearerRequest(request: Request) {
+  return (request.headers.get("authorization") || "").startsWith("Bearer ");
 }
 
 async function writeSessionCookie(tokenPayload: SessionTokenPayload, body: Record<string, unknown> = { success: true }) {
@@ -30,28 +37,54 @@ async function writeSessionCookie(tokenPayload: SessionTokenPayload, body: Recor
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const requestUser = await getRequestUser(request);
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    if (!requestUser?.id) {
+      return NextResponse.json({ error: "Please login first" }, { status: 401 });
     }
 
-    if (session.user.role !== "admin" || session.user.impersonating) {
-      return NextResponse.json({ error: "无权操作" }, { status: 403 });
+    if (requestUser.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { userId, username } = await request.json();
+    const { userId, username, query } = await request.json();
+    const keyword = String(query || username || "").trim();
     const targetUser = await db.user.findFirst({
-      where: userId ? { id: String(userId) } : { username: String(username || "") },
-      select: { id: true, username: true, email: true, role: true },
+      where: userId
+        ? { id: String(userId) }
+        : {
+            OR: [
+              { id: keyword },
+              { username: keyword },
+              { email: keyword },
+            ],
+          },
+      select: { id: true, username: true, email: true, avatar: true, bio: true, role: true },
     });
 
     if (!targetUser) {
-      return NextResponse.json({ error: "用户不存在" }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (targetUser.id === session.user.id) {
-      return NextResponse.json({ error: "不能模拟自己" }, { status: 400 });
+    if (targetUser.id === requestUser.id) {
+      return NextResponse.json({ error: "Cannot impersonate yourself" }, { status: 400 });
+    }
+
+    if (isBearerRequest(request)) {
+      const token = await issueAppToken(targetUser);
+      return NextResponse.json({
+        token,
+        user: {
+          id: targetUser.id,
+          username: targetUser.username,
+          avatar: targetUser.avatar,
+          bio: targetUser.bio,
+          role: targetUser.role,
+          impersonating: true,
+          impersonatorId: requestUser.id,
+          impersonatorName: requestUser.username,
+        },
+      });
     }
 
     return writeSessionCookie(
@@ -63,28 +96,34 @@ export async function POST(request: Request) {
         email: targetUser.email,
         role: targetUser.role,
         impersonating: true,
-        impersonatorId: session.user.id,
-        impersonatorName: session.user.name,
-        impersonatorRole: session.user.role,
+        impersonatorId: requestUser.id,
+        impersonatorName: requestUser.username,
+        impersonatorRole: requestUser.role,
       },
       { success: true, username: targetUser.username }
     );
   } catch (error) {
     console.error("Impersonate error:", error);
-    return NextResponse.json({ error: "服务器内部错误" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
+    if (isBearerRequest(request)) {
+      const requestUser = await getRequestUser(request);
+      const impersonatorId = requestUser?.id ? null : null;
+      return NextResponse.json({ error: "Please login again as admin", impersonatorId }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.impersonating || !session.user.impersonatorId) {
-      return NextResponse.json({ error: "当前不在模拟登录状态" }, { status: 400 });
+      return NextResponse.json({ error: "Not impersonating" }, { status: 400 });
     }
 
     if (session.user.impersonatorRole !== "admin") {
-      return NextResponse.json({ error: "无权操作" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const admin = await db.user.findUnique({
@@ -93,7 +132,7 @@ export async function DELETE() {
     });
 
     if (!admin || admin.role !== "admin") {
-      return NextResponse.json({ error: "管理员账号不存在" }, { status: 404 });
+      return NextResponse.json({ error: "Admin account not found" }, { status: 404 });
     }
 
     return writeSessionCookie({
@@ -106,6 +145,6 @@ export async function DELETE() {
     });
   } catch (error) {
     console.error("Stop impersonation error:", error);
-    return NextResponse.json({ error: "服务器内部错误" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

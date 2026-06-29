@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { toMarkdownContent } from "@/lib/postMedia";
 
 interface PostContentProps {
   content: string;
@@ -35,6 +36,8 @@ function SafeImage({ alt, src }: { alt?: string; src?: string }) {
 }
 
 export default function PostContent({ content }: PostContentProps) {
+  const markdownContent = toMarkdownContent(content);
+
   return (
     <div className="prose prose-orange max-w-none prose-headings:text-ink prose-p:text-muted prose-a:text-accent prose-code:text-pink-600 prose-pre:bg-gray-900 prose-pre:text-gray-100">
       <ReactMarkdown
@@ -46,7 +49,7 @@ export default function PostContent({ content }: PostContentProps) {
           ),
         }}
       >
-        {content}
+        {markdownContent}
       </ReactMarkdown>
     </div>
   );

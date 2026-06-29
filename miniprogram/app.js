@@ -1,9 +1,9 @@
 App({
   globalData: {
     user: {
-      name: "林同学",
-      school: "北华航天工业学院",
-      role: "admin"
+      name: "未登录同学",
+      school: "校园围炉",
+      role: "user"
     }
   }
 });

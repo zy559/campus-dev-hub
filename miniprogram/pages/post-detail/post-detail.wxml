@@ -17,9 +17,10 @@
     <image wx:for="{{post.images}}" wx:key="*this" class="post-image" src="{{item}}" mode="widthFix" />
     <text class="post-content">{{post.content}}</text>
 
-    <view class="post-actions">
+    <view class="post-actions {{post.canDelete ? 'three' : ''}}">
       <button bindtap="startChat">私信作者</button>
       <button class="ghost">收藏</button>
+      <button wx:if="{{post.canDelete}}" class="danger" bindtap="deletePost">删除</button>
     </view>
   </view>
 

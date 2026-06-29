@@ -1,4 +1,5 @@
 import { PROFILE_CARD_MARKER } from "@/lib/activitySections";
+import { parsePostMedia } from "@/lib/postMedia";
 
 export interface ProfileCardInput {
   name: string;
@@ -43,6 +44,56 @@ function cleanList(value: unknown): string[] {
   ).slice(0, 6);
 }
 
+function splitTextList(value: string) {
+  return value
+    .split(/[、,，\s]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function parseLegacyProfileCard(post: ProfileCardPost, rawPayload: string): ProfileCard | null {
+  const media = parsePostMedia(rawPayload);
+  const lines = media.text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const readField = (names: string[]) => {
+    const line = lines.find((item) => names.some((name) => item.startsWith(`${name}：`) || item.startsWith(`${name}:`)));
+    if (!line) return "";
+    const index = Math.max(line.indexOf("："), line.indexOf(":"));
+    return index >= 0 ? line.slice(index + 1).trim() : "";
+  };
+
+  const name = readField(["昵称", "name"]) || post.author.username;
+  const meta = readField(["学校", "meta"]) || "Campus student";
+  const needs = splitTextList(readField(["想找", "needs"]));
+  const interests = splitTextList(readField(["兴趣", "interests"]));
+  const intro = lines
+    .filter((line) => !["昵称", "name", "学校", "meta", "想找", "needs", "兴趣", "interests"].some((name) => line.startsWith(`${name}：`) || line.startsWith(`${name}:`)))
+    .join("\n")
+    .trim();
+
+  if (!name || !intro) return null;
+
+  return {
+    id: post.id,
+    postId: post.id,
+    remote: true,
+    name,
+    meta,
+    intro,
+    needs,
+    interests,
+    cover: media.images[0] || "",
+    signal: "Online",
+    imageTone: "teal",
+    createdAt: post.createdAt.toISOString(),
+    author: post.author,
+  };
+}
+
 export function buildProfileCardContent(input: ProfileCardInput) {
   const payload = {
     name: input.name.trim(),
@@ -84,6 +135,6 @@ export function parseProfileCardPost(post: ProfileCardPost): ProfileCard | null 
       author: post.author,
     };
   } catch {
-    return null;
+    return parseLegacyProfileCard(post, rawPayload);
   }
 }
