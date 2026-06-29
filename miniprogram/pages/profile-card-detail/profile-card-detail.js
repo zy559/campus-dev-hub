@@ -1,4 +1,4 @@
-const { getToken, request } = require("../../utils/request");
+const { getToken, normalizeImageUrl, request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../utils/mock");
 
 Page({
@@ -29,7 +29,7 @@ Page({
   loadRemoteCard(id) {
     request({ url: `/api/profile-cards?id=${id}` })
       .then((res) => {
-        const card = res.card || null;
+        const card = res.card ? { ...res.card, cover: normalizeImageUrl(res.card.cover) } : null;
         this.setData({
           card,
           canEdit: Boolean(card && card.canEdit),

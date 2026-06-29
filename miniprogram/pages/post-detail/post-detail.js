@@ -1,4 +1,4 @@
-const { getToken, request } = require("../../utils/request");
+const { getToken, normalizeImageUrl, request } = require("../../utils/request");
 const { LOCAL_POSTS_KEY, getLocalList, posts, postComments } = require("../../utils/mock");
 
 const IMAGE_MARKER = "[IMAGES]";
@@ -32,7 +32,7 @@ function normalizePost(post, remote = false) {
     id: post.id,
     title: post.title,
     content: media.content,
-    images: media.images,
+    images: media.images.map(normalizeImageUrl),
     author: post.author?.username || post.author || "同学",
     tag: post.tags?.[0]?.name || post.tag || "动态",
     comments: post.commentCount || post.comments || 0,

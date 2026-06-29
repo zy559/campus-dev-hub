@@ -1,4 +1,4 @@
-const { request } = require("../../utils/request");
+const { normalizeImageUrl, request } = require("../../utils/request");
 
 const IMAGE_MARKER = "[IMAGES]";
 const MARKDOWN_IMAGE_RE = /!\[[^\]]*\]\(([^)]+)\)/g;
@@ -36,7 +36,7 @@ function normalizeCard(card) {
     meta: card.meta || "校园同学",
     intro: String(card.intro || "").slice(0, 90),
     author: card.author?.username || "同学",
-    cover: card.cover || "",
+    cover: normalizeImageUrl(card.cover),
     time: formatDate(card.createdAt)
   };
 }

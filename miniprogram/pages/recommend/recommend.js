@@ -1,7 +1,14 @@
-const { getToken, request } = require("../../utils/request");
+const { getToken, normalizeImageUrl, request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../utils/mock");
 
 const filters = ["全部", "找对象", "找搭子", "找队友", "找朋友"];
+
+function normalizeCard(card) {
+  return {
+    ...card,
+    cover: normalizeImageUrl(card.cover)
+  };
+}
 
 Page({
   data: {
@@ -30,7 +37,7 @@ Page({
     this.setData({ loading: true });
     request({ url: "/api/profile-cards?limit=30" })
       .then((res) => {
-        const remoteCards = Array.isArray(res.cards) ? res.cards : [];
+        const remoteCards = Array.isArray(res.cards) ? res.cards.map(normalizeCard) : [];
         const allCards = remoteCards.concat(localCards, profileCards);
         this.setData({ allCards }, () => this.syncCards());
       })

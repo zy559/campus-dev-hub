@@ -36,6 +36,24 @@ function handleResponse({ res, url, resolve, reject }) {
   resolve(res.data);
 }
 
+function getErrorMessage(error, fallback = "操作失败") {
+  if (!error) return fallback;
+  if (typeof error === "string") return error;
+  const data = error.data || error.errMsg || error.message;
+  if (typeof data === "string") return data || fallback;
+  if (data && typeof data.error === "string") return data.error;
+  if (data && typeof data.message === "string") return data.message;
+  if (typeof error.errMsg === "string") return error.errMsg;
+  return fallback;
+}
+
+function normalizeImageUrl(url) {
+  const value = String(url || "").trim();
+  if (!value || !/^https?:\/\//.test(value)) return value;
+  if (value.startsWith(API_BASE_URL)) return value;
+  return `${API_BASE_URL}/api/image-proxy?url=${encodeURIComponent(value)}`;
+}
+
 function request({ url, method = "GET", data, header = {} }) {
   const token = getToken();
   return new Promise((resolve, reject) => {
@@ -117,6 +135,8 @@ module.exports = {
   getStoredUser,
   setAuth,
   clearAuth,
+  getErrorMessage,
+  normalizeImageUrl,
   request,
   uploadFile,
   loginWithWechat

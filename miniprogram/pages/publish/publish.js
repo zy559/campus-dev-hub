@@ -1,4 +1,4 @@
-const { getToken, request, uploadFile } = require("../../utils/request");
+const { getErrorMessage, getToken, request, uploadFile } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, LOCAL_POSTS_KEY, getLocalList } = require("../../utils/mock");
 
 const EDITING_PROFILE_CARD_KEY = "weiluo_editing_profile_card_id";
@@ -116,6 +116,14 @@ Page({
     return uploadFile({ filePath }).then((res) => res.url || "");
   },
 
+  uploadImageOrEmpty(filePath) {
+    return this.uploadImageIfNeeded(filePath).catch((error) => {
+      console.error("upload image failed", error);
+      wx.showToast({ title: "图片上传失败，先无图发布", icon: "none" });
+      return "";
+    });
+  },
+
   submitCard() {
     const nickname = this.data.nickname.trim();
     const intro = this.data.intro.trim();
@@ -141,7 +149,7 @@ Page({
     }
 
     this.setData({ submitting: true });
-    this.uploadImageIfNeeded(this.data.cover)
+    this.uploadImageOrEmpty(this.data.cover)
       .then((cover) => {
         const payload = {
           name: nickname,
@@ -162,8 +170,8 @@ Page({
         wx.showToast({ title: this.data.editingCardId ? "修改成功" : "发布成功", icon: "success" });
         wx.navigateTo({ url: `/pages/profile-card-detail/profile-card-detail?id=${res.card.id}&remote=1` });
       })
-      .catch(() => {
-        wx.showToast({ title: "发布失败，请稍后重试", icon: "none" });
+      .catch((error) => {
+        wx.showToast({ title: getErrorMessage(error, "资料卡发布失败"), icon: "none" });
       })
       .finally(() => {
         this.setData({ submitting: false });
@@ -211,7 +219,7 @@ Page({
     }
 
     this.setData({ submitting: true });
-    this.uploadImageIfNeeded(this.data.postImage)
+    this.uploadImageOrEmpty(this.data.postImage)
       .then((imageUrl) => request({
         url: "/api/posts",
         method: "POST",
@@ -226,8 +234,8 @@ Page({
         wx.showToast({ title: "发布成功", icon: "success" });
         wx.navigateTo({ url: `/pages/post-detail/post-detail?id=${post.id}&remote=1` });
       })
-      .catch(() => {
-        wx.showToast({ title: "发布失败，请稍后重试", icon: "none" });
+      .catch((error) => {
+        wx.showToast({ title: getErrorMessage(error, "帖子发布失败"), icon: "none" });
       })
       .finally(() => {
         this.setData({ submitting: false });

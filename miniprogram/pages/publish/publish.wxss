@@ -85,6 +85,8 @@
 
 .field input,
 .field textarea {
+  position: relative;
+  z-index: 2;
   width: 100%;
   box-sizing: border-box;
   border-radius: 24rpx;
@@ -95,8 +97,14 @@
   padding: 22rpx 24rpx;
 }
 
+.field input {
+  height: 88rpx;
+  line-height: 88rpx;
+}
+
 .field textarea {
-  min-height: 220rpx;
+  height: 260rpx;
+  min-height: 260rpx;
   line-height: 1.6;
 }
 

@@ -20,23 +20,23 @@
     </view>
     <view class="field">
       <text>昵称</text>
-      <input value="{{nickname}}" data-key="nickname" bindinput="input" placeholder="例如：林同学" />
+      <input value="{{nickname}}" data-key="nickname" bindinput="input" placeholder="例如：林同学" confirm-type="next" cursor-spacing="80" adjust-position="{{true}}" />
     </view>
     <view class="field">
       <text>学校/年级</text>
-      <input value="{{school}}" data-key="school" bindinput="input" placeholder="例如：北华航天工业学院 · 大三" />
+      <input value="{{school}}" data-key="school" bindinput="input" placeholder="例如：北华航天工业学院 · 大三" confirm-type="next" cursor-spacing="80" adjust-position="{{true}}" />
     </view>
     <view class="field">
       <text>想找什么</text>
-      <input value="{{needsText}}" data-key="needsText" bindinput="input" placeholder="例如：找对象、找搭子、比赛队友" />
+      <input value="{{needsText}}" data-key="needsText" bindinput="input" placeholder="例如：找对象、找搭子、比赛队友" confirm-type="next" cursor-spacing="80" adjust-position="{{true}}" />
     </view>
     <view class="field">
       <text>兴趣标签</text>
-      <input value="{{interestsText}}" data-key="interestsText" bindinput="input" placeholder="例如：前端、跑步、电影" />
+      <input value="{{interestsText}}" data-key="interestsText" bindinput="input" placeholder="例如：前端、跑步、电影" confirm-type="next" cursor-spacing="80" adjust-position="{{true}}" />
     </view>
     <view class="field">
       <text>自我介绍 / 需求</text>
-      <textarea value="{{intro}}" data-key="intro" bindinput="input" placeholder="你是谁，想认识什么样的人，希望一起做什么。" />
+      <textarea value="{{intro}}" data-key="intro" bindinput="input" placeholder="你是谁，想认识什么样的人，希望一起做什么。" cursor-spacing="100" adjust-position="{{true}}" show-confirm-bar="{{false}}"></textarea>
     </view>
   </view>
 
@@ -66,11 +66,11 @@
 
     <view class="field">
       <text>标题</text>
-      <input value="{{title}}" data-key="title" bindinput="input" placeholder="一句话说明你想发布什么" />
+      <input value="{{title}}" data-key="title" bindinput="input" placeholder="一句话说明你想发布什么" confirm-type="next" cursor-spacing="80" adjust-position="{{true}}" />
     </view>
     <view class="field">
       <text>正文</text>
-      <textarea value="{{content}}" data-key="content" bindinput="input" placeholder="写清楚时间、地点、需求、联系方式。" />
+      <textarea value="{{content}}" data-key="content" bindinput="input" placeholder="写清楚时间、地点、需求、联系方式。" cursor-spacing="100" adjust-position="{{true}}" show-confirm-bar="{{false}}"></textarea>
     </view>
   </view>
 
