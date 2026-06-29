@@ -9,7 +9,15 @@
   </view>
 
   <view class="list">
-    <view wx:for="{{conversations}}" wx:key="id" data-private="{{item.privateMode}}" bindtap="openChat" class="chat-card card">
+    <view
+      wx:for="{{conversations}}"
+      wx:key="id"
+      data-id="{{item.remote ? item.id : ''}}"
+      data-name="{{item.name}}"
+      data-private="{{item.privateMode}}"
+      bindtap="openChat"
+      class="chat-card card"
+    >
       <view class="avatar">{{item.name[0]}}</view>
       <view class="chat-main">
         <view class="between">

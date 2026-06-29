@@ -1,6 +1,8 @@
 const { getToken, request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, LOCAL_POSTS_KEY, getLocalList } = require("../../utils/mock");
 
+const EDITING_PROFILE_CARD_KEY = "weiluo_editing_profile_card_id";
+
 const templates = {
   比赛组队: "比赛/项目：\n目标：\n目前进度：\n缺少角色：\n时间安排：\n联系方式：",
   找搭子: "想找什么搭子：\n时间频率：\n地点：\n希望对方：\n联系方式：",
@@ -19,9 +21,44 @@ Page({
     needsText: "",
     interestsText: "",
     cover: "",
+    editingCardId: "",
     activeTemplate: "比赛组队",
     templateKeys: Object.keys(templates),
     submitting: false
+  },
+
+  onLoad(options) {
+    const cardId = options.cardId || "";
+    if (!cardId) return;
+    this.loadEditingCard(cardId);
+  },
+
+  onShow() {
+    const cardId = wx.getStorageSync(EDITING_PROFILE_CARD_KEY);
+    if (!cardId || cardId === this.data.editingCardId) return;
+    wx.removeStorageSync(EDITING_PROFILE_CARD_KEY);
+    this.loadEditingCard(cardId);
+  },
+
+  loadEditingCard(cardId) {
+    request({ url: `/api/profile-cards?id=${cardId}` })
+      .then((res) => {
+        const card = res.card;
+        if (!card) return;
+        this.setData({
+          mode: "card",
+          editingCardId: card.id,
+          nickname: card.name || "",
+          school: card.meta || "",
+          intro: card.intro || "",
+          needsText: Array.isArray(card.needs) ? card.needs.join("、") : "",
+          interestsText: Array.isArray(card.interests) ? card.interests.join("、") : "",
+          cover: card.cover || ""
+        });
+      })
+      .catch(() => {
+        wx.showToast({ title: "资料卡加载失败", icon: "none" });
+      });
   },
 
   setMode(event) {
@@ -91,11 +128,11 @@ Page({
     this.setData({ submitting: true });
     request({
       url: "/api/profile-cards",
-      method: "POST",
-      data: payload
+      method: this.data.editingCardId ? "PUT" : "POST",
+      data: this.data.editingCardId ? { id: this.data.editingCardId, ...payload } : payload
     })
       .then((res) => {
-        wx.showToast({ title: "发布成功", icon: "success" });
+        wx.showToast({ title: this.data.editingCardId ? "修改成功" : "发布成功", icon: "success" });
         wx.navigateTo({ url: `/pages/profile-card-detail/profile-card-detail?id=${res.card.id}&remote=1` });
       })
       .catch(() => {

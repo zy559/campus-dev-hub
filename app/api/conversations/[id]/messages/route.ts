@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { MessageSchema } from "@/lib/validators";
+import { getRequestUser } from "@/lib/wechatAuth";
 
 function isParticipant(userId: string, conv: { participant1Id: string; participant2Id: string }) {
   return userId === conv.participant1Id || userId === conv.participant2Id;
@@ -13,14 +12,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    const requestUser = await getRequestUser(request);
+    if (!requestUser?.id) {
+      return NextResponse.json({ error: "Please login first" }, { status: 401 });
     }
 
     const conv = await db.conversation.findUnique({ where: { id: params.id } });
-    if (!conv || !isParticipant(session.user.id, conv)) {
-      return NextResponse.json({ error: "对话不存在" }, { status: 404 });
+    if (!conv || !isParticipant(requestUser.id, conv)) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
     }
 
     const messages = await db.message.findMany({
@@ -30,17 +29,18 @@ export async function GET(
     });
 
     return NextResponse.json(
-      messages.map((m) => ({
-        id: m.id,
-        conversationId: m.conversationId,
-        content: m.content,
-        sender: m.sender,
-        createdAt: m.createdAt.toISOString(),
+      messages.map((message) => ({
+        id: message.id,
+        conversationId: message.conversationId,
+        content: message.content,
+        sender: message.sender,
+        mine: message.sender.id === requestUser.id,
+        createdAt: message.createdAt.toISOString(),
       }))
     );
   } catch (error) {
     console.error("Get messages error:", error);
-    return NextResponse.json({ error: "服务器内部错误" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
@@ -49,21 +49,21 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    const requestUser = await getRequestUser(request);
+    if (!requestUser?.id) {
+      return NextResponse.json({ error: "Please login first" }, { status: 401 });
     }
 
     const conv = await db.conversation.findUnique({ where: { id: params.id } });
-    if (!conv || !isParticipant(session.user.id, conv)) {
-      return NextResponse.json({ error: "对话不存在" }, { status: 404 });
+    if (!conv || !isParticipant(requestUser.id, conv)) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
     }
 
     const body = await request.json();
     const parsed = MessageSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "消息无效", details: parsed.error.flatten().fieldErrors },
+        { error: "Invalid message", details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
@@ -72,12 +72,11 @@ export async function POST(
       data: {
         content: parsed.data.content,
         conversationId: params.id,
-        senderId: session.user.id,
+        senderId: requestUser.id,
       },
       include: { sender: { select: { id: true, username: true, avatar: true } } },
     });
 
-    // 更新对话时间
     await db.conversation.update({
       where: { id: params.id },
       data: { updatedAt: new Date() },
@@ -88,10 +87,11 @@ export async function POST(
       conversationId: message.conversationId,
       content: message.content,
       sender: message.sender,
+      mine: true,
       createdAt: message.createdAt.toISOString(),
     }, { status: 201 });
   } catch (error) {
     console.error("Create message error:", error);
-    return NextResponse.json({ error: "服务器内部错误" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

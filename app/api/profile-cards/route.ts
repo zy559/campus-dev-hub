@@ -104,3 +104,76 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const requestUser = await getRequestUser(request);
+    if (!requestUser?.id) {
+      return NextResponse.json({ error: "Please login first" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const id = typeof body.id === "string" ? body.id : "";
+    if (!id) return NextResponse.json({ error: "Missing profile card id" }, { status: 400 });
+
+    const parsed = ProfileCardSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid profile card", details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const existing = await db.post.findUnique({ where: { id } });
+    if (!existing || !existing.content.startsWith(PROFILE_CARD_MARKER)) {
+      return NextResponse.json({ error: "Profile card not found" }, { status: 404 });
+    }
+    if (existing.authorId !== requestUser.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const data = parsed.data;
+    const post = await db.post.update({
+      where: { id },
+      data: {
+        title: `Profile Card: ${data.name}`,
+        content: buildProfileCardContent(data),
+      },
+      include: {
+        author: { select: { id: true, username: true, avatar: true } },
+      },
+    });
+
+    return NextResponse.json({ card: parseProfileCardPost(post) });
+  } catch (error) {
+    console.error("Update profile card error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const requestUser = await getRequestUser(request);
+    if (!requestUser?.id) {
+      return NextResponse.json({ error: "Please login first" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "Missing profile card id" }, { status: 400 });
+
+    const existing = await db.post.findUnique({ where: { id } });
+    if (!existing || !existing.content.startsWith(PROFILE_CARD_MARKER)) {
+      return NextResponse.json({ error: "Profile card not found" }, { status: 404 });
+    }
+    if (existing.authorId !== requestUser.id && requestUser.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await db.post.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete profile card error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

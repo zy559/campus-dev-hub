@@ -1,4 +1,4 @@
-const { request } = require("../../utils/request");
+const { getToken, request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../utils/mock");
 
 const filters = ["全部", "找对象", "找搭子", "找队友", "找朋友"];
@@ -90,11 +90,33 @@ Page({
   },
 
   startChat() {
-    wx.navigateTo({ url: "/pages/chat/chat?mode=normal" });
+    this.openConversation("normal");
   },
 
   privateChat() {
-    wx.navigateTo({ url: "/pages/chat/chat?mode=private" });
+    this.openConversation("private");
+  },
+
+  openConversation(mode) {
+    const card = this.data.currentCard;
+    const participantId = card && card.author && card.author.id;
+    if (!participantId || !getToken()) {
+      wx.navigateTo({ url: `/pages/chat/chat?mode=${mode}` });
+      return;
+    }
+
+    request({
+      url: "/api/conversations",
+      method: "POST",
+      data: { participantId }
+    })
+      .then((conversation) => {
+        const name = conversation.otherUser ? encodeURIComponent(conversation.otherUser.username) : "";
+        wx.navigateTo({ url: `/pages/chat/chat?id=${conversation.id}&mode=${mode}&name=${name}` });
+      })
+      .catch(() => {
+        wx.showToast({ title: "发起聊天失败", icon: "none" });
+      });
   },
 
   openCardDetail() {

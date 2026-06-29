@@ -1,8 +1,8 @@
 <view class="chat-page">
   <view class="chat-head glass">
-    <view class="avatar">周</view>
+    <view class="avatar">{{peerName[0]}}</view>
     <view class="head-main">
-      <text class="name">周同学</text>
+      <text class="name">{{peerName}}</text>
       <text class="desc">你和 TA 的对话</text>
     </view>
     <text class="mode {{mode === 'private' ? 'private' : ''}}">{{mode === 'private' ? '隐私模式' : '普通模式'}}</text>
@@ -12,7 +12,7 @@
 
   <scroll-view class="messages" scroll-y enhanced>
     <view wx:for="{{messages}}" wx:key="id" class="bubble-row {{item.mine ? 'mine' : ''}}">
-      <view wx:if="{{!item.mine}}" class="mini-avatar">周</view>
+      <view wx:if="{{!item.mine}}" class="mini-avatar">{{peerName[0]}}</view>
       <view>
         <view class="bubble {{item.mine ? (mode === 'private' ? 'mine-private' : 'mine-normal') : ''}}">{{item.text}}</view>
         <text class="time">{{item.time}}</text>

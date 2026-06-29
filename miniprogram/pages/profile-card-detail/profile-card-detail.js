@@ -1,4 +1,4 @@
-const { request } = require("../../utils/request");
+const { getToken, request } = require("../../utils/request");
 const { LOCAL_PROFILE_CARDS_KEY, getLocalList, profileCards } = require("../../utils/mock");
 
 Page({
@@ -40,23 +40,71 @@ Page({
   },
 
   startChat() {
-    wx.navigateTo({ url: "/pages/chat/chat?mode=normal" });
+    this.openConversation("normal");
   },
 
   privateChat() {
-    wx.navigateTo({ url: "/pages/chat/chat?mode=private" });
+    this.openConversation("private");
+  },
+
+  openConversation(mode) {
+    const card = this.data.card;
+    const participantId = card && card.author && card.author.id;
+    if (!participantId || !getToken()) {
+      wx.navigateTo({ url: `/pages/chat/chat?mode=${mode}` });
+      return;
+    }
+
+    request({
+      url: "/api/conversations",
+      method: "POST",
+      data: { participantId }
+    })
+      .then((conversation) => {
+        const name = conversation.otherUser ? encodeURIComponent(conversation.otherUser.username) : "";
+        wx.navigateTo({ url: `/pages/chat/chat?id=${conversation.id}&mode=${mode}&name=${name}` });
+      })
+      .catch(() => {
+        wx.showToast({ title: "发起聊天失败", icon: "none" });
+      });
   },
 
   editCard() {
+    const card = this.data.card;
+    if (card && card.remote) {
+      wx.setStorageSync("weiluo_editing_profile_card_id", card.id);
+      wx.switchTab({ url: "/pages/publish/publish" });
+      return;
+    }
     wx.switchTab({ url: "/pages/publish/publish" });
   },
 
   deleteCard() {
+    const card = this.data.card;
+    if (!card) return;
+
     wx.showModal({
       title: "删除资料卡",
-      content: "当前版本先支持发布和展示，线上删除会放到管理员与我的资料卡管理里统一处理。",
-      confirmText: "知道了",
-      showCancel: false
+      content: "删除后推荐页将不再展示这张资料卡。",
+      confirmText: "删除",
+      confirmColor: "#dc2626",
+      success: (res) => {
+        if (!res.confirm) return;
+        if (!card.remote) {
+          const next = getLocalList(LOCAL_PROFILE_CARDS_KEY).filter((item) => item.id !== card.id);
+          wx.setStorageSync(LOCAL_PROFILE_CARDS_KEY, next);
+          wx.navigateBack();
+          return;
+        }
+        request({ url: `/api/profile-cards?id=${card.id}`, method: "DELETE" })
+          .then(() => {
+            wx.showToast({ title: "已删除", icon: "success" });
+            wx.navigateBack();
+          })
+          .catch(() => {
+            wx.showToast({ title: "删除失败", icon: "none" });
+          });
+      }
     });
   }
 });
